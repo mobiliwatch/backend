@@ -1,0 +1,55 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/leaflet.css" />
+  <style>
+    * {
+      margin: 0;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="map"></div>
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.1/leaflet.js"></script>
+  <script type="text/javascript">
+
+  // Setup base map
+  var map = L.map('map').setView([45.19,5.71], 11);
+
+  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpandmbXliNDBjZWd2M2x6bDk3c2ZtOTkifQ._QA7i5Mpkd_m30IGElHziw', {
+    maxZoom: 18,
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+      '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+      'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    id: 'mapbox.light'
+  }).addTo(map);
+
+
+  var colors = {
+    'Unknow': '#00F',
+    'Free': '#0F0',
+    'Heavy': '#100',
+    'Congested': '#800',
+    'Blocked': '#F00',
+  };
+
+  jQuery.getJSON('traffic.geojson', function(data){
+    // Add geojson
+    L.geoJSON(data, {
+      style: function (feature) {
+        return {
+          color: colors[feature.properties.level],
+        };
+      }
+      //onEachFeature: onEachFeature
+    }).addTo(map);
+  });
+</script>
+
+</body>

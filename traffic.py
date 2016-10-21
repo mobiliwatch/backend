@@ -4,6 +4,8 @@ from geojson import MultiLineString, Feature, FeatureCollection
 import re
 
 
+LEVELS = ('Unknow', 'Free', 'Heavy', 'Congested', 'Blocked')
+
 mline_re = re.compile(r'([\d\.\s,]+)')
 mline_re = re.compile('(([\d\., ]+))')
 
@@ -35,13 +37,15 @@ def test():
                             continue
                 if line:
                     lines.append(line)
-            feature = Feature(geometry=MultiLineString(lines), properties={"type": item['Type']})
+            feature = Feature(geometry=MultiLineString(lines), properties={"level": LEVELS[int(item['Type'])]})
             out.append(feature)
 
 
     collection = FeatureCollection(out)
-    with open('traffic.json', 'w') as f:
-        f.write(geojson.dumps(collection))
+    name = 'traffic.geojson'
+    with open(name, 'w') as f:
+        f.write(geojson.dumps(collection, indent=4))
+
 
 if __name__ == '__main__':
     test()
