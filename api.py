@@ -11,6 +11,8 @@ class CachedApi(object):
         if not os.path.isdir(self.cache_dir):
             os.makedirs(self.cache_dir)
 
+        self.use_cache = True
+
     def request(self, path, params={}):
         """
         Cached requests
@@ -20,10 +22,10 @@ class CachedApi(object):
         url = '{}/{}'.format(self.API_URL, path)
         payload = url + '\n' + json.dumps(params, indent=4, sort_keys=True)
         h = hashlib.md5(payload.encode('utf-8')).hexdigest()
+        cache_path = os.path.join(self.cache_dir, '{}.json'.format(h))
 
         # Use cache
-        cache_path = os.path.join(self.cache_dir, '{}.json'.format(h))
-        if os.path.exists(cache_path):
+        if self.use_cache and os.path.exists(cache_path):
             return json.load(open(cache_path))
 
         # Make request
@@ -127,3 +129,21 @@ class Itinisere(CachedApi):
             'DepartureTime' : now.strftime('%H-%M'),
         }
         return self.request('journeyplanner/v2/WalkTrip/json', params)
+
+class MetroMobilite(CachedApi):
+    """
+    Access metro mobilite data
+    """
+    API_URL = 'http://data.metromobilite.fr/api/routers/default/index'
+
+    def get_routes(self):
+        return self.request('routes')
+
+    def get_stops(self, route_id):
+        return self.request('routes/{}/stops'.format(route_id))
+
+    def get_next_times(self, cluster_id, route_id=None):
+        params = {}
+        if route_id is not None:
+            params['route'] = route_id
+        return self.request('clusters/{}/stoptimes'.format(cluster_id), params)
