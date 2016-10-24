@@ -1,7 +1,20 @@
 from api import Bano, Itinisere
 
+def distance(slat, slng, elat, elng):
+    """
+    Distance between a point and a stop
+    """
+    api = Itinisere()
+    out = api.calc_walk_trip(slat, slng, elat, elng)
+    if out['Status']['Code'] == 'OK':
+        trip = out['trips']['Trip'][0] # first trip
+        print('Distance: {}m'.format(trip['Distance']))
+    else:
+        print('No distance !')
 
-if __name__ == '__main__':
+
+def test():
+    from pprint import pprint
 
     # Search home
     bano = Bano()
@@ -19,13 +32,16 @@ if __name__ == '__main__':
     for stop in stops['Data']:
         print('-' * 80)
         print('Stop #{} - {}'.format(stop['Id'], stop['Name']))
+        print('Pos: {}, {}'.format(stop['Latitude'], stop['Longitude']))
         for line in stop['LineList']:
             print(' > Line #{} {}'.format(line['Id'], line['Number']))
             for direction in line['DirectionList']:
                 print(' >> Direction {} : {}'.format(direction['Direction'], direction['Name']))
+        distance(lat, lng, stop['Latitude'], stop['Longitude'])
+
+    return
 
     # Next time for line A - alsace lorraine
-    from pprint import pprint
     times = api.get_next_departures_and_arrivals(101442)
     pprint(times)
 
@@ -37,3 +53,6 @@ if __name__ == '__main__':
     for h in hours['Data']['Hours']:
         print(h['TheoricArrivalTime'])
 
+
+if __name__ == '__main__':
+    test()

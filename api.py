@@ -53,6 +53,12 @@ class Bano(CachedApi):
 class Itinisere(CachedApi):
     API_URL = 'http://www.itinisere.fr:80/webServices/TransinfoService/api'
 
+    POSITION_POI = 'POI'
+    POSITION_BOARDING = 'BOARDING_POSITION'
+    POSITION_ADDRESS = 'ADDRESS'
+    POSITION_STOP = 'STOP_PLACE'
+    POSITION_ROAD_LINK = 'ROAD_LINK'
+
     def get_traffic(self):
         return self.request('traffic/v2/GetTrafficStatus/json')
 
@@ -103,3 +109,21 @@ class Itinisere(CachedApi):
             'DateTime' : now.strftime('%Y-%m-%d_%H-%M'),
         }
         return self.request('transport/v3/timetable/GetStopHours/json', params)
+
+    def calc_walk_trip(self, start_lat, start_lng, end_lat, end_lng, speed=6):
+        assert(isinstance(speed, int))
+        assert(isinstance(start_lat, float))
+        assert(isinstance(start_lng, float))
+        assert(isinstance(end_lat, float))
+        assert(isinstance(end_lng, float))
+        now = datetime.now()
+        params = {
+            'DepLat' : start_lat,
+            'DepLon' : start_lng,
+            'ArrLat' : end_lat,
+            'ArrLon' : end_lng,
+            'WalkSpeed' : speed,
+            'Date' : now.strftime('%Y-%m-%d'),
+            'DepartureTime' : now.strftime('%H-%M'),
+        }
+        return self.request('journeyplanner/v2/WalkTrip/json', params)
