@@ -16,6 +16,14 @@ def distance(slat, slng, elat, elng):
 def test():
     from pprint import pprint
 
+
+    api = Itinisere()
+    from pprint import pprint
+    pprint(api.get_lines())
+
+
+    return
+
     # Search home
     bano = Bano()
     resp = bano.search('13 Cours jean jaures', '38000')

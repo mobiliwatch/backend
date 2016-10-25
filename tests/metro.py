@@ -8,6 +8,10 @@ def test():
     routes = api.get_routes()
     for route in routes:
         print('[{}] {} id:{}'.format(route['mode'], route['shortName'], route['id']))
+        from pprint import pprint
+        pprint(route)
+
+    return
 
     # Get stops on tram line a
     route_id = 'SEM:A'
