@@ -46,4 +46,9 @@ class Migration(migrations.Migration):
             name='linestop',
             unique_together=set([('line', 'direction', 'order')]),
         ),
+        migrations.AddField(
+            model_name='stop',
+            name='metro_cluster',
+            field=models.CharField(blank=True, max_length=250, null=True),
+        ),
     ]

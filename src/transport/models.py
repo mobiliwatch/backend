@@ -70,6 +70,7 @@ class Stop(models.Model):
     # Api ids
     itinisere_id = models.IntegerField(unique=True) # LogicalStop
     metro_id = models.CharField(max_length=250, null=True, blank=True)
+    metro_cluster = models.CharField(max_length=250, null=True, blank=True)
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.city)

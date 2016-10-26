@@ -19,13 +19,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
+        # Apis
+        self.itinisere = Itinisere()
+        self.metro = MetroMobilite()
+
         # Load lines from Metro mobilite
-        metro = MetroMobilite()
-        metro_lines = metro.get_routes()
+        metro_lines = self.metro.get_routes()
         self.metro_lines = dict([('{}{}'.format((l['type'] in ('TRAM', )) and l['type'] or '', l['shortName']), l) for l in metro_lines])
 
         # Load lines from initisere
-        self.itinisere = Itinisere()
         iti_lines = self.itinisere.get_lines()
 
         # Helper
@@ -36,7 +38,7 @@ class Command(BaseCommand):
             try:
                 line = self.build(l)
                 print(line)
-                self.build_stops(line)
+                self.build_stops()
             except Exception as e:
                 print('ERROR: {}'.format(e))
                 pprint(l)
@@ -87,6 +89,23 @@ class Command(BaseCommand):
         """
         Add stops for a line
         """
+
+        metro_stops = []
+        if line.metro_id:
+            metro_stops = self.metro.get_stops(line.metro_id)
+
+        def _find_metro(stop):
+            # Find the best metro stop
+            # for an itinisere stop
+            if not metro_stops:
+                return
+            distances = [(i, abs(s['lat'] - stop['Latitude']) + abs(s['lon'] - stop['Longitude'])) for i,s in enumerate(metro_stops)]
+            distances = sorted(distances, key=lambda x : x[1])
+            best_index, distance = distances[0]
+            if distance > 0.00001: # need some real precision here
+                return
+            return metro_stops[best_index]
+
         for direction in line.directions.all():
             # Get stops from api
             stops = self.itinisere.get_line_stops(line.itinisere_id, direction.itinisere_id)
@@ -106,3 +125,10 @@ class Command(BaseCommand):
                 stop.line_stops.get_or_create(line=line, direction=direction, order=order, defaults=defaults)
 
                 print(stop)
+
+                # Find the best metro stop
+                metro_stop = _find_metro(s)
+                if metro_stop is not None:
+                    stop.metro_id = metro_stop['id']
+                    stop.metro_cluster = metro_stop['cluster']
+                    stop.save()
