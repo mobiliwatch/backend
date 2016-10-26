@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from transport.models import Line
+from transport.models import Line, Stop
 from api import MetroMobilite, Itinisere
 from transport.constants import TRANSPORT_BUS, TRANSPORT_TRAM, TRANSPORT_CAR, TRANSPORT_TRAIN, TRANSPORT_TAD, TRANSPORT_AVION
 from pprint import pprint
@@ -19,14 +19,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-	# Load lines from Metro mobilite
+        # Load lines from Metro mobilite
         metro = MetroMobilite()
         metro_lines = metro.get_routes()
         self.metro_lines = dict([('{}{}'.format((l['type'] in ('TRAM', )) and l['type'] or '', l['shortName']), l) for l in metro_lines])
 
         # Load lines from initisere
-        iti = Itinisere()
-        iti_lines = iti.get_lines()
+        self.itinisere = Itinisere()
+        iti_lines = self.itinisere.get_lines()
 
         # Helper
         modes = set([l['TransportMode'] for l in iti_lines['Data']])
@@ -36,6 +36,7 @@ class Command(BaseCommand):
             try:
                 line = self.build(l)
                 print(line)
+                self.build_stops(line)
             except Exception as e:
                 print('ERROR: {}'.format(e))
                 pprint(l)
@@ -81,3 +82,27 @@ class Command(BaseCommand):
             print('Found metro id {}'.format(line.metro_id))
 
         return line
+
+    def build_stops(self, line):
+        """
+        Add stops for a line
+        """
+        for direction in line.directions.all():
+            # Get stops from api
+            stops = self.itinisere.get_line_stops(line.itinisere_id, direction.itinisere_id)
+
+            for order, s in enumerate(stops['Data']):
+                # Build Stop from LogicalStop
+                defaults = {
+                    'name' : s['Name'],
+                    'city' : s['Locality']['Name'],
+                }
+                stop, _ = Stop.objects.get_or_create(itinisere_id=s['LogicalId'], defaults=defaults)
+
+                # Build LineStop from Stop
+                defaults = {
+                    'itinisere_id' : s['Id'],
+                }
+                stop.line_stops.get_or_create(line=line, direction=direction, order=order, defaults=defaults)
+
+                print(stop)

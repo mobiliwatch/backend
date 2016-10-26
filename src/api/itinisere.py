@@ -50,6 +50,15 @@ class Itinisere(CachedApi):
         }
         return self.request('transport/v3/timetable/GetLineHours/json', params)
 
+    def get_line_stops(self, line, direction):
+        assert isinstance(line, int)
+        assert isinstance(direction, int)
+        params = {
+            'LineId' : line,
+            'Direction' : direction,
+        }
+        return self.request('transport/v3/stop/GetStopsByLine/json', params)
+
     def get_stop_hours(self, stop_ids, line, direction):
         assert isinstance(stop_ids, list)
         assert isinstance(line, int)

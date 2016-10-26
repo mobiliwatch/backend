@@ -19,7 +19,22 @@ def test():
 
     api = Itinisere()
     from pprint import pprint
-    pprint(api.get_lines())
+    stops = {}
+
+    def _add(s, d):
+        if s['Id'] not in stops:
+            stops[s['Id']] = {}
+        stops[s['Id']][d] = s
+
+    for d in (1, 2):
+        for s in api.get_line_stops(11, d)['Data']:
+            _add(s, d)
+
+    for stop_id, directions in stops.items():
+        print('STOP {}'.format(stop_id))
+        for d, stop in directions.items():
+            print('d{} #{} {}'.format(d, stop['LogicalId'], stop['Name']))
+        print('-'*80)
 
 
     return
