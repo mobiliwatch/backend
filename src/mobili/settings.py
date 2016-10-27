@@ -40,6 +40,7 @@ INSTALLED_APPS = [
 
     # Our apps
     'transport',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -101,6 +102,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# User model
+AUTH_USER_MODEL = 'users.User'
 
 
 # Internationalization
