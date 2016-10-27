@@ -1,0 +1,28 @@
+<html>
+<head>
+  <title>Mobili.Watch</title>
+</head>
+
+<body>
+  <h1>Mobili.Watch</h1>
+
+  <ul id="menu">
+    {% if user.is_authenticated %}
+    <li>Hello {{ user.first_name }}</li>
+    <li>
+      <a href="{% url 'logout' %}">
+        Logout
+      </a>
+    </li>
+    {% else %}
+    <li>
+      <a href="{% url 'login' %}">
+        Login
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+
+  {% block content %}{% endblock %}
+</body>
+</html>
