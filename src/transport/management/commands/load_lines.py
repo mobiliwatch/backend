@@ -38,7 +38,7 @@ class Command(BaseCommand):
             try:
                 line = self.build(l)
                 print(line)
-                self.build_stops()
+                self.build_stops(line)
             except Exception as e:
                 print('ERROR: {}'.format(e))
                 pprint(l)
