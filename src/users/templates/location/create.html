@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% load bootstrap %}
+
+{% block content %}
+
+<form method="post" action="">
+  <legend>Ajouter un lieu</legend>
+  {% csrf_token %}
+  {{ form|bootstrap_horizontal }}
+
+  <hr />
+  <div class="form-group">
+    <div class="col-xs-12 col-sm-10 col-sm-offset-2">
+      <button type="submit" class="btn btn-primary">Ajouter</button>
+    </div>
+  </div>
+</form>
+
+{% endblock %}

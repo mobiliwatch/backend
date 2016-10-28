@@ -1,1 +1,27 @@
 {% extends 'base.html' %}
+
+{% block content %}
+
+<a href="{% url 'location-create' %}" class="btn btn-info">
+  Ajouter un lieu
+</a>
+
+<div class="row">
+  {% for location in user.locations.all %}
+  <div class="col-xs-12 col-sm-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">{{ location.name }}</div>
+      <div class="panel-body">
+        {{ location.address }} - {{ location.city }}
+      </div>
+      <div class="panel-footer text-right">
+        <a href="{% url 'location-transports' location.pk %}" class="btn btn-primary">
+          Transports
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

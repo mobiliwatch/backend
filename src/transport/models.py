@@ -1,4 +1,4 @@
-from django.db import models
+from django.contrib.gis.db import models
 from transport.constants import TRANSPORT_MODES
 
 
@@ -47,10 +47,9 @@ class LineStop(models.Model):
     direction = models.ForeignKey(Direction, related_name='line_stops')
     order = models.PositiveIntegerField()
     stop = models.ForeignKey('transport.Stop', related_name='line_stops')
+    point = models.PointField()
 
-    itinisere_id = models.IntegerField(unique=True) # Stop
-
-    # TODO: Position
+    itinisere_id = models.IntegerField() # Stop
 
     class Meta:
         ordering = ('line', 'direction', 'order')
@@ -65,7 +64,7 @@ class Stop(models.Model):
     """
     lines = models.ManyToManyField(Line, through=LineStop, related_name='stops')
     name = models.CharField(max_length=250)
-    city = models.CharField(max_length=250) # display only ATM
+    city = models.ForeignKey('transport.City', related_name='stops')
 
     # Api ids
     itinisere_id = models.IntegerField(unique=True) # LogicalStop
@@ -74,3 +73,17 @@ class Stop(models.Model):
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.city)
+
+
+class City(models.Model):
+    """
+    A city, used by transport & location
+    """
+    insee_code = models.CharField(max_length=8, unique=True)
+    name = models.CharField(max_length=250)
+
+    class Meta:
+        ordering = ('name', )
+
+    def __str__(self):
+        return self.name

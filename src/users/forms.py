@@ -1,5 +1,8 @@
 from django import forms
-from users.models import User
+from django.contrib.gis.geos import Point
+from api import Bano
+from users.models import User, Location
+import json
 
 
 class UserCreationForm(forms.ModelForm):
@@ -35,3 +38,34 @@ class UserCreationForm(forms.ModelForm):
             user.save()
         return user
 
+
+class LocationCreationForm(forms.ModelForm):
+    class Meta:
+        model = Location
+        fields = ('name', 'address', 'city')
+        widgets = {
+            'address' : forms.TextInput(),
+        }
+
+    def clean(self, *args, **kwargs):
+        address = self.cleaned_data.get('address')
+        city = self.cleaned_data.get('city')
+
+        # Lookup through Bano geocoder
+        try:
+            bano = Bano()
+            results = bano.search(address, city.insee_code)
+        except Exception as e:
+            raise forms.ValidationError('An error occured during address search: {}'.format(e))
+
+        if not results or not results['features']:
+            raise forms.ValidationError('Address not found.')
+
+        # Use point
+        geom = results['features'][0]['geometry']
+        self.point = Point(*geom['coordinates'])
+
+    def save(self, *args, **kwargs):
+        obj = super(LocationCreationForm, self).save(*args, **kwargs)
+        obj.point = self.point
+        return obj

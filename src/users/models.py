@@ -1,4 +1,4 @@
-from django.db import models
+from django.contrib.gis.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 
 
@@ -86,3 +86,13 @@ class User(AbstractBaseUser):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
+
+class Location(models.Model):
+    """
+    A location for a user
+    """
+    user = models.ForeignKey(User, related_name='locations')
+    name = models.CharField(max_length=250)
+    address = models.TextField()
+    city = models.ForeignKey('transport.City', related_name='locations')
+    point = models.PointField()

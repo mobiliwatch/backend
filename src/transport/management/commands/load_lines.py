@@ -1,5 +1,6 @@
-from django.core.management.base import BaseCommand, CommandError
-from transport.models import Line, Stop
+from django.core.management.base import BaseCommand
+from django.contrib.gis.geos import Point
+from transport.models import Line, Stop, City
 from api import MetroMobilite, Itinisere
 from transport.constants import TRANSPORT_BUS, TRANSPORT_TRAM, TRANSPORT_CAR, TRANSPORT_TRAIN, TRANSPORT_TAD, TRANSPORT_AVION
 from pprint import pprint
@@ -50,19 +51,17 @@ class Command(BaseCommand):
             line = Line.objects.get(itinisere_id=data['Id'])
         except Line.DoesNotExist:
             line = Line(itinisere_id=data['Id'])
+            mode = data['TransportMode']
+            if mode not in ITI_MODES:
+                raise Exception('Invalid mode {}'.format(mode))
+            line.mode = ITI_MODES[mode]
+            line.name = data['Number']
+            line.full_name = data['Name']
+            op = data.get('Operator')
+            if op:
+                line.operator = '{} - {}'.format(op['Code'], op['Name'])
 
-        # Update data
-        mode = data['TransportMode']
-        if mode not in ITI_MODES:
-            raise Exception('Invalid mode {}'.format(mode))
-        line.mode = ITI_MODES[mode]
-        line.name = data['Number']
-        line.full_name = data['Name']
-        op = data.get('Operator')
-        if op:
-            line.operator = '{} - {}'.format(op['Code'], op['Name'])
-
-        line.save()
+            line.save()
 
         # Add directions
         for d in data['LineDirections']:
@@ -110,17 +109,21 @@ class Command(BaseCommand):
             # Get stops from api
             stops = self.itinisere.get_line_stops(line.itinisere_id, direction.itinisere_id)
 
+            if stops['Data'] is None:
+                continue
+
             for order, s in enumerate(stops['Data']):
                 # Build Stop from LogicalStop
                 defaults = {
                     'name' : s['Name'],
-                    'city' : s['Locality']['Name'],
+                    'city' : self.build_city(s['Locality']),
                 }
                 stop, _ = Stop.objects.get_or_create(itinisere_id=s['LogicalId'], defaults=defaults)
 
                 # Build LineStop from Stop
                 defaults = {
                     'itinisere_id' : s['Id'],
+                    'point' : Point(s['Longitude'], s['Latitude']),
                 }
                 stop.line_stops.get_or_create(line=line, direction=direction, order=order, defaults=defaults)
 
@@ -132,3 +135,13 @@ class Command(BaseCommand):
                     stop.metro_id = metro_stop['id']
                     stop.metro_cluster = metro_stop['cluster']
                     stop.save()
+
+    def build_city(self, data):
+        """
+        Build a city
+        """
+        defaults = {
+            'name' : data['Name'],
+        }
+        city, _ = City.objects.get_or_create(insee_code=data['InseeCode'], defaults=defaults)
+        return city
