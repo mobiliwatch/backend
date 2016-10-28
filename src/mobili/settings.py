@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, '..', 'db.sqlite3'),
     }
 }
-SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
+#SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
 
 
 # Password validation
@@ -139,3 +139,11 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, '../front'),
     os.path.join(BASE_DIR, '../bower_components'),
 ]
+
+# Cache on FS
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, '../cache')
+    }
+}
