@@ -9,6 +9,7 @@
   "homepage": "",
   "private": true,
   "dependencies": {
-    "bootswatch-dist": "paper"
+    "bootswatch-dist": "paper",
+    "vue": "^2.0.3"
   }
 }

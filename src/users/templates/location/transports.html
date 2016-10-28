@@ -4,5 +4,13 @@
 <h1>{{ location.name }}</h1>
 <h5>{{ location.address }} - {{ location.city }}</h5>
 
-<div id="map"></div>
+<div id="transports">
+  <transports-map />
+</div>
+{% endblock %}
+
+{% block js %}
+<script type="text/javascript">
+transports('#transports', {{ location.point.x }}, {{ location.point.y }});
+</script>
 {% endblock %}
