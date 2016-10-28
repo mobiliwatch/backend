@@ -3,3 +3,4 @@ __pycache__
 *.geojson
 *.pyc
 *.sqlite3
+bower_components

@@ -1,0 +1,14 @@
+{
+  "name": "mobili.watch",
+  "authors": [
+    "Bastien Abadie <bastien@nextcairn.com>"
+  ],
+  "description": "",
+  "main": "",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "dependencies": {
+    "bootswatch-dist": "paper"
+  }
+}
