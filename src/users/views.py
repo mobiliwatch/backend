@@ -23,7 +23,7 @@ class Signup(CreateView):
 
         return out
 
-class LocationCreate(CreateView, LoginRequiredMixin):
+class LocationCreate(LoginRequiredMixin, CreateView):
     """
     Create a new Location
     """
@@ -38,7 +38,7 @@ class LocationCreate(CreateView, LoginRequiredMixin):
 
         return HttpResponseRedirect(reverse('location-transports', args=(location.pk, )))
 
-class LocationTransports(DetailView, LoginRequiredMixin):
+class LocationTransports(LoginRequiredMixin, DetailView):
     """
     Manage transports around a location
     """

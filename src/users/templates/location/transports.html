@@ -5,7 +5,7 @@
 <h5>{{ location.address }} - {{ location.city }}</h5>
 
 <div id="transports">
-  <transports-map />
+  <transports-map v-bind:lng="lng" v-bind:lat="lat" />
 </div>
 {% endblock %}
 

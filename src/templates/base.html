@@ -3,6 +3,8 @@
 <head>
   <title>Mobili.Watch</title>
   <link rel="stylesheet" type="text/css" href="{% static 'bootswatch-dist/css/bootstrap.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'leaflet/dist/leaflet.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/mobili.css' %}">
 </head>
 
 <body>
@@ -70,7 +72,9 @@
 
 
 	<script type="text/javascript" src="{% static 'vue/dist/vue.js' %}"></script>
-	<script type="text/javascript" src="{% static 'js/transports.js' %}"></script>
+  <script type="text/javascript" src="{% static 'js/transports.js' %}"></script>
+  <script type="text/javascript" src="{% static 'leaflet/dist/leaflet.js' %}"></script>
+
 	{% block js %}{% endblock %}
 
 </body>
