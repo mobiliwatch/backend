@@ -14,7 +14,7 @@ class Itinisere(CachedApi):
     def get_traffic(self):
         return self.request('traffic/v2/GetTrafficStatus/json')
 
-    def get_nearest_line_stops(self, lat, lng, distance=200):
+    def get_nearest_line_stops(self, lng, lat, distance=200):
         assert isinstance(lat, float)
         assert isinstance(lng, float)
         assert isinstance(distance, int)

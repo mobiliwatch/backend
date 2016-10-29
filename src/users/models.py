@@ -96,3 +96,6 @@ class Location(models.Model):
     address = models.TextField()
     city = models.ForeignKey('transport.City', related_name='locations')
     point = models.PointField()
+
+    def __str__(self):
+        return '{} : {}'.format(self.user, self.name)

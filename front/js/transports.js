@@ -37,15 +37,31 @@ Vue.component('transports-map', {
   },
 });
 
-var transports = function(elt, lat, lng){
+var transports = function(elt, location_id, lat, lng){
   new Vue({
     el: elt,
     data : {
+      location_id : location_id,
       lng : lng,
       lat : lat,
+      distance : 500, // default distance
+      stops : null,
     },
     mounted : function(){
-      console.log('Start', this);
+
+      // Load nearest stops
+      var url = '/api/location/' + this.location_id + '/stops/';
+      var options = {
+        params : {
+          'distance' : this.distance,
+        }
+      };
+      this.$http.get(url, options).then(function(resp){
+        this.stops = resp.json;
+
+      }).catch(function(resp){
+        console.warn('No data', resp);
+      });
     },
   });
 };

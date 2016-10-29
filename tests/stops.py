@@ -16,32 +16,9 @@ def distance(slat, slng, elat, elng):
 def test():
     from pprint import pprint
 
-
-    api = Itinisere()
-    from pprint import pprint
-    stops = {}
-
-    def _add(s, d):
-        if s['Id'] not in stops:
-            stops[s['Id']] = {}
-        stops[s['Id']][d] = s
-
-    for d in (1, 2):
-        for s in api.get_line_stops(11, d)['Data']:
-            _add(s, d)
-
-    for stop_id, directions in stops.items():
-        print('STOP {}'.format(stop_id))
-        for d, stop in directions.items():
-            print('d{} #{} {}'.format(d, stop['LogicalId'], stop['Name']))
-        print('-'*80)
-
-
-    return
-
     # Search home
     bano = Bano()
-    resp = bano.search('13 Cours jean jaures', '38000')
+    resp = bano.search('13 Cours jean jaures', '38185')
 
     # Use first result
     feature = resp['features'][0]
