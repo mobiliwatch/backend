@@ -17,13 +17,22 @@ Vue.component('transports-map', {
     this.$nextTick(function () {
       var map = L.map(this.$el).setView([this.lng, this.lat], 16);
 
+      // Use grayscale tiles
       L.tileLayer('http://{s}.grayscale.osm.maptiles.xyz/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-          '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-          'Imagery © <a href="http://mapbox.com">Mapbox</a>',
-        id: 'mapbox.light'
+          '<a href="https://maptiles.xyz">Maptiles.xyz</a>'
       }).addTo(map);
+
+      // Add a marker for location
+      var redMarker = L.ExtraMarkers.icon({
+        icon: 'glyphicon-home',
+        markerColor: 'green',
+        shape: 'square',
+        prefix: 'glyphicon'
+      });
+
+      L.marker([this.lng, this.lat], {icon: redMarker,}).addTo(map);
     });
   },
 });
