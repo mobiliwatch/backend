@@ -4,10 +4,12 @@ Vue.component('transports-map', {
   props : {
     lng : Number,
     lat : Number,
+    stops: Array,
   },
 
   data : function(){
     return {
+      map: null,
     }
   },
 
@@ -25,15 +27,63 @@ Vue.component('transports-map', {
       }).addTo(map);
 
       // Add a marker for location
-      var redMarker = L.ExtraMarkers.icon({
+      var icon = L.ExtraMarkers.icon({
         icon: 'glyphicon-home',
         markerColor: 'green',
         shape: 'square',
         prefix: 'glyphicon'
       });
 
-      L.marker([this.lng, this.lat], {icon: redMarker,}).addTo(map);
+      L.marker([this.lng, this.lat], {icon: icon,}).addTo(map);
+
+      this.$set(this, 'map', map);
     });
+  },
+
+  watch : {
+    stops : function(stops){
+      var map = this.map;
+      for(var s in stops){
+        var stop = this.stops[s];
+
+        for(var i in stop.line_stops){
+          var ls = stop.line_stops[i];
+
+          var icon = L.ExtraMarkers.icon({
+            icon: 'glyphicon-star',
+            markerColor: 'blue',
+            shape: 'square',
+            prefix: 'glyphicon'
+          });
+
+          // TODO: new position for logical stop
+          var coords = ls.point.coordinates;
+          L.marker([coords[1], coords[0]], {icon: icon,}).addTo(map);
+        }
+      }
+    },
+  },
+});
+
+Vue.component('transports-stop', {
+  template : '#transports-stop',
+
+  props : {
+    'stop' : {
+      type : Object,
+      required : true,
+    }
+  },
+
+  data : function(){
+    return {
+    }
+  },
+
+  methods : {
+    selected : function(evt){
+      console.log('Selected stop', this);
+    },
   },
 });
 
@@ -45,7 +95,7 @@ var transports = function(elt, location_id, lat, lng){
       lng : lng,
       lat : lat,
       distance : 500, // default distance
-      stops : null,
+      stops : [],
     },
     mounted : function(){
 
@@ -57,7 +107,7 @@ var transports = function(elt, location_id, lat, lng){
         }
       };
       this.$http.get(url, options).then(function(resp){
-        this.stops = resp.json;
+        this.$set(this, 'stops', resp.body); // weird
 
       }).catch(function(resp){
         console.warn('No data', resp);

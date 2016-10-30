@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.gis',
     'bootstrapform',
     'rest_framework',
+    'rest_framework_gis',
 
     # Our apps
     'transport',

@@ -4,13 +4,34 @@
 <h1>{{ location.name }}</h1>
 <h5>{{ location.address }} - {{ location.city }}</h5>
 
-<div id="transports">
-  <transports-map v-bind:lng="lng" v-bind:lat="lat" />
+<div id="transports" class="row">
+  <div class="col-xs-12 col-sm-9">
+    <transports-map v-bind:lng="lng" v-bind:lat="lat" v-bind:stops="stops"></transports-map>
+  </div>
+  <div class="col-xs-12 col-sm-3 list-group">
+    <transports-stop v-bind:stop="stop" v-for="(stop, i) in stops"/>
+  </div>
 </div>
 {% endblock %}
 
 {% block js %}
+{% verbatim %}
+<script type="text/x-template" id="transports-stop">
+  <div href="#" class="list-group-item" v-on:click="selected">
+    <h5 class="list-group-item-heading">{{ stop.name }}</h5>
+    <div class="list-group-item-text">
+      <ul>
+        <li v-for="(line_stop, i) in stop.line_stops">
+          {{ line_stop.line.mode}} {{ line_stop.line.name }}
+          > {{ line_stop.direction.name }}
+        </li>
+      </ul>
+    <div>
+  </div>
+</script>
+{% endverbatim %}
+
 <script type="text/javascript">
-transports('#transports', {{ location.id }}, {{ location.point.x }}, {{ location.point.y }});
+  transports('#transports', {{ location.id }}, {{ location.point.x }}, {{ location.point.y }});
 </script>
 {% endblock %}
