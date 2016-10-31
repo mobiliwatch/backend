@@ -42,5 +42,6 @@ class StopSerializer(serializers.ModelSerializer):
             'id',
             'itinisere_id',
             'name',
+            'point',
             'line_stops',
         )

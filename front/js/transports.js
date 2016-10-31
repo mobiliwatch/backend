@@ -46,20 +46,15 @@ Vue.component('transports-map', {
       for(var s in stops){
         var stop = this.stops[s];
 
-        for(var i in stop.line_stops){
-          var ls = stop.line_stops[i];
+        var icon = L.ExtraMarkers.icon({
+          icon: 'glyphicon-star',
+          markerColor: 'blue',
+          shape: 'square',
+          prefix: 'glyphicon'
+        });
 
-          var icon = L.ExtraMarkers.icon({
-            icon: 'glyphicon-star',
-            markerColor: 'blue',
-            shape: 'square',
-            prefix: 'glyphicon'
-          });
-
-          // TODO: new position for logical stop
-          var coords = ls.point.coordinates;
-          L.marker([coords[1], coords[0]], {icon: icon,}).addTo(map);
-        }
+        var coords = stop.point.coordinates;
+        L.marker([coords[1], coords[0]], {icon: icon,}).addTo(map);
       }
     },
   },

@@ -127,6 +127,10 @@ class Command(BaseCommand):
                 }
                 stop.line_stops.get_or_create(line=line, direction=direction, order=order, defaults=defaults)
 
+                # Update stop point
+                if stop.calc_point():
+                    stop.save()
+
                 print(stop)
 
                 # Find the best metro stop

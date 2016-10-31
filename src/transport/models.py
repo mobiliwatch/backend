@@ -1,5 +1,7 @@
 from django.contrib.gis.db import models
 from transport.constants import TRANSPORT_MODES
+from statistics import mean
+from django.contrib.gis.geos import Point
 
 
 class Line(models.Model):
@@ -65,6 +67,7 @@ class Stop(models.Model):
     lines = models.ManyToManyField(Line, through=LineStop, related_name='stops')
     name = models.CharField(max_length=250)
     city = models.ForeignKey('transport.City', related_name='stops')
+    point = models.PointField(null=True, blank=True) # computed average point
 
     # Api ids
     itinisere_id = models.IntegerField(unique=True) # LogicalStop
@@ -73,6 +76,18 @@ class Stop(models.Model):
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.city)
+
+    def calc_point(self):
+        """
+        Calc the average position of dependant line stops
+        """
+        points = [(ls.point.x, ls.point.y) for ls in self.line_stops.all()]
+        if not points:
+            return
+
+        x, y = map(mean, zip(*points))
+        self.point = Point(x, y)
+        return self.point
 
 
 class City(models.Model):
