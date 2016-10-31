@@ -5,3 +5,6 @@ __pycache__
 *.sqlite3
 bower_components
 src/mobili/local_settings.py
+node_modules
+front/bundles/
+npm-debug.log

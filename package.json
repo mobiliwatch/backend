@@ -1,0 +1,23 @@
+{
+  "name": "mobili.watch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build": "webpack --config webpack.config.js --progress --colors",
+    "watch": "webpack --config webpack.config.js --progress --colors --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@lab.nextcairn.com:mobiliplay/backend.git"
+  },
+  "author": "Bastien Abadie <bastien@nextcairn.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "^1.13.3",
+    "webpack-bundle-tracker": "0.0.93"
+  }
+}

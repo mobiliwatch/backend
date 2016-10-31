@@ -1,11 +1,13 @@
 <html>
 {% load static %}
+{% load render_bundle from webpack_loader %}
 <head>
   <title>Mobili.Watch</title>
   <link rel="stylesheet" type="text/css" href="{% static 'bootswatch-dist/css/bootstrap.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'leaflet/dist/leaflet.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'css/mobili.css' %}">
   <link rel="stylesheet" type="text/css" href="{% static 'Leaflet.extra-markers/dist/css/leaflet.extra-markers.min.css' %}">
+  {% render_bundle 'main' 'css' %}
 </head>
 
 <body>
@@ -77,6 +79,8 @@
   <script type="text/javascript" src="{% static 'js/transports.js' %}"></script>
   <script type="text/javascript" src="{% static 'leaflet/dist/leaflet.js' %}"></script>
   <script type="text/javascript" src="{% static 'Leaflet.extra-markers/dist/js/leaflet.extra-markers.min.js' %}"></script>
+
+  {% render_bundle 'main' 'js' %}
 
 	{% block js %}{% endblock %}
 
