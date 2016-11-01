@@ -4,7 +4,9 @@
 
 <script>
 require('leaflet');
-//require('Leaflet.extra-markers');
+require('Leaflet.extra-markers/dist/js/leaflet.extra-markers.min.js');
+require('leaflet/dist/leaflet.css');
+require('Leaflet.extra-markers/dist/css/leaflet.extra-markers.min.css');
 
 module.exports = {
   props : {
@@ -33,17 +35,14 @@ module.exports = {
       }).addTo(map);
 
       // Add a marker for location
-/*
       var icon = L.ExtraMarkers.icon({
         icon: 'glyphicon-home',
         markerColor: 'green',
         shape: 'square',
         prefix: 'glyphicon'
       });
-*/
 
-      //L.marker([this.lng, this.lat], {icon: icon,}).addTo(map);
-      L.marker([this.lng, this.lat]).addTo(map);
+      L.marker([this.lng, this.lat], {icon: icon,}).addTo(map);
 
       this.$set(this, 'map', map);
     });
@@ -55,18 +54,15 @@ module.exports = {
       for(var s in stops){
         var stop = this.stops[s];
 
-/*
         var icon = L.ExtraMarkers.icon({
           icon: 'glyphicon-star',
           markerColor: 'blue',
           shape: 'square',
           prefix: 'glyphicon'
         });
-*/
 
         var coords = stop.point.coordinates;
-        //L.marker([coords[1], coords[0]], {icon: icon,}).addTo(map);
-        L.marker([coords[1], coords[0]]).addTo(map);
+        L.marker([coords[1], coords[0]], {icon: icon,}).addTo(map);
       }
     },
   },
