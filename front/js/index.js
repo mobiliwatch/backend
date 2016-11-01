@@ -1,10 +1,15 @@
 // Js libs
-require('vue/dist/vue.js');
-require('vue-resource/dist/vue-resource.js');
-require('leaflet/dist/leaflet.js');
-require('Leaflet.extra-markers/dist/js/leaflet.extra-markers.min.js');
-require('js/transports.js');
+var Vue = require('vue/dist/vue.js');
+Vue.use(require('vue-resource'));
+var Transports = require('vue/Transports.vue')
 
+var app = new Vue({
+  el : '#app',
+  components : {
+    Transports : Transports,
+  },
+
+});
 
 // Css
 require('bootswatch-dist/css/bootstrap.css');

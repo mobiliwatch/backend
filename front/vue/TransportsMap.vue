@@ -1,6 +1,12 @@
-Vue.component('transports-map', {
-  template: '<div class="map"></div>',
+<template>
+  <div class="map"></div>
+</template>
 
+<script>
+require('leaflet');
+//require('Leaflet.extra-markers');
+
+module.exports = {
   props : {
     lng : Number,
     lat : Number,
@@ -27,14 +33,17 @@ Vue.component('transports-map', {
       }).addTo(map);
 
       // Add a marker for location
+/*
       var icon = L.ExtraMarkers.icon({
         icon: 'glyphicon-home',
         markerColor: 'green',
         shape: 'square',
         prefix: 'glyphicon'
       });
+*/
 
-      L.marker([this.lng, this.lat], {icon: icon,}).addTo(map);
+      //L.marker([this.lng, this.lat], {icon: icon,}).addTo(map);
+      L.marker([this.lng, this.lat]).addTo(map);
 
       this.$set(this, 'map', map);
     });
@@ -46,67 +55,20 @@ Vue.component('transports-map', {
       for(var s in stops){
         var stop = this.stops[s];
 
+/*
         var icon = L.ExtraMarkers.icon({
           icon: 'glyphicon-star',
           markerColor: 'blue',
           shape: 'square',
           prefix: 'glyphicon'
         });
+*/
 
         var coords = stop.point.coordinates;
-        L.marker([coords[1], coords[0]], {icon: icon,}).addTo(map);
+        //L.marker([coords[1], coords[0]], {icon: icon,}).addTo(map);
+        L.marker([coords[1], coords[0]]).addTo(map);
       }
     },
   },
-});
-
-Vue.component('transports-stop', {
-  template : '#transports-stop',
-
-  props : {
-    'stop' : {
-      type : Object,
-      required : true,
-    }
-  },
-
-  data : function(){
-    return {
-    }
-  },
-
-  methods : {
-    selected : function(evt){
-      console.log('Selected stop', this);
-    },
-  },
-});
-
-var transports = function(elt, location_id, lat, lng){
-  new Vue({
-    el: elt,
-    data : {
-      location_id : location_id,
-      lng : lng,
-      lat : lat,
-      distance : 500, // default distance
-      stops : [],
-    },
-    mounted : function(){
-
-      // Load nearest stops
-      var url = '/api/location/' + this.location_id + '/stops/';
-      var options = {
-        params : {
-          'distance' : this.distance,
-        }
-      };
-      this.$http.get(url, options).then(function(resp){
-        this.$set(this, 'stops', resp.body); // weird
-
-      }).catch(function(resp){
-        console.warn('No data', resp);
-      });
-    },
-  });
-};
+}
+</script>
