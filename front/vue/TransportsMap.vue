@@ -66,7 +66,9 @@ module.exports = {
     stops : function(stops){
 
       // Display markers for stops
+      var bounds = L.latLngBounds();
       var map = this.map;
+      var that = this;
       for(var s in stops){
         var stop = this.stops[s];
 
@@ -78,15 +80,26 @@ module.exports = {
         });
 
         var coords = stop.point.coordinates;
-        var marker = L.marker([coords[1], coords[0]], {icon: icon,});
+        var point = L.latLng([coords[1], coords[0]]);
+        var marker = L.marker(point, {icon: icon,});
         marker.bindPopup(stop.name);
         marker.addTo(map);
+        marker.on('click', function(){
+          that.$emit('selected_stop', this.stop);
+        });
+        bounds.extend(point);
 
         // Link marker to stop
         var markers = this.markers;
+        marker.stop = stop;
         markers[stop.id] = marker;
         this.$set(this, 'markers', markers);
       }
+      
+      // Map fit all points
+      map.fitBounds(bounds, {
+        padding : [10, 10],
+      });
     },
 
     current_stop : function(stop){
