@@ -1,17 +1,17 @@
 <template>
   <div id="transports" class="row">
     <div class="col-xs-12 col-sm-9">
-      <TransportsMap v-bind:lng="lng" v-bind:lat="lat" v-bind:stops="stops"></TransportsMap>
+      <TransportsMap v-bind:lng="lng" v-bind:lat="lat" v-bind:stops="stops" v-bind:current_stop="current_stop"></TransportsMap>
     </div>
-    <div class="col-xs-12 col-sm-3 list-group">
-      <TransportsStop v-bind:stop="stop" v-for="(stop, i) in stops"/>
+    <div class="col-xs-12 col-sm-3">
+      <TransportsStops v-bind:stops="stops" v-bind:current_stop="current_stop" v-on:selected_stop="selected_stop" />
     </div>
   </div>
 </template>
 
 <script>
 var TransportsMap = require('vue/TransportsMap.vue');
-var TransportsStop = require('vue/TransportsStop.vue');
+var TransportsStops = require('vue/TransportsStops.vue');
 
 module.exports = {
   props : {
@@ -26,11 +26,12 @@ module.exports = {
   data : function(){
     return {
       stops : [],
+      current_stop : null,
     };
   },
   components : {
     TransportsMap : TransportsMap,
-    TransportsStop : TransportsStop,
+    TransportsStops : TransportsStops,
   },
   mounted : function(){
 
@@ -47,6 +48,13 @@ module.exports = {
     }).catch(function(resp){
       console.warn('No data', resp);
     });
+  },
+
+  methods : {
+    'selected_stop' : function(stop){
+      // Save selected stop
+      this.$set(this, 'current_stop', stop);
+    },
   },
 }
 </script>

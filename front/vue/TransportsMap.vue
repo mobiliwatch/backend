@@ -2,6 +2,14 @@
   <div class="map"></div>
 </template>
 
+<style scoped>
+.map {
+  border: 1px solid #ccc;
+  width: 100%;
+  height: 600px;
+}
+</style>
+
 <script>
 require('leaflet');
 require('Leaflet.extra-markers/dist/js/leaflet.extra-markers.min.js');
@@ -13,11 +21,14 @@ module.exports = {
     lng : Number,
     lat : Number,
     stops: Array,
+    'current_stop' : Object,
   },
 
   data : function(){
     return {
       map: null,
+      markers : {},
+      stop_circles : null, // LayerGroup
     }
   },
 
@@ -45,11 +56,16 @@ module.exports = {
       L.marker([this.lng, this.lat], {icon: icon,}).addTo(map);
 
       this.$set(this, 'map', map);
+
+      // Init stop circles
+      this.$set(this, 'stop_circles', L.layerGroup().addTo(map));
     });
   },
 
   watch : {
     stops : function(stops){
+
+      // Display markers for stops
       var map = this.map;
       for(var s in stops){
         var stop = this.stops[s];
@@ -62,8 +78,38 @@ module.exports = {
         });
 
         var coords = stop.point.coordinates;
-        L.marker([coords[1], coords[0]], {icon: icon,}).addTo(map);
+        var marker = L.marker([coords[1], coords[0]], {icon: icon,});
+        marker.bindPopup(stop.name);
+        marker.addTo(map);
+
+        // Link marker to stop
+        var markers = this.markers;
+        markers[stop.id] = marker;
+        this.$set(this, 'markers', markers);
       }
+    },
+
+    current_stop : function(stop){
+      // Center map around current stop
+      if(stop === null)
+        return;
+      var coords = stop.point.coordinates;
+      this.map.setView([coords[1], coords[0]], 17);
+
+      // Show popup
+      var marker = this.markers[stop.id];     
+      if(marker)
+        marker.openPopup();
+
+      // Display line stops as circles
+      // unified in a LayerGroup
+      var that = this;
+      this.stop_circles.clearLayers();
+      stop.line_stops.forEach(function(ls, i){
+        var coords = ls.point.coordinates;
+        var circle = L.circle([coords[1], coords[0]], 4);
+        that.stop_circles.addLayer(circle);
+      });
     },
   },
 }
