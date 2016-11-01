@@ -6,11 +6,15 @@
     <div class="col-xs-12 col-sm-3">
       <TransportsStops v-bind:stops="stops" v-bind:current_stop="current_stop" v-on:selected_stop="selected_stop" />
     </div>
+    <div class="col-xs-12">
+      <TransportsStop v-bind:current_stop="current_stop" />
+    </div>
   </div>
 </template>
 
 <script>
 var TransportsMap = require('vue/TransportsMap.vue');
+var TransportsStop = require('vue/TransportsStop.vue');
 var TransportsStops = require('vue/TransportsStops.vue');
 
 module.exports = {
@@ -31,6 +35,7 @@ module.exports = {
   },
   components : {
     TransportsMap : TransportsMap,
+    TransportsStop : TransportsStop,
     TransportsStops : TransportsStops,
   },
   mounted : function(){
