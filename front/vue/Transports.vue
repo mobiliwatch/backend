@@ -66,7 +66,12 @@ module.exports = {
         }
       };
       this.$http.get(url, options).then(function(resp){
-        this.$set(this, 'stops', resp.body); // weird
+
+        // Sort stops by distance
+        var stops = resp.body.sort(function(x, y){
+          return x.distance > y.distance;
+        });
+        this.$set(this, 'stops', stops); // weird
 
       }).catch(function(resp){
         console.warn('No data', resp);

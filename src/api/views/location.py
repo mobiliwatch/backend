@@ -16,14 +16,14 @@ class LocationStops(ListAPIView):
 
         # Load location
         try:
-            location = self.request.user.locations.get(pk=self.kwargs['pk'])
+            self.location = self.request.user.locations.get(pk=self.kwargs['pk'])
         except Location.DoesNotExist:
             raise Http404
 
         # Find nearby stops
         distance = int(self.request.GET.get('distance', 400))
         iti = Itinisere()
-        stops = iti.get_nearest_line_stops(location.point.x, location.point.y, distance)
+        stops = iti.get_nearest_line_stops(self.location.point.x, self.location.point.y, distance)
         if not stops or not stops.get('Data'):
             return []
 

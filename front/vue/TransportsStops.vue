@@ -1,6 +1,7 @@
 <template>
   <ul class="list-group">
     <li class="list-group-item" v-bind:class="{active : stop == current_stop}" v-on:click="selected(stop)" v-for="(stop, i) in stops">
+      <span class="badge">{{ stop.distance }} m</span>
       {{ stop.name }}
     </li>
   </ul>
