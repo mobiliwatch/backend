@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'webpack_loader',
     'rest_framework',
     'rest_framework_gis',
+    'channels',
 
     # Our apps
     'transport',
@@ -164,6 +165,17 @@ WEBPACK_LOADER = {
         'BUNDLE_DIR_NAME': 'bundles/',
         'STATS_FILE': os.path.join(BASE_DIR, '../front/webpack-stats.json'),
     }
+}
+
+# Channels - async
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "asgi_redis.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+        "ROUTING": "mobili.routing.channel_routing",
+    },
 }
 
 try:
