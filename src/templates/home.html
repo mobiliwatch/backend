@@ -15,6 +15,14 @@
       <div class="panel-heading">{{ location.name }}</div>
       <div class="panel-body">
         {{ location.address }} - {{ location.city }}
+
+        <ul>
+          {% for ls in location.line_stops.all %}
+          <li>
+            {{ ls.line.mode }} {{ ls.line.name }} vers {{ ls.direction.name }}
+          </li>
+          {% endfor %}
+        </ul>
       </div>
       <div class="panel-footer text-right">
         <a href="{% url 'location-transports' location.pk %}" class="btn btn-primary">

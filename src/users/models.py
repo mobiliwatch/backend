@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+import json
 
 
 class UserManager(BaseUserManager):
@@ -97,5 +98,12 @@ class Location(models.Model):
     city = models.ForeignKey('transport.City', related_name='locations')
     point = models.PointField()
 
+    line_stops = models.ManyToManyField('transport.LineStop', related_name='locations')
+
     def __str__(self):
         return '{} : {}'.format(self.user, self.name)
+
+    @property
+    def line_stops_json(self):
+        # Helper for templates
+        return json.dumps([ls.id for ls in self.line_stops.all()])

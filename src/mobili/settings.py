@@ -119,6 +119,10 @@ LOGIN_URL = '/user/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+# Cookies
+CSRF_COOKIE_NAME = 'mobili.csrf'
+SESSION_COOKIE_NAME = 'mobili.auth'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/

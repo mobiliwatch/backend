@@ -1,5 +1,5 @@
-from rest_framework.generics import ListAPIView
-from api.serializers import StopSerializer
+from rest_framework.generics import ListAPIView, UpdateAPIView
+from api.serializers import StopSerializer, LocationSerializer
 from api import Itinisere
 from transport.models import Stop
 from users.models import Location
@@ -30,3 +30,13 @@ class LocationStops(ListAPIView):
         # Load stops from database
         stop_ids = set(s['LogicalStopId'] for s in stops['Data'])
         return Stop.objects.filter(itinisere_id__in=stop_ids)
+
+
+class LocationDetails(UpdateAPIView):
+    """
+    Update details for a location
+    """
+    serializer_class = LocationSerializer
+
+    def get_queryset(self):
+        return self.request.user.locations.all()

@@ -1,2 +1,2 @@
-from .location import LocationStops
+from .location import LocationStops, LocationDetails
 

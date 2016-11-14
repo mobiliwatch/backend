@@ -8,3 +8,4 @@ src/mobili/local_settings.py
 node_modules
 front/bundles/
 npm-debug.log
+front/webpack-stats.json

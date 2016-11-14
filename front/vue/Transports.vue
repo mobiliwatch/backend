@@ -1,7 +1,7 @@
 <template>
   <div id="transports" class="row">
     <div class="col-xs-12 col-sm-9">
-      <TransportsMap v-bind:lng="lng" v-bind:lat="lat" v-bind:stops="stops" v-bind:current_stop="current_stop" v-on:selected_stop="selected_stop"></TransportsMap>
+      <TransportsMap :lng="lng" :lat="lat" :stops="stops" :current_stop="current_stop" v-on:selected_stop="selected_stop"></TransportsMap>
 
       <form class="form-inline">
         <div class="form-group">
@@ -13,10 +13,10 @@
         <button class="btn btn-primary" v-on:click="load_stops">Search !</button>
       </form>
 
-      <TransportsStop v-bind:current_stop="current_stop" />
+      <TransportsStop :current_stop="current_stop" :line_stops="line_stops" v-on:toggle_line_stop="toggle_line_stop"/>
     </div>
     <div class="col-xs-12 col-sm-3">
-      <TransportsStops v-bind:stops="stops" v-bind:current_stop="current_stop" v-on:selected_stop="selected_stop" />
+      <TransportsStops :stops="stops" :current_stop="current_stop" :line_stops="line_stops" v-on:selected_stop="selected_stop" />
     </div>
   </div>
 </template>
@@ -31,11 +31,13 @@ module.exports = {
     location_id : Number,
     lat : Number,
     lng : Number,
+    line_stops_initial : Array,
   },
   data : function(){
     return {
       stops : [],
       current_stop : null,
+      line_stops : [], // selected by user
       distance : 500,
     };
   },
@@ -46,12 +48,31 @@ module.exports = {
   },
   mounted : function(){
     this.load_stops();
+    this.$set(this, 'line_stops', this.line_stops_initial);
   },
 
   methods : {
     selected_stop : function(stop){
       // Save selected stop
       this.$set(this, 'current_stop', stop);
+    },
+
+    toggle_line_stop : function(line_stop){
+      // Toggle id in local list
+      var ls_id = line_stop['id'];
+      var index = this.line_stops.indexOf(ls_id);
+      if(index > -1){
+        this.line_stops.splice(index, 1);
+      }else{
+        this.line_stops.push(ls_id);
+      }
+
+      // Update line stops on backend
+      var url = '/api/location/' + this.location_id + '/';
+      var data = {
+        line_stops : this.line_stops || [],
+      };
+      this.$http.patch(url, data);
     },
 
     load_stops : function(evt){

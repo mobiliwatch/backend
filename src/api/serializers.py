@@ -1,4 +1,5 @@
 from transport.models import Stop, LineStop, Line, Direction
+from users.models import Location
 from rest_framework import serializers
 from mobili.helpers import haversine_distance
 
@@ -62,3 +63,18 @@ class StopSerializer(serializers.ModelSerializer):
         except Exception as e:
             print(e)
             return 0
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    # Nullable line_stops
+    line_stops = serializers.PrimaryKeyRelatedField(queryset=LineStop.objects.all(), many=True, allow_null=True)
+
+    class Meta:
+        model = Location
+        fields = (
+            'id',
+            'line_stops',
+        )
+        readonly_fields = (
+            'id',
+        )

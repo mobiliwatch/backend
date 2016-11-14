@@ -5,7 +5,7 @@
 <h5>{{ location.address }} - {{ location.city }}</h5>
 
 <div id="app">
-  <Transports :lat="{{ location.point.x }}" :lng="{{ location.point.y }}" :location_id="{{ location.id }}" />
+  <Transports :lat="{{ location.point.x }}" :lng="{{ location.point.y }}" :location_id="{{ location.id }}" :line_stops_initial="{{ location.line_stops_json }}" />
 </div>
 
 {% endblock %}
