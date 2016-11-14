@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # Our apps
     'transport',
     'users',
+    'screen',
 ]
 
 MIDDLEWARE = [

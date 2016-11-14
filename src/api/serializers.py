@@ -1,7 +1,10 @@
 from transport.models import Stop, LineStop, Line, Direction
 from users.models import Location
+from screen.models import Screen
 from rest_framework import serializers
 from mobili.helpers import haversine_distance
+import json
+
 
 class LineSerializer(serializers.ModelSerializer):
 
@@ -77,4 +80,34 @@ class LocationSerializer(serializers.ModelSerializer):
         )
         readonly_fields = (
             'id',
+        )
+
+class WidgetSerializer(serializers.Serializer):
+    """
+    Cannot use a Modelserializer with an abstract class
+    """
+    id = serializers.IntegerField()
+    type = serializers.SerializerMethodField()
+    top = serializers.IntegerField()
+    left = serializers.IntegerField()
+    bottom = serializers.IntegerField()
+    right = serializers.IntegerField()
+    payload = serializers.SerializerMethodField()
+
+    def get_type(self, widget):
+        return widget.__class__.__name__
+
+    def get_payload(self, widget):
+        return widget.build_payload()
+
+class ScreenSerializer(serializers.ModelSerializer):
+
+    widgets = WidgetSerializer(source='list_widgets', many=True)
+
+    class Meta:
+        model = Screen
+        fields = (
+            'slug',
+            'ratio',
+            'widgets',
         )

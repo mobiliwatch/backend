@@ -101,7 +101,7 @@ class Location(models.Model):
     line_stops = models.ManyToManyField('transport.LineStop', related_name='locations')
 
     def __str__(self):
-        return '{} : {}'.format(self.user, self.name)
+        return '{} : {} - {}'.format(self.name, self.address, self.city)
 
     @property
     def line_stops_json(self):
