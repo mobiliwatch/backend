@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from users.models import Location
 from django.utils.text import slugify
+from datetime import datetime
 
 RATIOS = (
   # Gets 8x2 blocks
@@ -170,14 +171,9 @@ class ClockWidget(Widget):
     """
     timezone = models.CharField(max_length=250, default='Europe/Paris')
 
-    def build_payload(self):
-        """
-        Current timestamp
-        """
-        import time
-        return {
-            'time' : time.time(),
-        }
+    def now(self):
+        # TODO: use timezone
+        return datetime.now()
 
 class LocationWidget(Widget):
     """
@@ -192,28 +188,18 @@ class LocationWidget(Widget):
         if self.screen.ratio == '9:16':
             return (w, h / 2)
 
-    def build_payload(self):
-        return {}
-
 class WeatherWidget(Widget):
     """
     Display current weather on a screen
     """
     city = models.ForeignKey('transport.City', related_name='weather_widgets')
 
-    def build_payload(self):
+    def get_weather(self):
         # TODO
-        return {}
-
+        return 'sunny'
 
 class NoteWidget(Widget):
     """
     Display some text on a screen
     """
     text = models.TextField()
-
-    def build_payload(self):
-        # TODO
-        return {
-            'text' : self.text,
-        }

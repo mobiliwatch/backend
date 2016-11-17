@@ -1,9 +1,8 @@
 from transport.models import Stop, LineStop, Line, Direction
 from users.models import Location
-from screen.models import Screen
+from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget
 from rest_framework import serializers
 from mobili.helpers import haversine_distance
-import json
 
 
 class LineSerializer(serializers.ModelSerializer):
@@ -68,7 +67,11 @@ class StopSerializer(serializers.ModelSerializer):
             return 0
 
 
-class LocationSerializer(serializers.ModelSerializer):
+class LocationLightSerializer(serializers.ModelSerializer):
+    """
+    Used by backend to manage line stops
+    """
+
     # Nullable line_stops
     line_stops = serializers.PrimaryKeyRelatedField(queryset=LineStop.objects.all(), many=True, allow_null=True)
 
@@ -82,9 +85,24 @@ class LocationSerializer(serializers.ModelSerializer):
             'id',
         )
 
+class LocationSerializer(serializers.ModelSerializer):
+    """
+    Used by frontend to have full details on managed stops
+    """
+    # Nullable line_stops
+    line_stops = LineStopSerializer(many=True)
+
+    class Meta:
+        model = Location
+        fields = (
+            'id',
+            'line_stops',
+        )
+
 class WidgetSerializer(serializers.Serializer):
     """
     Cannot use a Modelserializer with an abstract class
+    This serializer is just a base, see below for moar
     """
     id = serializers.IntegerField()
     type = serializers.SerializerMethodField()
@@ -92,17 +110,53 @@ class WidgetSerializer(serializers.Serializer):
     left = serializers.IntegerField()
     bottom = serializers.IntegerField()
     right = serializers.IntegerField()
-    payload = serializers.SerializerMethodField()
 
     def get_type(self, widget):
         return widget.__class__.__name__
 
-    def get_payload(self, widget):
-        return widget.build_payload()
+
+class ClockWidgetSerializer(WidgetSerializer):
+    now = serializers.DateTimeField()
+
+class NoteWidgetSerializer(WidgetSerializer):
+    text = serializers.CharField()
+
+class WeatherWidgetSerializer(WidgetSerializer):
+    weather = serializers.CharField(source='get_weather')
+
+class LocationWidgetSerializer(WidgetSerializer):
+    location = LocationSerializer()
+
+
+class WidgetsSerializer(serializers.ListSerializer):
+    """
+    This is where the magic happens:
+    For each widget class, there is a mapped serializer
+    """
+    serializers = {
+        ClockWidget : ClockWidgetSerializer,
+        WeatherWidget : WeatherWidgetSerializer,
+        NoteWidget : NoteWidgetSerializer,
+        LocationWidget : LocationWidgetSerializer,
+    }
+
+    def __init__(self, *args, **kwargs):
+        # Do not instanciante any "child"
+        self.allow_empty = kwargs.pop('allow_empty', True)
+        super(serializers.ListSerializer, self).__init__(*args, **kwargs)
+
+    def to_representation(self, widgets):
+        def _serialize(widget):
+            # Fetch the mapped serializer
+            # Fallback to base serializer
+            cls = self.serializers.get(widget.__class__, WidgetSerializer)
+            return cls().to_representation(instance=widget)
+
+        return [_serialize(w) for w in widgets]
 
 class ScreenSerializer(serializers.ModelSerializer):
 
-    widgets = WidgetSerializer(source='list_widgets', many=True)
+    widgets = WidgetsSerializer(source='list_widgets')
 
     class Meta:
         model = Screen
