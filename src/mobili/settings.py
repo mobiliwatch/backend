@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_gis',
     'channels',
+    'corsheaders',
 
     # Our apps
     'transport',
@@ -53,6 +54,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -182,6 +184,12 @@ CHANNEL_LAYERS = {
         "ROUTING": "mobili.routing.channel_routing",
     },
 }
+
+# Cors
+CORS_ORIGIN_WHITELIST = (
+    'localhost:8080',
+)
+CORS_ALLOW_CREDENTIALS = True
 
 try:
     from .local_settings import *
