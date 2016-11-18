@@ -1,5 +1,5 @@
 from rest_framework.generics import ListAPIView, UpdateAPIView
-from api.serializers import StopSerializer, LocationSerializer
+from api.serializers import StopSerializer, LocationLightSerializer
 from api import Itinisere
 from transport.models import Stop
 from users.models import Location
@@ -36,7 +36,7 @@ class LocationDetails(UpdateAPIView):
     """
     Update details for a location
     """
-    serializer_class = LocationSerializer
+    serializer_class = LocationLightSerializer
 
     def get_queryset(self):
         return self.request.user.locations.all()
