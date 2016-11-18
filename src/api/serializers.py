@@ -104,7 +104,7 @@ class WidgetSerializer(serializers.Serializer):
     Cannot use a Modelserializer with an abstract class
     This serializer is just a base, see below for moar
     """
-    id = serializers.IntegerField()
+    id = serializers.UUIDField()
     type = serializers.SerializerMethodField()
 
     def get_type(self, widget):
