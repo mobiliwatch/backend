@@ -16,5 +16,5 @@ var app = new Vue({
 });
 
 // Css
-require('bootswatch-dist/css/bootstrap.css');
+require('bootstrap/dist/css/bootstrap.css');
 require('css/mobili.css');

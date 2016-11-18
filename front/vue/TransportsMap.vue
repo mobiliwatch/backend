@@ -12,9 +12,9 @@
 
 <script>
 require('leaflet');
-require('Leaflet.extra-markers/dist/js/leaflet.extra-markers.min.js');
 require('leaflet/dist/leaflet.css');
-require('Leaflet.extra-markers/dist/css/leaflet.extra-markers.min.css');
+require('leaflet-extra-markers/dist/js/leaflet.extra-markers.min.js');
+require('leaflet-extra-markers/dist/css/leaflet.extra-markers.min.css');
 
 module.exports = {
   props : {
