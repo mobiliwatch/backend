@@ -28,6 +28,11 @@ class Screen(models.Model):
         # Used by api
         return self.groups.filter(parent__isnull=True)
 
+    @property
+    def frontend_url(self):
+        from django.conf import settings
+        return settings.FRONTEND_SCREEN_URL.format(self.slug)
+
     def slugify(self):
         """
         Build a new slug

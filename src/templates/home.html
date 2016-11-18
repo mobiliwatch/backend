@@ -4,6 +4,7 @@
 
 {% if user.is_authenticated %}
 
+<h1>Vos Lieux</h1>
 <a href="{% url 'location-create' %}" class="btn btn-info">
   Ajouter un lieu
 </a>
@@ -34,9 +35,30 @@
   {% endfor %}
 </div>
 
+<h1>Vos écrans</h1>
 <a href="{% url 'screen-create' %}" class="btn btn-info">
   Ajouter un écran
 </a>
+<div class="row">
+  {% for screen in user.screens.all %}
+  <div class="col-xs-12 col-sm-6">
+    <div class="panel panel-default">
+      <div class="panel-heading">{{ screen.name }}</div>
+      <div class="panel-body">
+        ...
+      </div>
+      <div class="panel-footer text-right">
+        <a href="{% url 'screen' screen.slug %}" class="btn btn-primary">
+          Editer
+        </a>
+        <a href="{{ screen.frontend_url }}" class="btn btn-success" target="_blank">
+          Voir
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
 
 
 {% else %}

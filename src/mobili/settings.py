@@ -190,6 +190,9 @@ CORS_ORIGIN_WHITELIST = (
 )
 CORS_ALLOW_CREDENTIALS = True
 
+# Frontend
+FRONTEND_SCREEN_URL = 'http://localhost:8080/?screen={}'
+
 try:
     from .local_settings import *
 except ImportError:
