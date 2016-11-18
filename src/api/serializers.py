@@ -151,17 +151,14 @@ class WidgetsSerializer(serializers.ListSerializer):
         return [_serialize(w) for w in widgets]
 
 class GroupSerializer(serializers.ModelSerializer):
-
-    widgets = WidgetsSerializer(source='list_widgets')
+    widgets = serializers.PrimaryKeyRelatedField(read_only=True, source='list_widgets', many=True)
 
     class Meta:
         model = Group
         fields = (
-            'id',
             'position',
             'vertical',
             'widgets',
-            'parent',
             'groups',
         )
 
@@ -171,6 +168,8 @@ class ScreenSerializer(serializers.ModelSerializer):
 
     groups = GroupSerializer(many=True, source='top_groups')
 
+    widgets = WidgetsSerializer(source='all_widgets')
+
     class Meta:
         model = Screen
         fields = (
@@ -178,4 +177,5 @@ class ScreenSerializer(serializers.ModelSerializer):
             'slug',
             'ratio',
             'groups',
+            'widgets',
         )

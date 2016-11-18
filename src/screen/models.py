@@ -3,6 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from users.models import Location
 from django.utils.text import slugify
 from datetime import datetime
+import uuid
 
 RATIOS = (
   ('16:9', _('Landscape 16x9')),
@@ -27,6 +28,11 @@ class Screen(models.Model):
     def top_groups(self):
         # Used by api
         return self.groups.filter(parent__isnull=True)
+
+    @property
+    def all_widgets(self):
+        # Used by api
+        return [w for g in self.groups.all() for w in g.list_widgets()]
 
     @property
     def frontend_url(self):
@@ -138,6 +144,7 @@ class Widget(models.Model):
     """
     An abstract widget on a screen
     """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     group = models.ForeignKey(Group, related_name='%(class)s')
 
     class Meta:
