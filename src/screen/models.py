@@ -5,9 +5,7 @@ from django.utils.text import slugify
 from datetime import datetime
 
 RATIOS = (
-  # Gets 8x2 blocks
   ('16:9', _('Landscape 16x9')),
-  # Gets 2x8 blocks
   ('9:16', _('Portrait 9x16')),
 )
 
@@ -24,6 +22,11 @@ class Screen(models.Model):
         unique_together = (
             ('user', 'slug')
         )
+
+    @property
+    def top_groups(self):
+        # Used by api
+        return self.groups.filter(parent__isnull=True)
 
     def slugify(self):
         """
@@ -47,13 +50,72 @@ class Screen(models.Model):
 
         return self.slug
 
-    @property
-    def size(self):
-        # In blocks
+    def build_default_widgets(self, location):
+        """
+        Build default widgets
+        Based on a location
+        """
+        assert isinstance(location, Location)
+
+        # Init widgets without positions
+        loc = LocationWidget(location=location)
+        clock = ClockWidget()
+        weather = WeatherWidget(city=location.city)
+        note = NoteWidget(text='Bienvenue sur Mobili.Watch !')
+
         if self.ratio == '16:9':
-            return (8, 2)
-        if self.ratio == '9:16':
-            return (2, 8)
+            # Build groups
+            left = self.groups.create(position=0, vertical=True)
+            right = self.groups.create(position=1, vertical=True)
+            right_top = right.groups.create(screen=self, position=0)
+            right_bottom = right.groups.create(screen=self, position=1)
+
+            # Location widget on left
+            loc.group = left
+            loc.save()
+
+            # Clock & Weather on top right
+            clock.group = right_top
+            clock.save()
+            weather.group = right_top
+            weather.save()
+
+            # Note below Weather
+            note.group = right_bottom
+            note.save()
+
+        elif self.ratio == '9:16':
+            # Build groups
+            top = self.groups.create(screen=self, position=0)
+            bottom = self.groups.create(screen=self, position=1)
+
+            # Clock+Weather+Note on top
+            clock.group = top
+            clock.save()
+            weather.group = top
+            weather.save()
+            note.group = top
+            note.save()
+
+            # Location on bottom
+            location.group = bottom
+            location.save()
+
+class Group(models.Model):
+    """
+    A group of widget, used for display
+    """
+    screen = models.ForeignKey(Screen, related_name='groups')
+    parent = models.ForeignKey('self', related_name='groups', null=True, blank=True)
+    position = models.PositiveIntegerField(default=0)
+
+    vertical = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ('position', )
+        unique_together = (
+            ('screen', 'parent', 'position'),
+        )
 
     def list_widgets(self):
         """
@@ -66,104 +128,15 @@ class Screen(models.Model):
             + list(self.weatherwidget.all()) \
             + list(self.notewidget.all())
 
-    def build_default_widgets(self, location):
-        """
-        Build default widgets
-        Based on a location
-        """
-        assert isinstance(location, Location)
-
-        # Init widgets without positions
-        loc = LocationWidget(screen=self, location=location)
-        clock = ClockWidget(screen=self)
-        weather = WeatherWidget(screen=self, city=location.city)
-        note = NoteWidget(screen=self, text='Bienvenue sur Mobili.Watch !')
-
-        if self.ratio == '16:9':
-            # Location widget on left
-            loc.top, loc.left = 0, 0
-            loc.save()
-
-            # Clock on top right
-            clock.top, clock.left = 0, self.size[0] - 1
-            clock.save()
-
-            # Weather below clock
-            weather.set_below(clock)
-            weather.save()
-
-            # Note below Weather
-            note.set_below(weather)
-            note.save()
-
-        elif self.ratio == '9:16':
-
-            # Clock on top
-            clock.top, clock.left = 0, 0
-            clock.save()
-
-            # Weather next to clock
-            weather.set_next(clock)
-            weather.save()
-
-            # Location below clock
-            location.set_below(clock)
-            location.save()
-
-            # Note below location
-            note.set_below(weather)
-            weather.save()
-
-        # TODO: check integrity
 
 class Widget(models.Model):
     """
     An abstract widget on a screen
     """
-    screen = models.ForeignKey(Screen, related_name='%(class)s')
-
-    # Position
-    top = models.PositiveIntegerField()
-    left = models.PositiveIntegerField()
+    group = models.ForeignKey(Group, related_name='%(class)s')
 
     class Meta:
         abstract = True
-
-    def build_payload(self):
-        raise NotImplementedError
-
-    @property
-    def size(self):
-        return self.get_size()
-
-    def get_size(self):
-        # default size in blocks
-        return (1, 1)
-
-    @property
-    def bottom(self):
-        return self.top + self.size[1]
-
-    @property
-    def right(self):
-        return self.left + self.size[0]
-
-    def set_next(self, widget):
-        """
-        Calc new position for widget
-        on the right of specified one
-        """
-        self.top = widget.top
-        self.left = widget.right
-
-    def set_below(self, widget):
-        """
-        Calc new position for widget
-        on the bottom of specified one
-        """
-        self.top = widget.bottom
-        self.left = widget.left
-
 
 class ClockWidget(Widget):
     """

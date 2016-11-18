@@ -1,6 +1,6 @@
 from transport.models import Stop, LineStop, Line, Direction
 from users.models import Location
-from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget
+from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget, Group
 from rest_framework import serializers
 from mobili.helpers import haversine_distance
 
@@ -106,10 +106,6 @@ class WidgetSerializer(serializers.Serializer):
     """
     id = serializers.IntegerField()
     type = serializers.SerializerMethodField()
-    top = serializers.IntegerField()
-    left = serializers.IntegerField()
-    bottom = serializers.IntegerField()
-    right = serializers.IntegerField()
 
     def get_type(self, widget):
         return widget.__class__.__name__
@@ -154,14 +150,32 @@ class WidgetsSerializer(serializers.ListSerializer):
 
         return [_serialize(w) for w in widgets]
 
-class ScreenSerializer(serializers.ModelSerializer):
+class GroupSerializer(serializers.ModelSerializer):
 
     widgets = WidgetsSerializer(source='list_widgets')
 
     class Meta:
+        model = Group
+        fields = (
+            'id',
+            'position',
+            'vertical',
+            'widgets',
+            'parent',
+            'groups',
+        )
+
+GroupSerializer._declared_fields['groups'] = GroupSerializer(many=True) # recursive !
+
+class ScreenSerializer(serializers.ModelSerializer):
+
+    groups = GroupSerializer(many=True, source='top_groups')
+
+    class Meta:
         model = Screen
         fields = (
+            'name',
             'slug',
             'ratio',
-            'widgets',
+            'groups',
         )
