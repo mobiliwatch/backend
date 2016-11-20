@@ -2,8 +2,10 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from users.models import Location
 from django.utils.text import slugify
+from channels import Group as WsGroup
 from datetime import datetime
 import uuid
+import json
 
 RATIOS = (
   ('16:9', _('Landscape 16x9')),
@@ -19,15 +21,25 @@ class Screen(models.Model):
     slug = models.SlugField(max_length=100)
     ratio = models.CharField(max_length=20, choices=RATIOS, default='16:9')
 
+    active = models.BooleanField(default=False) # triggered by WS
+
     class Meta:
         unique_together = (
             ('user', 'slug')
         )
 
+    def __str__(self):
+        return self.name
+
     @property
     def top_groups(self):
         # Used by api
         return self.groups.filter(parent__isnull=True)
+
+    @property
+    def ws_group(self):
+        # Used by websockets
+        return WsGroup('screen_{}'.format(self.id))
 
     @property
     def all_widgets(self):
@@ -149,6 +161,28 @@ class Widget(models.Model):
 
     class Meta:
         abstract = True
+
+    def send_ws_update(self, extra_data=None):
+        """
+        Send an update to screens through WebSockets
+        """
+        # Build update data
+        # TODO: build serialized data
+        update = {}
+
+        if isinstance(extra_data, dict):
+            update.update(extra_data)
+        data = {
+            'widget': str(self.id),
+            'update': update,
+        }
+
+        # Send to WebSocket group
+        # as json on text
+        self.group.screen.ws_group.send({
+            'text' : json.dumps(data)
+        })
+
 
 class ClockWidget(Widget):
     """

@@ -28,6 +28,7 @@
     "webpack-cleanup-plugin": "^0.4.1"
   },
   "dependencies": {
+    "bootstrap": "^3.3.7",
     "leaflet": "^1.0.1",
     "leaflet-extra-markers": "^1.0.6",
     "vue": "^2.0.3",
