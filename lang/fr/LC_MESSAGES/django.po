@@ -7,22 +7,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-21 14:44+0100\n"
-"PO-Revision-Date: 2016-11-21 14:45+0100\n"
+"POT-Creation-Date: 2016-11-21 15:56+0100\n"
+"PO-Revision-Date: 2016-11-21 15:57+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"Last-Translator: \n"
-"Language-Team: \n"
 "X-Generator: Poedit 1.8.7.1\n"
 
-#: mobili/settings.py:148
+#: mobili/settings.py:149
 msgid "French"
 msgstr "Français"
 
-#: mobili/settings.py:149
+#: mobili/settings.py:150
 msgid "English"
 msgstr "Anglais"
 
@@ -34,17 +34,30 @@ msgstr "Paysage (16:9)"
 msgid "Portrait 9x16"
 msgstr "Portrait (9:16)"
 
-#: templates/base.html:56
+#: screen/templates/screen/create.html:9
+msgid "Add a screen "
+msgstr "Ajouter un écran"
+
+#: screen/templates/screen/create.html:20 templates/home.html:75
+msgid "Add a screen"
+msgstr "Ajouter un écran"
+
+#: screen/templates/screen/create.html:23
+#: users/templates/location/create.html:22
+msgid "Cancel"
+msgstr "Annuler"
+
+#: templates/base.html:52
 msgid "Logout"
 msgstr "Déconnection"
 
-#: templates/base.html:67 templates/home.html:78
+#: templates/base.html:63 templates/home.html:118
 #: users/templates/registration/signup.html:7
 #: users/templates/registration/signup.html:20
 msgid "Signup"
 msgstr "Créer un compte"
 
-#: templates/base.html:73 templates/home.html:84
+#: templates/base.html:69 templates/home.html:124
 #: users/templates/registration/login.html:7
 #: users/templates/registration/login.html:17
 msgid "Login"
@@ -54,6 +67,55 @@ msgstr "Connection"
 msgid "Error"
 msgstr "Erreur"
 
-#: templates/home.html:69
+#: templates/home.html:11
+msgid "Your locations"
+msgstr "Vos lieux"
+
+#: templates/home.html:14
+msgid "Add some locations to display them on your screens"
+msgstr "Ajouter des lieux pour les afficher sur vos écrans"
+
+#: templates/home.html:22 users/templates/location/create.html:8
+#: users/templates/location/create.html:19
+msgid "Add a location"
+msgstr "Ajouter un lieu"
+
+#: templates/home.html:37
+msgid "Tramway"
+msgstr "Tramway"
+
+#: templates/home.html:39
+msgid "Bus"
+msgstr "Bus"
+
+#: templates/home.html:41
+msgid "Autocar"
+msgstr "Autocar"
+
+#: templates/home.html:45
+msgid "towards"
+msgstr "vers"
+
+#: templates/home.html:52
+msgid "Transport stops"
+msgstr "Arrêt de transports"
+
+#: templates/home.html:64
+msgid "Your screens"
+msgstr "Vos écrans"
+
+#: templates/home.html:67
+msgid "Manage all your screens to display informations"
+msgstr "Gérez tous vos écrans pour afficher des informations en temps réel"
+
+#: templates/home.html:90
+msgid "Edit"
+msgstr "Editer"
+
+#: templates/home.html:94
+msgid "View"
+msgstr "Voir l'écran"
+
+#: templates/home.html:109
 msgid "Welcome on Mobili.Watch !"
 msgstr "Bienvenue sur Mobili.Watch !"
