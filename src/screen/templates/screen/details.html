@@ -1,10 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ screen.name }}</h1>
-<h5>Ratio <span class="label label-info">{{ screen.ratio }}</h5>
+<h1 class="title">{{ screen.name }}</h1>
+<p>
+  <span class="tag is-dark is-small">{{ screen.ratio }}</span>
+</p>
+<hr />
 
 <div id="app">
+  <Screen slug="{{ screen.slug }}" />
 </div>
 
 {% endblock %}
