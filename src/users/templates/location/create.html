@@ -1,20 +1,27 @@
 {% extends 'base.html' %}
 
-{% load bootstrap %}
+{% load bulma_forms %}
 
 {% block content %}
 
 <form method="post" action="">
-  <legend>Ajouter un lieu</legend>
+  <h3 class="title">{{ _('Add a location') }}</h3>
   {% csrf_token %}
-  {{ form|bootstrap_horizontal }}
+
+  {% form_errors form %}
+  {% form_input form.name 'globe' %}
+  {% form_input form.address 'address-card' %}
+  {% form_select form.city %}
 
   <hr />
-  <div class="form-group">
-    <div class="col-xs-12 col-sm-10 col-sm-offset-2">
-      <button type="submit" class="btn btn-primary">Ajouter</button>
-    </div>
-  </div>
+  <p class="control">
+    <button class="button is-success" type="submit">
+      {{ _('Add a location') }}
+    </button>
+    <a class="button" href="{% url 'home' %}">
+      {{ _('Cancel') }}
+    </a>
+  </p>
 </form>
 
 {% endblock %}

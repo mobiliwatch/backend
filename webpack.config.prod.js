@@ -20,9 +20,9 @@ config.plugins = [
   new WebpackCleanupPlugin({
     exclude : ['webpack-stats.json', ],
   }),
+  new webpack.optimize.UglifyJsPlugin({
+    minimize: true
+  }),
 ];
-
-// Minimize js
-config.plugins.push(new webpack.optimize.UglifyJsPlugin({minimize: true}));
 
 module.exports = config;

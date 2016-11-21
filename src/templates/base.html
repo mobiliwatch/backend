@@ -9,67 +9,76 @@
 </head>
 
 <body>
+  <nav class="nav" id="top">
+    <div class="nav-left">
+      <a class="nav-item" href="#">
+        <span class="icon">
+          <i class="fa fa-github"></i>
+        </span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="icon">
+          <i class="fa fa-twitter"></i>
+        </span>
+      </a>
+    </div>
 
-	<nav class="navbar navbar-default navbar-static-top">
-		<div class="container">
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-				<a class="navbar-brand" href="{% url 'home' %}">Mobili.Watch</a>
-			</div>
-			<div id="navbar" class="navbar-collapse collapse">
-				<!--
-				<ul class="nav navbar-nav">
-					<li class="active"><a href="#">Home</a></li>
-					<li><a href="#about">About</a></li>
-					<li><a href="#contact">Contact</a></li>
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							<li><a href="#">Action</a></li>
-							<li><a href="#">Another action</a></li>
-							<li><a href="#">Something else here</a></li>
-							<li role="separator" class="divider"></li>
-							<li class="dropdown-header">Nav header</li>
-							<li><a href="#">Separated link</a></li>
-							<li><a href="#">One more separated link</a></li>
-						</ul>
-					</li>
-				</ul>
-				-->
-				<ul class="nav navbar-nav navbar-right">
-					{% if user.is_authenticated %}
-					<li><span class="navbar-text">Hello {{ user.first_name }}</span></li>
-					<li>
-						<a href="{% url 'logout' %}">
-							Logout
-						</a>
-					</li>
-					{% else %}
-					<li>
-						<a href="{% url 'signup' %}">
-							Signup
-						</a>
-					</li>
-					<li>
-						<a href="{% url 'login' %}">
-							Login
-						</a>
-					</li>
-					{% endif %}
-				</ul>
-			</div><!--/.nav-collapse -->
-		</div>
-	</nav>
+    <div class="nav-center">
+      <a class="nav-item is-brand" href="{% url 'home' %}">
+        <span class="icon is-medium">
+          <span class="fa fa-bus"></span>
+        </span>
+        <span class="icon is-medium">
+          <span class="fa fa-clock-o"></span>
+        </span>
+        Mobili.Watch
+      </a>
+    </div>
 
+    <span class="nav-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
 
+    <div class="nav-right nav-menu">
+
+      <span class="nav-item">
+        {% if user.is_authenticated %}
+        <span>
+          Hello {{ user.first_name }}
+        </span>
+        <a class="button is-danger is-outlined" href="{% url 'logout' %}">
+          <span>{{ _('Logout') }}</span>
+          <span class="icon is-small">
+            <i class="fa fa-sign-out"></i>
+          </span>
+        </a>
+
+        {% else %}
+        <a class="button is-outlined" href="{% url 'signup' %}">
+          <span class="icon is-small">
+            <i class="fa fa-user-plus"></i>
+          </span>
+          <span>{{ _('Signup') }}</span>
+        </a>
+        <a class="button is-success is-outlined" href="{% url 'login' %}">
+          <span class="icon is-small">
+            <i class="fa fa-sign-in"></i>
+          </span>
+          <span>{{ _('Login') }}</span>
+        </a>
+        {% endif %}
+      </span>
+
+    </div>
+  </nav>
+
+  {% block fullcontent %}
 	<div class="container">
 		{% block content %}{% endblock %}
 	</div>
+  {% endblock %}
 
   {% render_bundle 'main' 'js' %}
 	{% block js %}{% endblock %}

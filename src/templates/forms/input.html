@@ -1,0 +1,16 @@
+{% load widget_tweaks %}
+
+<p class="control has-icon">
+
+  {% with WIDGET_ERROR_CLASS='is-danger' %}
+    {% render_field field placeholder=field.label class+="input" error_class+="is-danger" %}
+  {% endwith %}
+
+  <i class="fa fa-{{ icon }}"></i>
+
+  {% if field.errors %}
+    {% for err in field.errors %}
+    <span class="help is-danger">{{ err }}</span>
+    {% endfor %}
+  {% endif %}
+</p>

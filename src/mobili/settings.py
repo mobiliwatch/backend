@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
+from django.utils.translation import ugettext_lazy as _
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -38,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
-    'bootstrapform',
+    'widget_tweaks',
     'webpack_loader',
     'rest_framework',
     'rest_framework_gis',
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # Our apps
+    'mobili',
     'transport',
     'users',
     'screen',
@@ -55,6 +57,8 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'mobili.middlewares.ForceDefaultLanguageMiddleware',
+    #'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -77,6 +81,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.i18n',
             ],
         },
     },
@@ -130,15 +135,24 @@ SESSION_COOKIE_NAME = 'mobili.auth'
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'fr-fr'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Paris'
 
 USE_I18N = True
 
 USE_L10N = True
 
 USE_TZ = True
+
+LANGUAGES = [
+    ('fr', _('French')),
+    ('en', _('English')),
+]
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, '../lang')
+]
 
 
 # Static files (CSS, JavaScript, Images)

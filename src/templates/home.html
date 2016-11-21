@@ -1,70 +1,132 @@
 {% extends 'base.html' %}
 
-{% block content %}
+{% block fullcontent %}
 
 {% if user.is_authenticated %}
+<div class="container">
 
-<h1>Vos Lieux</h1>
-<a href="{% url 'location-create' %}" class="btn btn-info">
-  Ajouter un lieu
-</a>
-
-<div class="row">
-  {% for location in user.locations.all %}
-  <div class="col-xs-12 col-sm-6">
-    <div class="panel panel-default">
-      <div class="panel-heading">{{ location.name }}</div>
-      <div class="panel-body">
-        {{ location.address }} - {{ location.city }}
-
-        <ul>
-          {% for ls in location.line_stops.all %}
-          <li>
-            {{ ls.line.mode }} {{ ls.line.name }} vers {{ ls.direction.name }}
-          </li>
-          {% endfor %}
-        </ul>
-      </div>
-      <div class="panel-footer text-right">
-        <a href="{% url 'location-transports' location.pk %}" class="btn btn-primary">
-          Transports
-        </a>
-      </div>
+  <div class="columns">
+    <div class="column">
+      <h1 class="title">
+        {{ _('Your locations') }}
+      </h1>
+      <h2 class="subtitle">
+        {{ _('Add some locations to display them on your screens') }}
+      </h2>
+    </div>
+    <div class="column has-text-right">
+      <a href="{% url 'location-create' %}" class="button is-info is-medium">
+        <span class="icon">
+          <span class="fa fa-globe"></span>
+        </span>
+        <span>{{ _('Add a location') }}</span>
+      </a>
     </div>
   </div>
-  {% endfor %}
-</div>
+  <hr />
 
-<h1>Vos écrans</h1>
-<a href="{% url 'screen-create' %}" class="btn btn-info">
-  Ajouter un écran
-</a>
-<div class="row">
-  {% for screen in user.screens.all %}
-  <div class="col-xs-12 col-sm-6">
-    <div class="panel panel-default">
-      <div class="panel-heading">{{ screen.name }}</div>
-      <div class="panel-body">
-        ...
-      </div>
-      <div class="panel-footer text-right">
-        <a href="{% url 'screen' screen.slug %}" class="btn btn-primary">
-          Editer
-        </a>
-        <a href="{{ screen.frontend_url }}" class="btn btn-success" target="_blank">
-          Voir
-        </a>
+  <div class="columns">
+    {% for location in user.locations.all %}
+    <div class="column is-one-third">
+      <div class="box">
+        <h5 class="title">{{ location.name }}</h5>
+        <h4 class="subtitle">{{ location.address }} - {{ location.city }}</h5>
+        {% for ls in location.line_stops.all %}
+        <p class="line">
+          {% if ls.line.mode == 'tram' %}
+          <span class="tag is-success">{{ _('Tramway') }} {{ ls.line.name }}</span>
+          {% elif ls.line.mode == 'bus' %}
+          <span class="tag is-primary">{{ _('Bus') }} {{ ls.line.name }}</span>
+          {% elif ls.line.mode == 'car' %}
+          <span class="tag is-info">{{ _('Autocar') }} {{ ls.line.name }}</span>
+          {% else %}
+          <span class="tag">{{ ls.line.mode }} {{ ls.line.mode }}</span>
+          {% endif %}
+          {{ _('towards') }} {{ ls.direction.name }}
+        </p>
+        {% endfor %}
+        <nav class="level">
+          <div class="level-left">
+            <a class="level-item" href="{% url 'location-transports' location.pk %}">
+              <span class="icon is-small"><i class="fa fa-plus"></i></span>
+              <span>{{ _('Transport stops') }}</span>
+            </a>
+          </div>
+        </nav>
       </div>
     </div>
+    {% endfor %}
   </div>
-  {% endfor %}
-</div>
 
+  <div class="columns">
+    <div class="column">
+      <h1 class="title">
+        {{ _('Your screens') }}
+      </h1>
+      <h2 class="subtitle">
+        {{ _('Manage all your screens to display informations') }}
+      </h2>
+    </div>
+    <div class="column has-text-right">
+      <a href="{% url 'screen-create' %}" class="button is-info is-medium">
+        <span class="icon">
+          <span class="fa fa-desktop"></span>
+        </span>
+        <span>{{ _('Add a screen') }}</span>
+      </a>
+    </div>
+  </div>
+  <hr />
+
+  <div class="columns">
+    {% for screen in user.screens.all %}
+    <div class="column is-one-third">
+      <div class="box">
+        <h5 class="title">{{ screen.name }}</h5>
+        <nav class="level">
+          <div class="level-left">
+            <a class="level-item" href="{% url 'screen' screen.slug %}">
+              <span class="icon is-small"><i class="fa fa-pencil"></i></span>
+              <span>{{ _('Edit') }}</span>
+            </a>
+            <a class="level-item is-primary" href="{{ screen.frontend_url }}" target="_blank">
+              <span class="icon is-small"><i class="fa fa-desktop"></i></span>
+              <span>{{ _('View') }}</span>
+            </a>
+          </div>
+        </nav>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
 
 {% else %}
-<p class="alert alert-info">
-  Please login or signup.
-</p>
+<section class="hero is-dark is-large">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        {{ _('Welcome on Mobili.Watch !') }}
+      </h1>
+      <h2 class="subtitle">
+         Lorem ipsum...
+      </h2>
+      <a class="button is-large is-light is-outlined" href="{% url 'signup' %}">
+        <span class="icon is-medium">
+          <i class="fa fa-user-plus"></i>
+        </span>
+        <span>{{ _('Signup') }}</span>
+      </a>
+      <a class="button is-large is-success is-outlined" href="{% url 'login' %}">
+        <span class="icon is-medium">
+          <i class="fa fa-sign-in"></i>
+        </span>
+        <span>{{ _('Login') }}</span>
+      </a>
+
+    </div>
+  </div>
+</section>
 {% endif %}
 
 {% endblock %}

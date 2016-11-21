@@ -1,0 +1,17 @@
+{% load widget_tweaks %}
+
+<label class="label">{{ field.label }}</span>
+<p class="control">
+
+  <span class="select">
+    {% with WIDGET_ERROR_CLASS='is-danger' %}
+      {% render_field field error_class+="is-danger" %}
+    {% endwith %}
+  </span>
+
+  {% if field.errors %}
+    {% for err in field.errors %}
+    <span class="help is-danger">{{ err }}</span>
+    {% endfor %}
+  {% endif %}
+</p>

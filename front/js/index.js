@@ -16,5 +16,6 @@ var app = new Vue({
 });
 
 // Css
-require('bootstrap/dist/css/bootstrap.css');
+require('bulma/css/bulma.css');
+require('font-awesome/css/font-awesome.css');
 require('css/mobili.css');

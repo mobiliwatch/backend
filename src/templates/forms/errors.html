@@ -1,0 +1,8 @@
+{% if errors %}
+<div class="notification is-warning">
+  <h5 class="subtitle">{{ _('Error') }}</h5>
+  {% for err in errors %}
+  <p>{{ err }}</p>
+  {% endfor %}
+</div>
+{% endif %}

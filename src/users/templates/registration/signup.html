@@ -1,21 +1,25 @@
 {% extends 'base.html' %}
 
-{% load bootstrap %}
+{% load bulma_forms %}
 
 {% block content %}
-
 <form method="post" action="">
-  <legend>Signup</legend>
-
+  <h3 class="title">{{ _('Signup') }}</h3>
   {% csrf_token %}
-  {{ form|bootstrap_horizontal }}
+
+  {% form_errors form %}
+  {% form_input form.first_name 'user' %}
+  {% form_input form.last_name 'user' %}
+  {% form_input form.email 'envelope' %}
+  {% form_input form.password1 'lock' %}
+  {% form_input form.password2 'lock' %}
 
   <hr />
-  <div class="form-group">
-    <div class="col-xs-12 col-sm-10 col-sm-offset-2">
-      <button type="submit" class="btn btn-primary">Signup</button>
-    </div>
-  </div>
+  <p class="control">
+    <button class="button is-success" type="submit">
+      {{ _('Signup') }}
+    </button>
+  </p>
 </form>
 
 {% endblock %}
