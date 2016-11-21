@@ -29,22 +29,38 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RunPython(remove_widgets),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='clockwidget',
+            name='id',
+	),
+        migrations.AddField(
             model_name='clockwidget',
             name='id',
             field=models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='locationwidget',
+            name='id',
+	),
+        migrations.AddField(
             model_name='locationwidget',
             name='id',
             field=models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='notewidget',
+            name='id',
+	),
+        migrations.AddField(
             model_name='notewidget',
             name='id',
             field=models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False),
         ),
-        migrations.AlterField(
+        migrations.RemoveField(
+            model_name='weatherwidget',
+            name='id',
+	),
+        migrations.AddField(
             model_name='weatherwidget',
             name='id',
             field=models.UUIDField(default=uuid.uuid4, primary_key=True, serialize=False),
