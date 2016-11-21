@@ -27,6 +27,7 @@ class DirectionSerializer(serializers.ModelSerializer):
 class LineStopSerializer(serializers.ModelSerializer):
     line = LineSerializer()
     direction = DirectionSerializer()
+    times = serializers.SerializerMethodField()
 
     class Meta:
         model = LineStop
@@ -35,7 +36,12 @@ class LineStopSerializer(serializers.ModelSerializer):
             'point',
             'line',
             'direction',
+            'times',
         )
+
+    def get_times(self, widget):
+        # Placeholder for WS updates
+        return []
 
 class StopSerializer(serializers.ModelSerializer):
     line_stops = LineStopSerializer(many=True)
@@ -106,10 +112,20 @@ class WidgetSerializer(serializers.Serializer):
     """
     id = serializers.UUIDField()
     type = serializers.SerializerMethodField()
+    revision = serializers.SerializerMethodField()
 
     def get_type(self, widget):
         return widget.__class__.__name__
 
+    def get_revision(self, widget):
+        """
+        Do NOT remove this
+        This simplifies a lot the whole update process
+        through websockets + vuejs : as we update on add_update
+        the revision, the whole object gets evaluated again
+        allowing us to add more fields !
+        """
+        return 1
 
 class ClockWidgetSerializer(WidgetSerializer):
     now = serializers.DateTimeField()
@@ -122,7 +138,6 @@ class WeatherWidgetSerializer(WidgetSerializer):
 
 class LocationWidgetSerializer(WidgetSerializer):
     location = LocationSerializer()
-
 
 class WidgetsSerializer(serializers.ListSerializer):
     """

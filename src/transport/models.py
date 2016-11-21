@@ -2,6 +2,10 @@ from django.contrib.gis.db import models
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
 from django.contrib.gis.geos import Point
+from api import MetroMobilite
+import logging
+
+logger = logging.getLogger('transport.models')
 
 
 class Line(models.Model):
@@ -59,6 +63,34 @@ class LineStop(models.Model):
             ('line', 'direction', 'order'),
         )
 
+    def get_next_times(self):
+        """
+        Get stop hours for this stop
+        and direction
+        """
+        import random
+        return [random.randint(0, 1000) for _ in range(3)]
+
+        if self.stop.metro_cluster and self.line.metro_id:
+
+            # Reorder results per directions
+            try:
+                api = MetroMobilite()
+                results = api.get_next_times(self.stop.metro_cluster, self.line.metro_id)
+                directions = dict([(r['pattern']['dir'],r['times']) for r in results])
+                times = directions.get(self.direction.itinisere_id) # yes, use itinisere id here. looks liek it matches
+                if times is None:
+                    raise Exception('Missing metro mobilite times')
+
+                # Convert in nice timestamps
+                return [t['serviceDay'] + t.get('realtimeArrival', t['scheduledArrival']) for t in times]
+            except Exception as e:
+                logger.error('Metro time lookup failed: {}'.format(e))
+
+        self.stop.get_next_times()
+
+        return []
+
 class Stop(models.Model):
     """
     A Logical stop on some transport lines
@@ -88,6 +120,12 @@ class Stop(models.Model):
         x, y = map(mean, zip(*points))
         self.point = Point(x, y)
         return self.point
+
+    def get_next_times(self):
+        """
+        Get stop hours for this stop
+        """
+        print('Itinisere search', self.itinisere_id)
 
 
 class City(models.Model):
