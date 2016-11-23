@@ -1,7 +1,7 @@
 <script>
 module.exports = {
   props : {
-    widget : Object,
+    widgetId : String,
   },
   data : function(){
     return {};
@@ -14,9 +14,7 @@ module.exports = {
   <div class="tile is-parent">
     <article class="tile is-child notification is-info">
       <div class="content">
-        <pre>
-          {{ widget }}
-        </pre>
+        <h1>{{ widgetId }}</pre>
 
       </div>
     </article>

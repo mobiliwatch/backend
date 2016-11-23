@@ -1,11 +1,7 @@
 {% extends 'base.html' %}
 
-{% block content %}
-<h1>{{ location.name }}</h1>
-<h5>{{ location.address }} - {{ location.city }}</h5>
-
+{% block fullcontent %}
 <div id="app">
-  <Transports :lat="{{ location.point.x }}" :lng="{{ location.point.y }}" :location_id="{{ location.id }}" :line_stops_initial="{{ location.line_stops_json }}" />
+  <Transports name="{{ location.name }}" address="{{ location.address }} - {{ location.city }}" :point="{{ location.point.geojson }}" :location_id="{{ location.id }}" :line_stops_initial="{{ location.line_stops_json }}" ></Transports>
 </div>
-
 {% endblock %}

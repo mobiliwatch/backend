@@ -11,9 +11,10 @@
       </div>
     </div>
 
-    <div class="alert alert-info" v-if="current_stop == null">
+    <div class="notification is-info" v-if="current_stop == null">
       Veuillez sélectionner un arrêt pour voir les détails.
     </div>
+
   </div>
 </template>
 

@@ -18,8 +18,7 @@ require('leaflet-extra-markers/dist/css/leaflet.extra-markers.min.css');
 
 module.exports = {
   props : {
-    lng : Number,
-    lat : Number,
+    point: Object,
     stops: Array,
     'current_stop' : Object,
   },
@@ -36,7 +35,7 @@ module.exports = {
 
     // Setup base map
     this.$nextTick(function () {
-      var map = L.map(this.$el).setView([this.lng, this.lat], 16);
+      var map = L.map(this.$el).setView(this.point.coordinates, 16);
 
       // Use grayscale tiles
       L.tileLayer('http://{s}.grayscale.osm.maptiles.xyz/{z}/{x}/{y}.png', {
@@ -47,13 +46,13 @@ module.exports = {
 
       // Add a marker for location
       var icon = L.ExtraMarkers.icon({
-        icon: 'glyphicon-home',
+        icon: 'fa-home',
         markerColor: 'green',
         shape: 'square',
-        prefix: 'glyphicon'
+        prefix: 'fa'
       });
 
-      L.marker([this.lng, this.lat], {icon: icon,}).addTo(map);
+      L.marker(this.point.coordinates, {icon: icon,}).addTo(map);
 
       this.$set(this, 'map', map);
 
@@ -73,10 +72,10 @@ module.exports = {
         var stop = this.stops[s];
 
         var icon = L.ExtraMarkers.icon({
-          icon: 'glyphicon-star',
+          icon: 'fa-star',
           markerColor: 'blue',
           shape: 'square',
-          prefix: 'glyphicon'
+          prefix: 'fa'
         });
 
         var coords = stop.point.coordinates;

@@ -24,7 +24,7 @@ module.exports = {
     <Group :group="g" :widgets="widgets" v-for="g in group.groups" />
 
     <div class="tile" v-for="w in group.widgets">
-      <Widget :widget="widgets[w]" />
+      <Widget :widgetId="w" />
     </div>
 
   </div>

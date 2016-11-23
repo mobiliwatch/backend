@@ -1,21 +1,48 @@
 <template>
-  <ul class="list-group">
-    <li class="list-group-item" v-bind:class="{active : stop == current_stop}" v-on:click="selected(stop)" v-for="(stop, i) in stops">
-      <span class="badge">{{ stop.distance }} m</span>
-      {{ stop.name }}
+  <aside class="menu">
+    <ul class="menu-list">
+      <li v-on:click="selected(stop)" v-for="(stop, i) in stops">
+        <a href="javascript:null" v-bind:class="{'is-active' : stop == current_stop}">
+          <strong>{{ stop.name }}</strong> à {{ stop.distance }} m
+        </a>
 
-      <ul>
-        <li v-for="ls in line_stops_dict[stop.id]">
-          {{ ls.line.mode }} {{ ls.line.name }} vers {{ ls.direction.name }}
-        </li>
-      </ul>
-    </li>
-  </ul>
+        <ul v-if="line_stops_dict[stop.id].length">
+          <li v-for="ls in line_stops_dict[stop.id]">
+            {{ ls.line.mode }} {{ ls.line.name }} vers {{ ls.direction.name }}
+          </li>
+        </ul>
+        <p class="no-selection" v-else>
+          <span class="icon is-small">
+            <span class="fa fa-bus"></span>
+          </span>
+          Aucune ligne sélectionée pour cet arrêt.
+        </p>
+
+      </li>
+    </ul>
+  </aside>
 </template>
 
 <style scoped>
-ul li.list-group-item {
+ul.menu-list li {
   cursor: pointer;
+  margin-bottom: 6px;
+}
+
+ul.menu-list li ul {
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
+}
+
+ul.menu-list a {
+  padding-bottom: 0 !important;
+  padding-top: 1px !important;
+}
+
+p.no-selection {
+  font-size: 0.8em;
+  margin-left: 8px;
+  color: #CCC;
 }
 </style>
 
