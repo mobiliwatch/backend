@@ -27,5 +27,26 @@ module.exports = {
       <Widget :widgetId="w" />
     </div>
 
+<!--
+    <div class="control is-grouped">
+      <p class="control has-addons">
+        <button class="button">
+          <span class="icon is-small">
+            <i class="fa fa-plus"></i>
+          </span>
+        <span>Ajouter un widget</span>
+        </button>
+      </p>
+      <p class="control has-addons">
+        <button class="button">
+          <span class="icon is-small">
+            <i class="fa fa-align-left"></i>
+          </span>
+        <span>Left</span>
+        </button>
+      </p>
+    </div>
+-->
+
   </div>
 </template>

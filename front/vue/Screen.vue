@@ -17,6 +17,11 @@ module.exports = {
     var url = '/api/screen/' + this.slug + '/';
     this.$http.get(url).then(function(resp){
       this.$set(this, 'screen', resp.body);
+
+      var store = this.$store;
+      this.screen.widgets.forEach(function(w){
+        store.commit('add_widget', w);
+      });
     });
   },
 };

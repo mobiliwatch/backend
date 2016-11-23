@@ -6,6 +6,11 @@ module.exports = {
   data : function(){
     return {};
   },
+  computed : {
+    widget : function(){
+      return this.$store.state.widgets[this.widgetId];
+    },
+  }
 };
 </script>
 
@@ -14,8 +19,8 @@ module.exports = {
   <div class="tile is-parent">
     <article class="tile is-child notification is-info">
       <div class="content">
-        <h1>{{ widgetId }}</pre>
-
+        <h1 class="title">{{ widget.type }}</h1>
+        <h5 class="subtitle">{{ widget.id }}</h5>
       </div>
     </article>
   </div>
