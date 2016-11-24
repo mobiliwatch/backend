@@ -124,6 +124,7 @@ class WidgetSerializer(serializers.Serializer):
         through websockets + vuejs : as we update on add_update
         the revision, the whole object gets evaluated again
         allowing us to add more fields !
+        DEPRECATED ? to test
         """
         return 1
 
@@ -133,16 +134,27 @@ class ClockWidgetSerializer(WidgetSerializer):
 class NoteWidgetSerializer(WidgetSerializer):
     text = serializers.CharField()
 
+    def update(self, widget, data):
+
+        # Save on Db
+        widget.text = data['text']
+        widget.save()
+
+        # Send update through ws
+        widget.send_ws_update({
+            'text' : widget.text,
+        })
+        return widget
+
 class WeatherWidgetSerializer(WidgetSerializer):
     weather = serializers.CharField(source='get_weather')
 
 class LocationWidgetSerializer(WidgetSerializer):
     location = LocationSerializer()
 
-class WidgetsSerializer(serializers.ListSerializer):
+def get_widget_serializer(widget):
     """
-    This is where the magic happens:
-    For each widget class, there is a mapped serializer
+    Find correct serializer for an instance
     """
     serializers = {
         ClockWidget : ClockWidgetSerializer,
@@ -150,6 +162,13 @@ class WidgetsSerializer(serializers.ListSerializer):
         NoteWidget : NoteWidgetSerializer,
         LocationWidget : LocationWidgetSerializer,
     }
+    return serializers.get(widget.__class__, WidgetSerializer)
+
+class WidgetsSerializer(serializers.ListSerializer):
+    """
+    This is where the magic happens:
+    For each widget class, there is a mapped serializer
+    """
 
     def __init__(self, *args, **kwargs):
         # Do not instanciante any "child"
@@ -160,7 +179,7 @@ class WidgetsSerializer(serializers.ListSerializer):
         def _serialize(widget):
             # Fetch the mapped serializer
             # Fallback to base serializer
-            cls = self.serializers.get(widget.__class__, WidgetSerializer)
+            cls = get_widget_serializer(widget)
             return cls().to_representation(instance=widget)
 
         return [_serialize(w) for w in widgets]

@@ -19,6 +19,7 @@ module.exports = {
       this.$set(this, 'screen', resp.body);
 
       var store = this.$store;
+      store.commit('use_screen', this.slug);
       this.screen.widgets.forEach(function(w){
         store.commit('add_widget', w);
       });

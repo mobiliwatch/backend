@@ -50,3 +50,9 @@ module.exports = {
 
   </div>
 </template>
+
+<style scoped>
+div.group {
+/*  border: 1px solid red; */
+}
+</style>

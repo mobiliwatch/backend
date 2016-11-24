@@ -1,2 +1,2 @@
 from .location import LocationStops, LocationDetails
-from .screen import ScreenDetails
+from .screen import ScreenDetails, WidgetUpdate
