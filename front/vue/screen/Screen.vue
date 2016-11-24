@@ -1,5 +1,5 @@
 <script>
-var Group = require('./WidgetGroup.vue');
+var Group = require('./Group.vue');
 
 module.exports = {
   components : {

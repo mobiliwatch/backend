@@ -2,8 +2,8 @@
 var Vue = require('vue/dist/vue.js');
 Vue.use(require('vue-resource'));
 Vue.use(require('vuex'));
-var Transports = require('vue/Transports.vue')
-var Screen = require('vue/Screen.vue')
+var Transports = require('vue/transports/Transports.vue')
+var Screen = require('vue/screen/Screen.vue')
 
 // Add csrf token
 Vue.http.headers.common['X-CSRFTOKEN'] = document.querySelector('#csrf').getAttribute('content');

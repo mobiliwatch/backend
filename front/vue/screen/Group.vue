@@ -6,7 +6,7 @@ module.exports = {
     Widget : Widget,
   },
   beforeCreate: function () {
-    this.$options.components.Group = require('./WidgetGroup.vue')
+    this.$options.components.Group = require('./Group.vue')
   },
   props : {
     widgets : Array,

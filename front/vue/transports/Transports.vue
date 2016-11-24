@@ -4,7 +4,7 @@
       <div class="tile is-parent">
         <div class="tile is-child box is-3">
           <p class="title">{{ stops.length }} arrêts trouvés</p>
-          <TransportsStops :stops="stops" :current_stop="current_stop" :line_stops="line_stops" v-on:selected_stop="selected_stop" />
+          <Stops :stops="stops" :current_stop="current_stop" :line_stops="line_stops" v-on:selected_stop="selected_stop" />
           <hr />
           <div>
             <label class="label">Changer la distance de recherche des arrêts</label>
@@ -19,7 +19,7 @@
         <div class="tile is-child is-6">
           <p class="title">{{ name }}</p>
           <p class="subtitle">{{ address }}</p>
-          <TransportsMap :point="point" :stops="stops" :current_stop="current_stop" v-on:selected_stop="selected_stop"></TransportsMap>
+          <Map :point="point" :stops="stops" :current_stop="current_stop" v-on:selected_stop="selected_stop"></Map>
 
           <div class="notification is-success" v-if="saved">
             <span class="icon">
@@ -30,7 +30,7 @@
         </div>
         <div class="tile is-child box">
           <p class="title">Choisir ses arrêts</p>
-          <TransportsStop :current_stop="current_stop" :line_stops="line_stops" v-on:toggle_line_stop="toggle_line_stop"/>
+          <Stop :current_stop="current_stop" :line_stops="line_stops" v-on:toggle_line_stop="toggle_line_stop"/>
         </div>
       </div>
     </div>
@@ -38,9 +38,9 @@
 </template>
 
 <script>
-var TransportsMap = require('vue/TransportsMap.vue');
-var TransportsStop = require('vue/TransportsStop.vue');
-var TransportsStops = require('vue/TransportsStops.vue');
+var Map = require('vue/transports/Map.vue');
+var Stop = require('vue/transports/Stop.vue');
+var Stops = require('vue/transports/Stops.vue');
 
 module.exports = {
   props : {
@@ -61,9 +61,9 @@ module.exports = {
     };
   },
   components : {
-    TransportsMap : TransportsMap,
-    TransportsStop : TransportsStop,
-    TransportsStops : TransportsStops,
+    Map : Map,
+    Stop : Stop,
+    Stops : Stops,
   },
   mounted : function(){
     this.load_stops();
