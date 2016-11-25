@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from screen.models import Screen, NoteWidget, LocationWidget
+from screen.models import Screen, NoteWidget, LocationWidget, WeatherWidget
 
 class Command(BaseCommand):
     help = 'Update all screens data though WebSockets'
@@ -48,6 +48,9 @@ class Command(BaseCommand):
         Update weather data for a screen
         """
         print('Update weather for screen {}'.format(screen))
+        widgets = WeatherWidget.objects.filter(group__screen=screen)
+        for w in widgets:
+            w.send_ws_update()
 
     def update_note(self, screen):
         """
@@ -57,9 +60,7 @@ class Command(BaseCommand):
 
         widgets = NoteWidget.objects.filter(group__screen=screen)
         for w in widgets:
-            w.send_ws_update({
-                'text' : w.text + '4',
-            })
+            w.send_ws_update()
 
     def update_location(self, screen):
         """
@@ -69,15 +70,4 @@ class Command(BaseCommand):
         widgets = LocationWidget.objects.filter(group__screen=screen)
         for w in widgets:
             print('Location: {}'.format(w.location))
-            w.send_ws_update({
-
-                'location' : {
-                    'line_stops' : [{
-                        'times' : ls.get_next_times()
-                    } for ls in w.location.line_stops.all()]
-                },
-
-                'times' : {
-                    45 : [1, 2,]
-                }
-            })
+            w.send_ws_update()

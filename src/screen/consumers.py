@@ -1,4 +1,5 @@
 from channels.auth import channel_session_user, channel_session_user_from_http
+from channels import Group
 import logging
 
 logger = logging.getLogger('screen.consumers')
@@ -19,6 +20,24 @@ def screen_required(func):
         return func(message, slug)
     return wrapper
 
+def async_screen_init(message):
+    """
+    Asynchronously init a screen
+    so that we don't lock any process
+    Connected to channel screen_init
+    """
+    screen = message.content['screen']
+
+    # Mark this screen as active
+    if not message.screen.active:
+        message.screen.active = True
+        message.screen.save()
+
+    # Send initial update for widgets
+    for widget in screen.all_widgets:
+        widget.send_ws_update()
+
+
 @channel_session_user_from_http
 @screen_required
 def ws_screen_add(message, slug):
@@ -29,10 +48,11 @@ def ws_screen_add(message, slug):
     # Use this channel for this screen
     message.screen.ws_group.add(message.reply_channel)
 
-    # Mark this screen as active
-    if not message.screen.active:
-        message.screen.active = True
-        message.screen.save()
+    # Async screen init
+    # TODO
+    Group('screen_init').send({
+        'screen' : message.screen,
+    })
 
 @channel_session_user
 @screen_required

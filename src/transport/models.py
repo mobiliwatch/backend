@@ -1,8 +1,9 @@
 from django.contrib.gis.db import models
+from django.contrib.gis.geos import Point
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
 from django.contrib.gis.geos import Point
-from api import MetroMobilite
+from api import MetroMobilite, Bano, Weather
 import logging
 
 logger = logging.getLogger('transport.models')
@@ -134,9 +135,31 @@ class City(models.Model):
     """
     insee_code = models.CharField(max_length=8, unique=True)
     name = models.CharField(max_length=250)
+    position = models.PointField(null=True, blank=True)
 
     class Meta:
         ordering = ('name', )
 
     def __str__(self):
         return self.name
+
+    def find_position(self):
+        api = Bano()
+        resp = api.get_city(self.name, self.insee_code)
+        if not resp or not resp.get('features'):
+            raise Exception('No result found')
+
+        best = resp['features'][0]['geometry']['coordinates']
+        self.position = Point(*best)
+        return self.position
+
+    def get_weather(self):
+        """
+        Get current weather
+        """
+        if not self.position:
+            self.find_position()
+            self.save()
+
+        w = Weather()
+        return w.now(self.position)

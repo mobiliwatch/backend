@@ -1,9 +1,17 @@
-from transport.models import Stop, LineStop, Line, Direction
+from transport.models import Stop, LineStop, Line, Direction, City
 from users.models import Location
 from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget, Group
 from rest_framework import serializers
 from mobili.helpers import haversine_distance
 
+
+class CitySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = City
+        fields = (
+            'name',
+        )
 
 class LineSerializer(serializers.ModelSerializer):
 
@@ -112,24 +120,12 @@ class WidgetSerializer(serializers.Serializer):
     """
     id = serializers.UUIDField()
     type = serializers.SerializerMethodField()
-    revision = serializers.SerializerMethodField()
 
     def get_type(self, widget):
         return widget.__class__.__name__
 
-    def get_revision(self, widget):
-        """
-        Do NOT remove this
-        This simplifies a lot the whole update process
-        through websockets + vuejs : as we update on add_update
-        the revision, the whole object gets evaluated again
-        allowing us to add more fields !
-        DEPRECATED ? to test
-        """
-        return 1
-
 class ClockWidgetSerializer(WidgetSerializer):
-    now = serializers.DateTimeField()
+    now = serializers.FloatField()
 
 class NoteWidgetSerializer(WidgetSerializer):
     text = serializers.CharField()
@@ -141,13 +137,12 @@ class NoteWidgetSerializer(WidgetSerializer):
         widget.save()
 
         # Send update through ws
-        widget.send_ws_update({
-            'text' : widget.text,
-        })
+        widget.send_ws_update()
+
         return widget
 
 class WeatherWidgetSerializer(WidgetSerializer):
-    weather = serializers.CharField(source='get_weather')
+    city = CitySerializer()
 
 class LocationWidgetSerializer(WidgetSerializer):
     location = LocationSerializer()

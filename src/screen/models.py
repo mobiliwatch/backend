@@ -3,7 +3,6 @@ from django.utils.translation import ugettext_lazy as _
 from users.models import Location
 from django.utils.text import slugify
 from channels import Group as WsGroup
-from datetime import datetime
 import uuid
 import time
 import json
@@ -168,8 +167,8 @@ class Widget(models.Model):
         Send an update to screens through WebSockets
         """
         # Build update data
-        # TODO: build serialized data
-        update = {}
+        update = self.build_update()
+        print('sending', update)
 
         if isinstance(extra_data, dict):
             update.update(extra_data)
@@ -185,6 +184,11 @@ class Widget(models.Model):
             'text' : json.dumps(data)
         })
 
+    def build_update(self):
+        """
+        Implemented in sub classes
+        """
+        raise NotImplementedError
 
 class ClockWidget(Widget):
     """
@@ -193,8 +197,19 @@ class ClockWidget(Widget):
     timezone = models.CharField(max_length=250, default='Europe/Paris')
 
     def now(self):
+        """
+        As timestamp !
+        """
         # TODO: use timezone
-        return datetime.now()
+        return time.time()
+
+    def build_update(self):
+        """
+        Send date to screens
+        """
+        return {
+            'now' : self.now(),
+        }
 
 class LocationWidget(Widget):
     """
@@ -202,12 +217,18 @@ class LocationWidget(Widget):
     """
     location = models.ForeignKey('users.Location', related_name='widgets')
 
-    def get_size(self):
-        w, h = self.screen.size
-        if self.screen.ratio == '16:9':
-            return (w / 2, h)
-        if self.screen.ratio == '9:16':
-            return (w, h / 2)
+    def build_update(self):
+        """
+        Send next times to screens
+        """
+        return {
+            'location' : {
+                'line_stops' : [{
+                    'times' : ls.get_next_times()
+                } for ls in self.location.line_stops.all()]
+            },
+        }
+
 
 class WeatherWidget(Widget):
     """
@@ -215,12 +236,32 @@ class WeatherWidget(Widget):
     """
     city = models.ForeignKey('transport.City', related_name='weather_widgets')
 
-    def get_weather(self):
-        # TODO
-        return 'sunny'
+    def build_update(self):
+        """
+        Send weather to screens
+        """
+        weather = self.city.get_weather()
+        return {
+            'observed' : weather.get_reference_time(),
+            'wind' : weather.get_wind(),
+            'humidity' : weather.get_humidity(),
+            'temperature' : weather.get_temperature(unit='celsius'),
+            'status' : weather.get_status(),
+            'code' : weather.get_weather_code(),
+            'sunrise' : weather.get_sunrise_time(),
+            'sunset' : weather.get_sunset_time(),
+        }
 
 class NoteWidget(Widget):
     """
     Display some text on a screen
     """
     text = models.TextField()
+
+    def build_update(self):
+        """
+        Send text to screens
+        """
+        return {
+            'text' : self.text,
+        }

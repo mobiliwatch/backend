@@ -207,6 +207,9 @@ CORS_ALLOW_CREDENTIALS = True
 # Frontend
 FRONTEND_SCREEN_URL = 'http://localhost:8080/#/screen/{}'
 
+# Weather
+OPEN_WEATHER_MAP_API = None
+
 try:
     from .local_settings import *
 except ImportError:
