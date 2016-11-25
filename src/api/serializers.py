@@ -198,6 +198,15 @@ class GroupSerializer(serializers.ModelSerializer):
 
 GroupSerializer._declared_fields['groups'] = GroupSerializer(many=True) # recursive !
 
+class ScreenLightSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Screen
+        fields = (
+            'name',
+            'slug',
+            'ratio',
+        )
+
 class ScreenSerializer(serializers.ModelSerializer):
 
     groups = GroupSerializer(many=True, source='top_groups')

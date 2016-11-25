@@ -1,5 +1,5 @@
-from rest_framework.generics import RetrieveAPIView, UpdateAPIView
-from api.serializers import ScreenSerializer, get_widget_serializer
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView
+from api.serializers import ScreenLightSerializer, ScreenSerializer, get_widget_serializer
 from screen.models import Screen, Widget
 from django.http import Http404
 
@@ -12,6 +12,15 @@ class ScreenMixin(object):
             return self.request.user.screens.get(slug=self.kwargs['slug'])
         except Screen.DoesNotExist:
             raise Http404
+
+class ScreenList(ScreenMixin, ListAPIView):
+    """
+    List simplified screens
+    """
+    serializer_class = ScreenLightSerializer
+
+    def get_queryset(self):
+        return self.request.user.screens.all()
 
 class ScreenDetails(ScreenMixin,RetrieveAPIView):
     """

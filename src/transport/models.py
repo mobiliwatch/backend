@@ -68,9 +68,9 @@ class LineStop(models.Model):
         Get stop hours for this stop
         and direction
         """
-        import random
-        return [random.randint(0, 1000) for _ in range(3)]
-
+#        import random
+#        return [random.randint(0, 1000) for _ in range(3)]
+#
         if self.stop.metro_cluster and self.line.metro_id:
 
             # Reorder results per directions
