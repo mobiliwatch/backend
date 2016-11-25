@@ -5,6 +5,7 @@ from django.utils.text import slugify
 from channels import Group as WsGroup
 from datetime import datetime
 import uuid
+import time
 import json
 
 RATIOS = (
@@ -173,6 +174,7 @@ class Widget(models.Model):
         if isinstance(extra_data, dict):
             update.update(extra_data)
         data = {
+            'time' : time.time(),
             'widget': str(self.id),
             'update': update,
         }
