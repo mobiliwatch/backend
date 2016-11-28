@@ -1,6 +1,11 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib.auth import views as auth
-from users.views import Signup, LocationCreate, LocationTransports
+from users.views import Signup, LocationCreate, LocationTransports, LocationDelete
+
+location_patterns = [
+    url('^$', LocationTransports.as_view(), name='location-transports'),
+    url('^delete/$', LocationDelete.as_view(), name='location-delete'),
+]
 
 urlpatterns = (
 
@@ -11,5 +16,5 @@ urlpatterns = (
 
     # User locations
     url('^location/new/$', LocationCreate.as_view(), name='location-create'),
-    url('^location/(?P<pk>\d+)/$', LocationTransports.as_view(), name='location-transports'),
+    url('^location/(?P<pk>\d+)/', include(location_patterns)),
 )

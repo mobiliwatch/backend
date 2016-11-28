@@ -1,5 +1,6 @@
 from channels.auth import channel_session_user, channel_session_user_from_http
-from channels import Group
+from channels import Group, Channel
+from screen import models
 import logging
 
 logger = logging.getLogger('screen.consumers')
@@ -24,19 +25,29 @@ def async_screen_init(message):
     """
     Asynchronously init a screen
     so that we don't lock any process
-    Connected to channel screen_init
+    Connected to channel screen.init
     """
-    screen = message.content['screen']
+    screen = models.Screen.objects.get(id=message.content['screen'])
 
     # Mark this screen as active
-    if not message.screen.active:
-        message.screen.active = True
-        message.screen.save()
+    if not screen.active:
+        screen.active = True
+        screen.save()
 
     # Send initial update for widgets
     for widget in screen.all_widgets:
-        widget.send_ws_update()
+        Channel('screen.widget').send({
+            'widget_id' : str(widget.id),
+            'widget_class' : widget.__class__.__name__,
+        })
 
+def async_screen_widget(message):
+    """
+    Aysnchronously update a widget
+    """
+    cls = getattr(models, message.content['widget_class'])
+    widget = cls.objects.get(id=message.content['widget_id'])
+    widget.send_ws_update()
 
 @channel_session_user_from_http
 @screen_required
@@ -49,9 +60,8 @@ def ws_screen_add(message, slug):
     message.screen.ws_group.add(message.reply_channel)
 
     # Async screen init
-    # TODO
-    Group('screen_init').send({
-        'screen' : message.screen,
+    Channel('screen.init').send({
+        'screen' : message.screen.id,
     })
 
 @channel_session_user

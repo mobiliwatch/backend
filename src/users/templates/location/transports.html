@@ -2,6 +2,6 @@
 
 {% block fullcontent %}
 <div id="app">
-  <Transports name="{{ location.name }}" address="{{ location.address }} - {{ location.city }}" :point="{{ location.point.geojson }}" :location_id="{{ location.id }}" :line_stops_initial="{{ location.line_stops_json }}" ></Transports>
+  <Transports :location_id="{{ location.id }}"></Transports>
 </div>
 {% endblock %}

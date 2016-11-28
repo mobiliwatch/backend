@@ -18,6 +18,7 @@ require('leaflet-extra-markers/dist/css/leaflet.extra-markers.min.css');
 
 module.exports = {
   props : {
+    name: String,
     point: Object,
     stops: Array,
     'current_stop' : Object,
@@ -26,6 +27,7 @@ module.exports = {
   data : function(){
     return {
       map: null,
+      bounds : L.latLngBounds(),
       markers : {},
       stop_circles : null, // LayerGroup
     }
@@ -36,6 +38,7 @@ module.exports = {
     // Setup base map
     this.$nextTick(function () {
       var map = L.map(this.$el).setView(this.point.coordinates, 16);
+      this.$set(this, 'map', map);
 
       // Use grayscale tiles
       L.tileLayer('http://{s}.grayscale.osm.maptiles.xyz/{z}/{x}/{y}.png', {
@@ -44,59 +47,56 @@ module.exports = {
           '<a href="https://maptiles.xyz">Maptiles.xyz</a>'
       }).addTo(map);
 
-      // Add a marker for location
+      // Init stop circles
+      this.$set(this, 'stop_circles', L.layerGroup().addTo(this.map));
+    });
+  },
+
+  methods : {
+    add_marker : function(name, coords, icon_name, icon_color){
       var icon = L.ExtraMarkers.icon({
-        icon: 'fa-home',
-        markerColor: 'green',
+        icon: icon_name,
+        markerColor: icon_color,
         shape: 'square',
         prefix: 'fa'
       });
+      var point = L.latLng([coords[1], coords[0]]);
+      var marker = L.marker(point, {icon: icon,});
+      marker.bindPopup(name);
+      marker.addTo(this.map);
+      this.bounds.extend(point);
 
-      L.marker(this.point.coordinates, {icon: icon,}).addTo(map);
-
-      this.$set(this, 'map', map);
-
-      // Init stop circles
-      this.$set(this, 'stop_circles', L.layerGroup().addTo(map));
-    });
+      return marker;
+    },
   },
 
   watch : {
     stops : function(stops){
 
       // Display markers for stops
-      var bounds = L.latLngBounds();
       var map = this.map;
       var that = this;
+      var markers = [];
+
       for(var s in stops){
+        // Build marker for each stop
         var stop = this.stops[s];
-
-        var icon = L.ExtraMarkers.icon({
-          icon: 'fa-star',
-          markerColor: 'blue',
-          shape: 'square',
-          prefix: 'fa'
-        });
-
-        var coords = stop.point.coordinates;
-        var point = L.latLng([coords[1], coords[0]]);
-        var marker = L.marker(point, {icon: icon,});
-        marker.bindPopup(stop.name);
-        marker.addTo(map);
+        var marker = this.add_marker(stop.name, stop.point.coordinates, 'fa-star', 'blue');
         marker.on('click', function(){
           that.$emit('selected_stop', this.stop);
         });
-        bounds.extend(point);
 
         // Link marker to stop
-        var markers = this.markers;
         marker.stop = stop;
         markers[stop.id] = marker;
-        this.$set(this, 'markers', markers);
       }
+      this.$set(this, 'markers', markers);
+
+      // Add a marker for location
+      this.add_marker(this.name, this.point.coordinates, 'fa-home', 'green');
       
       // Map fit all points
-      map.fitBounds(bounds, {
+      map.fitBounds(this.bounds, {
         padding : [10, 10],
       });
     },

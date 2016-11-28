@@ -16,10 +16,27 @@
             </p>
           </div>
         </div>
-        <div class="tile is-child is-6">
-          <p class="title">{{ name }}</p>
-          <p class="subtitle">{{ address }}</p>
-          <Map :point="point" :stops="stops" :current_stop="current_stop" v-on:selected_stop="selected_stop"></Map>
+        <div class="tile is-child is-6" v-if="location">
+          <div class="level top">
+            <div class="level-left">
+              <div class="level-item">
+                <p class="title">{{ location.name }}</p>
+                <p class="heading">{{ location.address }} - {{ location.city.name }}</p>
+              </div>
+            </div>
+
+            <div class="level-right">
+              <p class="level-item" v-for="screen in location.screens">
+                <a :href="'/screen/' + screen.slug" class="button is-outlined is-success">
+                  <span class="icon is-small">
+                    <span class="fa fa-desktop"></span>
+                  </span>
+                  <span>{{ screen.name }}</span>
+                </a>
+              </p>
+            </div>
+          </div>
+          <TransportsMap :name="location.name" :point="location.point" :stops="stops" :current_stop="current_stop" v-on:selected_stop="selected_stop"></TransportsMap>
 
           <div class="notification is-success" v-if="saved">
             <span class="icon">
@@ -38,20 +55,17 @@
 </template>
 
 <script>
-var Map = require('vue/transports/Map.vue');
+var TransportsMap = require('vue/transports/Map.vue');
 var Stop = require('vue/transports/Stop.vue');
 var Stops = require('vue/transports/Stops.vue');
 
 module.exports = {
   props : {
-    name: String,
-    address : String,
     location_id : Number,
-    point : Object,
-    line_stops_initial : Array,
   },
   data : function(){
     return {
+      location: null,
       loading: false,
       saved : false,
       stops : [],
@@ -61,13 +75,13 @@ module.exports = {
     };
   },
   components : {
-    Map : Map,
+    TransportsMap : TransportsMap,
     Stop : Stop,
     Stops : Stops,
   },
   mounted : function(){
+    this.load_location();
     this.load_stops();
-    this.$set(this, 'line_stops', this.line_stops_initial);
   },
 
   methods : {
@@ -100,6 +114,21 @@ module.exports = {
       });
     },
 
+    // Load location data
+    load_location : function(){
+      var url = '/api/location/' + this.location_id + '/';
+      this.$http.get(url).then(function(resp){
+        this.$set(this, 'location', resp.body);
+
+        var line_stops = [];
+        this.location.line_stops.forEach(function(ls){
+          line_stops.push(ls);
+        });
+        this.$set(this, 'line_stops', line_stops);
+      }).catch(function(resp){
+        console.warn('No data', resp);
+      });
+    },
     load_stops : function(evt){
       if(evt)
         evt.preventDefault();
@@ -130,3 +159,11 @@ module.exports = {
   },
 }
 </script>
+
+<style scoped>
+
+div.tile div.level.top {
+  padding: 0 5px;
+  margin-bottom: 0px;
+}
+</style>

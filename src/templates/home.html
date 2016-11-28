@@ -51,6 +51,10 @@
               <span class="icon is-small"><i class="fa fa-plus"></i></span>
               <span>{{ _('Transport stops') }}</span>
             </a>
+            <a class="level-item" href="{% url 'location-delete' location.pk %}">
+              <span class="icon is-small"><i class="fa fa-trash"></i></span>
+              <span>{{ _('Delete') }}</span>
+            </a>
           </div>
         </nav>
       </div>
@@ -93,8 +97,21 @@
               <span class="icon is-small"><i class="fa fa-desktop"></i></span>
               <span>{{ _('View') }}</span>
             </a>
+            <a class="level-item is-primary" href="{% url 'screen-delete' screen.slug %}">
+              <span class="icon is-small"><i class="fa fa-trash"></i></span>
+              <span>{{ _('Delete') }}</span>
+            </a>
           </div>
         </nav>
+      </div>
+    </div>
+    {% empty %}
+    <div class="column is-12">
+      <div class="notification is-info">
+        <span class="icon">
+          <span class="fa fa-question-circle"></span>
+        </span>
+        {{ _('You can create new screens to display notes, bus & tramway stops, ...') }}
       </div>
     </div>
     {% endfor %}

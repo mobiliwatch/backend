@@ -1,4 +1,4 @@
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, DeleteView
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
@@ -28,13 +28,28 @@ class ScreenCreate(LoginRequiredMixin, CreateView):
 
         return HttpResponseRedirect(reverse('screen', args=(screen.slug, )))
 
-
-class ScreenDetails(LoginRequiredMixin, DetailView):
+class ScreenMixin(LoginRequiredMixin):
     """
-    View a screen
+    Load a screen
     """
-    template_name = 'screen/details.html'
     context_object_name = 'screen'
 
     def get_queryset(self):
         return self.request.user.screens.all()
+
+
+class ScreenDetails(ScreenMixin, DetailView):
+    """
+    View a screen
+    """
+    template_name = 'screen/details.html'
+
+
+class ScreenDelete(ScreenMixin, DeleteView):
+    """
+    Delete a screen
+    """
+    template_name = 'screen/delete.html'
+
+    def get_success_url(self):
+        return reverse('home')

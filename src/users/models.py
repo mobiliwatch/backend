@@ -104,6 +104,7 @@ class Location(models.Model):
         return '{} : {} - {}'.format(self.name, self.address, self.city)
 
     @property
-    def line_stops_json(self):
-        # Helper for templates
-        return json.dumps([ls.id for ls in self.line_stops.all()])
+    def screens(self):
+        # Used by API
+        from screen.models import Screen
+        return Screen.objects.filter(groups__locationwidget__location=self)

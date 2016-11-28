@@ -1,4 +1,4 @@
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, DeleteView
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
@@ -38,12 +38,26 @@ class LocationCreate(LoginRequiredMixin, CreateView):
 
         return HttpResponseRedirect(reverse('location-transports', args=(location.pk, )))
 
-class LocationTransports(LoginRequiredMixin, DetailView):
+class LocationMixin(LoginRequiredMixin):
     """
-    Manage transports around a location
+    Access a location from user
     """
-    template_name = 'location/transports.html'
     context_object_name = 'location'
 
     def get_queryset(self):
         return self.request.user.locations.all()
+
+class LocationTransports(LocationMixin, DetailView):
+    """
+    Manage transports around a location
+    """
+    template_name = 'location/transports.html'
+
+class LocationDelete(LocationMixin, DeleteView):
+    """
+    Delete a location
+    """
+    template_name = 'location/delete.html'
+
+    def get_success_url(self):
+        return reverse('home')

@@ -109,8 +109,9 @@ class Screen(models.Model):
 
         elif self.ratio == '9:16':
             # Build groups
-            top = self.groups.create(screen=self, position=0)
-            bottom = self.groups.create(screen=self, position=1)
+            base = self.groups.create(screen=self, vertical=True, position=0)
+            top = base.groups.create(screen=self, position=0)
+            bottom = base.groups.create(screen=self, position=1)
 
             # Clock+Weather+Note on top
             clock.group = top
@@ -221,11 +222,16 @@ class LocationWidget(Widget):
         """
         Send next times to screens
         """
+        from api.serializers import LineStopSerializer
+
+        def _serialize(ls):
+            out = LineStopSerializer(ls).data
+            out['times'] = ls.get_next_times()
+            return out
+
         return {
             'location' : {
-                'line_stops' : [{
-                    'times' : ls.get_next_times()
-                } for ls in self.location.line_stops.all()]
+                'line_stops' : [_serialize(ls) for ls in self.location.line_stops.all()]
             },
         }
 

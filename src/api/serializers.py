@@ -81,37 +81,45 @@ class StopSerializer(serializers.ModelSerializer):
             return 0
 
 
-class LocationLightSerializer(serializers.ModelSerializer):
-    """
-    Used by backend to manage line stops
-    """
-
-    # Nullable line_stops
-    line_stops = serializers.PrimaryKeyRelatedField(queryset=LineStop.objects.all(), many=True, allow_null=True)
-
+class ScreenLightSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Location
+        model = Screen
         fields = (
-            'id',
-            'line_stops',
+            'name',
+            'slug',
+            'ratio',
         )
-        readonly_fields = (
-            'id',
-        )
+
 
 class LocationSerializer(serializers.ModelSerializer):
     """
     Used by frontend to have full details on managed stops
     """
     # Nullable line_stops
-    line_stops = LineStopSerializer(many=True)
+    line_stops = serializers.PrimaryKeyRelatedField(queryset=LineStop.objects.all(), many=True, allow_null=True)
+    city = CitySerializer()
+    screens = ScreenLightSerializer(many=True)
 
     class Meta:
         model = Location
         fields = (
             'id',
+            'name',
+            'address',
+            'city',
+            'point',
             'line_stops',
+            'screens',
         )
+        readonly_fields = (
+            'id',
+            'name',
+            'address',
+            'city',
+            'point',
+            'screens',
+        )
+
 
 class WidgetSerializer(serializers.Serializer):
     """
@@ -192,15 +200,6 @@ class GroupSerializer(serializers.ModelSerializer):
         )
 
 GroupSerializer._declared_fields['groups'] = GroupSerializer(many=True) # recursive !
-
-class ScreenLightSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Screen
-        fields = (
-            'name',
-            'slug',
-            'ratio',
-        )
 
 class ScreenSerializer(serializers.ModelSerializer):
 
