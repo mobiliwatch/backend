@@ -3,7 +3,8 @@ from django.contrib.gis.geos import Point
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
 from django.contrib.gis.geos import Point
-from api import MetroMobilite, Bano, Weather
+from api import Itinisere, MetroMobilite, Bano, Weather
+import re
 import logging
 
 logger = logging.getLogger('transport.models')
@@ -69,9 +70,20 @@ class LineStop(models.Model):
         Get stop hours for this stop
         and direction
         """
-#        import random
-#        return [random.randint(0, 1000) for _ in range(3)]
-#
+
+        def _clean_itinisere(time):
+            regex = r'^/Date\((\d+)\+(\d+)\)/$'
+            res = re.match(regex, time)
+            if res:
+                return int(res.group(1)) / 1000
+
+        # Search on itinisere first
+        iti = Itinisere()
+        out = iti.get_next_departures_and_arrivals(self.itinisere_id)
+        if out.get('StatusCode') == 200 and 'Data' in out:
+            return [_clean_itinisere(t['AimedTime']) for t in out['Data']]
+
+        # Then search on metro mobilite
         if self.stop.metro_cluster and self.line.metro_id:
 
             # Reorder results per directions
@@ -88,8 +100,7 @@ class LineStop(models.Model):
             except Exception as e:
                 logger.error('Metro time lookup failed: {}'.format(e))
 
-        self.stop.get_next_times()
-
+        # No times :/
         return []
 
 class Stop(models.Model):
@@ -122,11 +133,6 @@ class Stop(models.Model):
         self.point = Point(x, y)
         return self.point
 
-    def get_next_times(self):
-        """
-        Get stop hours for this stop
-        """
-        print('Itinisere search', self.itinisere_id)
 
 
 class City(models.Model):
