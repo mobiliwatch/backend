@@ -2,9 +2,9 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
-from django.contrib.gis.geos import Point
 from api import Itinisere, MetroMobilite, Bano, Weather
 import re
+import hashlib
 import logging
 
 logger = logging.getLogger('transport.models')
@@ -72,16 +72,32 @@ class LineStop(models.Model):
         """
 
         def _clean_itinisere(time):
+            # Build itinisere output
             regex = r'^/Date\((\d+)\+(\d+)\)/$'
-            res = re.match(regex, time)
-            if res:
-                return int(res.group(1)) / 1000
+            res = re.match(regex, time['AimedTime'])
+            if not res:
+                return
+            return {
+                'source' : 'itinisere',
+                'time' : int(res.group(1)) / 1000,
+                'reference' : time['VehicleJourneyRef'],
+            }
+
+        def _clean_metro(time):
+            # Build metro mobilite output
+            contents = '{stopId}:{serviceDay}:{realtimeArrival}'.format(**time)
+            h = hashlib.md5(contents.encode('utf-8')).hexdigest()
+            return {
+                'source' : 'metro',
+                'time' : time['serviceDay'] + time.get('realtimeArrival', time['scheduledArrival']),
+                'reference' : h[0:6],
+            }
 
         # Search on itinisere first
         iti = Itinisere()
         out = iti.get_next_departures_and_arrivals(self.itinisere_id)
         if out.get('StatusCode') == 200 and 'Data' in out:
-            return [_clean_itinisere(t['AimedTime']) for t in out['Data']]
+            return [_clean_itinisere(t) for t in out['Data']]
 
         # Then search on metro mobilite
         if self.stop.metro_cluster and self.line.metro_id:
@@ -96,7 +112,7 @@ class LineStop(models.Model):
                     raise Exception('Missing metro mobilite times')
 
                 # Convert in nice timestamps
-                return [t['serviceDay'] + t.get('realtimeArrival', t['scheduledArrival']) for t in times]
+                return [_clean_metro(t) for t in times]
             except Exception as e:
                 logger.error('Metro time lookup failed: {}'.format(e))
 
