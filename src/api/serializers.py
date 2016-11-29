@@ -152,6 +152,16 @@ class NoteWidgetSerializer(WidgetSerializer):
 class WeatherWidgetSerializer(WidgetSerializer):
     city = CitySerializer()
 
+    def update(self, widget, data):
+
+        # Save on Db
+        #widget.save()
+
+        # Send update through ws
+        widget.send_ws_update()
+
+        return widget
+
 class LocationWidgetSerializer(WidgetSerializer):
     location = LocationSerializer()
 

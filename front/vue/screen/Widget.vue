@@ -5,18 +5,7 @@
       <div class="content">
 
         <Note v-if="widget.type == 'NoteWidget'" :widgetId="widget.id" />
-
-        <div v-if="widget.type == 'WeatherWidget'">
-          <h1 class="title">Météo</h1>
-          <div class="notification is-info">
-            <span class="icon">
-              <span class="fa fa-bolt"></span>
-            </span>
-            <span>
-              Les prévisions météo s'afficheront ici.
-            </span>
-          </div>
-        </div>
+        <Weather v-if="widget.type == 'WeatherWidget'" :widgetId="widget.id" />
 
         <div v-if="widget.type == 'ClockWidget'">
           <h1 class="title">Horloge</h1>
@@ -50,11 +39,13 @@
 <script>
 var mixins = require('./widgets/mixins.js');
 var Note = require('./widgets/Note.vue');
+var Weather = require('./widgets/Weather.vue');
 
 module.exports = {
   mixins : [mixins, ],
   components : {
     Note : Note,
+    Weather : Weather,
   },
   data : function(){
     return {};
