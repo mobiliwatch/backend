@@ -6,6 +6,9 @@ from channels import Group as WsGroup
 import uuid
 import time
 import json
+from datetime import datetime
+from django.utils.timezone import utc
+import calendar
 
 RATIOS = (
   ('16:9', _('Landscape 16x9')),
@@ -171,10 +174,14 @@ class Widget(models.Model):
         update = self.build_update()
         print('sending', update)
 
+        # Get utc now
+        now = datetime.utcnow().replace(tzinfo=utc)
+        t = calendar.timegm(now.timetuple())
+
         if isinstance(extra_data, dict):
             update.update(extra_data)
         data = {
-            'time' : time.time(),
+            'time' : t,
             'widget': str(self.id),
             'update': update,
         }
