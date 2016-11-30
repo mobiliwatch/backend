@@ -23,13 +23,14 @@ class Screen(models.Model):
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=100)
     ratio = models.CharField(max_length=20, choices=RATIOS, default='16:9')
-    token = models.UUIDField(default=uuid.uuid4, unique=True)
+    token = models.UUIDField(default=uuid.uuid4)
 
     active = models.BooleanField(default=False) # triggered by WS
 
     class Meta:
         unique_together = (
-            ('user', 'slug')
+            ('user', 'slug'),
+            ('slug', 'token'),
         )
 
     def __str__(self):
