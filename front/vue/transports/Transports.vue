@@ -36,7 +36,7 @@
               </p>
             </div>
           </div>
-          <TransportsMap :name="location.name" :point="location.point" :stops="stops" :current_stop="current_stop" v-on:selected_stop="selected_stop"></TransportsMap>
+          <TransportsMap :name="location.name" :point="location.point" :stops="stops" :path="path" :current_stop="current_stop" v-on:selected_stop="selected_stop"></TransportsMap>
 
           <div class="notification is-success" v-if="saved">
             <span class="icon">
@@ -69,6 +69,7 @@ module.exports = {
       loading: false,
       saved : false,
       stops : [],
+      path : null,
       current_stop : null,
       line_stops : [], // selected by user
       distance : 500,
@@ -88,6 +89,12 @@ module.exports = {
     selected_stop : function(stop){
       // Save selected stop
       this.$set(this, 'current_stop', stop);
+
+      // Load distance for this stop
+      var url = '/api/location/' + this.location_id + '/distance/' + stop.id + '/';
+      this.$http.get(url).then(function(resp){
+        this.$set(this, 'path', resp.body.geometry);
+      });
     },
 
     toggle_line_stop : function(line_stop){

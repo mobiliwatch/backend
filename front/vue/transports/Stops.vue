@@ -2,9 +2,9 @@
   <aside class="menu">
     <ul class="menu-list">
       <li v-on:click="selected(stop)" v-for="(stop, i) in stops">
-        <a href="javascript:null" v-bind:class="{'is-active' : stop == current_stop}">
+        <span class="name" v-bind:class="{'is-active' : stop == current_stop}">
           <strong>{{ stop.name }}</strong> à {{ stop.distance }} m
-        </a>
+        </span>
 
         <ul v-if="line_stops_dict[stop.id].length">
           <li v-for="ls in line_stops_dict[stop.id]">
@@ -34,9 +34,17 @@ ul.menu-list li ul {
   margin-bottom: 2px !important;
 }
 
-ul.menu-list a {
-  padding-bottom: 0 !important;
-  padding-top: 1px !important;
+ul.menu-list span.name {
+  display: block;
+}
+
+ul.menu-list span.is-active {
+  background: #3273dc;
+  color: white;
+}
+
+ul.menu-list span.is-active strong {
+  color: white;
 }
 
 p.no-selection {

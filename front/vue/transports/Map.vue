@@ -20,6 +20,7 @@ module.exports = {
   props : {
     name: String,
     point: Object,
+    path: Object,
     stops: Array,
     'current_stop' : Object,
   },
@@ -29,6 +30,7 @@ module.exports = {
       map: null,
       bounds : L.latLngBounds(),
       markers : {},
+      path_layer : null,
       stop_circles : null, // LayerGroup
     }
   },
@@ -47,8 +49,9 @@ module.exports = {
           '<a href="https://maptiles.xyz">Maptiles.xyz</a>'
       }).addTo(map);
 
-      // Init stop circles
+      // Init layers
       this.$set(this, 'stop_circles', L.layerGroup().addTo(this.map));
+      this.$set(this, 'path_layer', L.geoJSON().addTo(this.map));
     });
   },
 
@@ -99,6 +102,12 @@ module.exports = {
       map.fitBounds(this.bounds, {
         padding : [10, 10],
       });
+    },
+
+    path : function(path){
+      // Display path to point
+      this.path_layer.clearLayers();
+      this.path_layer.addData(path);
     },
 
     current_stop : function(stop){

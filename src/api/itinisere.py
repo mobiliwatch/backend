@@ -73,18 +73,17 @@ class Itinisere(CachedApi):
         }
         return self.request('transport/v3/timetable/GetStopHours/json', params)
 
-    def calc_walk_trip(self, start_lat, start_lng, end_lat, end_lng, speed=6):
+    def calc_walk_trip(self, start_point, stop_id, speed=6):
+        """
+        From a Point to a Stop
+        """
         assert(isinstance(speed, int))
-        assert(isinstance(start_lat, float))
-        assert(isinstance(start_lng, float))
-        assert(isinstance(end_lat, float))
-        assert(isinstance(end_lng, float))
         now = datetime.now()
         params = {
-            'DepLat' : start_lat,
-            'DepLon' : start_lng,
-            'ArrLat' : end_lat,
-            'ArrLon' : end_lng,
+            'DepLat' : start_point.y,
+            'DepLon' : start_point.x,
+            'ArrId' : stop_id,
+            'ArrType' : 'STOP_PLACE',
             'WalkSpeed' : speed,
             'Date' : now.strftime('%Y-%m-%d'),
             'DepartureTime' : now.strftime('%H-%M'),

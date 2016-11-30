@@ -2,6 +2,7 @@ from transport.models import Stop, LineStop, Line, Direction, City
 from users.models import Location
 from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget, Group
 from rest_framework import serializers
+from rest_framework_gis.serializers import GeometrySerializerMethodField
 from mobili.helpers import haversine_distance
 
 
@@ -226,3 +227,11 @@ class ScreenSerializer(serializers.ModelSerializer):
             'groups',
             'widgets',
         )
+
+class DistanceSerializer(serializers.Serializer):
+    distance = serializers.FloatField()
+    duration = serializers.FloatField()
+    geometry = GeometrySerializerMethodField()
+
+    def get_geometry(self, data):
+        return data['geometry']
