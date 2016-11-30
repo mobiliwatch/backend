@@ -8,6 +8,8 @@ class Weather(object):
     Proxy to OpenWeatherMap
     """
     def __init__(self):
+        if not settings.OPEN_WEATHER_MAP_API:
+            raise Exception('Missing OWM Api key')
         self.api = pyowm.OWM(settings.OPEN_WEATHER_MAP_API, language='fr')
         if not self.api.is_API_online():
             raise Exception('Weather api offline')

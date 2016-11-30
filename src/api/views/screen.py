@@ -1,6 +1,6 @@
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView
 from api.serializers import ScreenLightSerializer, ScreenSerializer, get_widget_serializer
-from screen.models import Screen, Widget
+from screen.models import Screen
 from django.http import Http404
 
 class ScreenMixin(object):
@@ -30,6 +30,21 @@ class ScreenDetails(ScreenMixin,RetrieveAPIView):
 
     def get_object(self):
         return self.get_screen()
+
+class ScreenShared(RetrieveAPIView):
+    """
+    Retrieve details for a screen + widgets
+    as an anonymous user, with a token
+    """
+    serializer_class = ScreenSerializer
+    permission_classes = () # open !
+
+    def get_object(self):
+        # Load screen with slug + token
+        try:
+            return Screen.objects.get(slug=self.kwargs['slug'], token=self.kwargs['token'])
+        except Screen.DoesNotExist:
+            raise Http404
 
 class WidgetUpdate(ScreenMixin, UpdateAPIView):
 

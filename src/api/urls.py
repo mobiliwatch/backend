@@ -1,8 +1,9 @@
 from django.conf.urls import url, include
-from api.views import LocationStops, LocationDetails, ScreenDetails, WidgetUpdate, ScreenList
+from api.views import LocationStops, LocationDetails, ScreenDetails, WidgetUpdate, ScreenList, ScreenShared
 
 screen_patterns = [
     url(r'^(?P<widget>[\w\-]+)/$', WidgetUpdate.as_view(), name='widget-update'),
+    url(r'^shared/(?P<token>[\w\-]+)/$', ScreenShared.as_view(), name='screen-shared'),
     url(r'^$', ScreenDetails.as_view(), name='screen'),
 ]
 

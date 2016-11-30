@@ -1,3 +1,7 @@
 from django.contrib import admin
+from screen.models import Screen
 
-# Register your models here.
+class ScreenAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user', 'token', )
+
+admin.site.register(Screen, ScreenAdmin)

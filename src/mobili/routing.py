@@ -10,7 +10,11 @@ screen_routing = [
 
 
 channel_routing = [
+    # Authenticated version
     include(screen_routing, path=r"^/screen/(?P<slug>[\w\-]+)/$"),
+
+    # Anonymous version
+    include(screen_routing, path=r"^/screen/(?P<slug>[\w\-]+)/shared/(?P<token>[\w\-]+)/$"),
 
     # Internal routing
     route('screen.init', async_screen_init),

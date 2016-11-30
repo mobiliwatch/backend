@@ -1,5 +1,5 @@
 from channels.auth import channel_session_user, channel_session_user_from_http
-from channels import Group, Channel
+from channels import Channel
 from screen import models
 import logging
 
@@ -10,15 +10,22 @@ def screen_required(func):
     """
     Check screen from slug is available
     to connected user from WebSocket
+    Support anonymous with token
     """
-    def wrapper(message, slug):
+    def wrapper(message, slug, token=None):
+
         try:
-            message.screen = message.user.screens.get(slug=slug)
+            if token is None:
+                # Authenticated
+                message.screen = message.user.screens.get(slug=slug)
+            else:
+                # Anonymous
+                message.screen = models.Screen.objects.get(slug=slug, token=token)
         except Exception as e:
             logger.error('Screen {} is required: {}'.format(slug, e))
             return
 
-        return func(message, slug)
+        return func(message, slug, token)
     return wrapper
 
 def async_screen_init(message):
@@ -51,7 +58,7 @@ def async_screen_widget(message):
 
 @channel_session_user_from_http
 @screen_required
-def ws_screen_add(message, slug):
+def ws_screen_add(message, slug, token=None):
     """
     Connected to websocket.connect
     """
@@ -66,7 +73,7 @@ def ws_screen_add(message, slug):
 
 @channel_session_user
 @screen_required
-def ws_screen_message(message, slug):
+def ws_screen_message(message, slug, token=None):
     """
     Connected to websocket.receive
     """
@@ -80,7 +87,7 @@ def ws_screen_message(message, slug):
 
 @channel_session_user
 @screen_required
-def ws_screen_disconnect(message, slug):
+def ws_screen_disconnect(message, slug, token=None):
     """
     Connected to websocket.disconnect
     """

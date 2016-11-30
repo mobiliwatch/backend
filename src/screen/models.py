@@ -23,6 +23,7 @@ class Screen(models.Model):
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=100)
     ratio = models.CharField(max_length=20, choices=RATIOS, default='16:9')
+    token = models.UUIDField(default=uuid.uuid4, unique=True)
 
     active = models.BooleanField(default=False) # triggered by WS
 
@@ -53,6 +54,11 @@ class Screen(models.Model):
     def frontend_url(self):
         from django.conf import settings
         return settings.FRONTEND_SCREEN_URL.format(self.slug)
+
+    @property
+    def frontend_shared_url(self):
+        from django.conf import settings
+        return settings.FRONTEND_SCREEN_SHARED_URL.format(self.slug, self.token)
 
     def slugify(self):
         """
