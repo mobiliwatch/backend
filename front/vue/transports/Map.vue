@@ -43,10 +43,11 @@ module.exports = {
       this.$set(this, 'map', map);
 
       // Use grayscale tiles
-      L.tileLayer('http://{s}.grayscale.osm.maptiles.xyz/{z}/{x}/{y}.png', {
+      //var server = 'http://{s}.grayscale.osm.maptiles.xyz/{z}/{x}/{y}.png';
+      var server = 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png';
+      L.tileLayer(server, {
         maxZoom: 18,
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-          '<a href="https://maptiles.xyz">Maptiles.xyz</a>'
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
       }).addTo(map);
 
       // Init layers
@@ -75,6 +76,12 @@ module.exports = {
 
   watch : {
     stops : function(stops){
+      // Detect if there are new stops
+      var diff = _.differenceWith(stops, this.markers, function(stop, marker){
+        return marker != null && stop.id == marker.stop.id;
+      });
+      if(diff.length == 0)
+        return;
 
       // Display markers for stops
       var map = this.map;
@@ -83,7 +90,7 @@ module.exports = {
 
       for(var s in stops){
         // Build marker for each stop
-        var stop = this.stops[s];
+        var stop = stops[s];
         var marker = this.add_marker(stop.name, stop.point.coordinates, 'fa-star', 'blue');
         marker.on('click', function(){
           that.$emit('selected_stop', this.stop);
@@ -111,11 +118,20 @@ module.exports = {
     },
 
     current_stop : function(stop){
-      // Center map around current stop
+      // Show location & stop
       if(stop === null)
         return;
-      var coords = stop.point.coordinates;
-      this.map.setView([coords[1], coords[0]], 17);
+      var coords_stop = stop.point.coordinates;
+      var coords_home = this.point.coordinates;
+      this.map.fitBounds([
+        [coords_stop[1], coords_stop[0]],
+        [coords_home[1], coords_home[0]],
+      ], {
+        padding : [50, 50],
+      });
+
+      // Clean path layer
+      this.path_layer.clearLayers();
 
       // Show popup
       var marker = this.markers[stop.id];     

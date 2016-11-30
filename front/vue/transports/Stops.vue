@@ -3,7 +3,9 @@
     <ul class="menu-list">
       <li v-on:click="selected(stop)" v-for="(stop, i) in stops">
         <span class="name" v-bind:class="{'is-active' : stop == current_stop}">
-          <strong>{{ stop.name }}</strong> à {{ stop.distance }} m
+          <strong>{{ stop.name }}</strong> à 
+          <em v-if="!stop.trip">{{ stop.approximate_distance }} m</em>
+          <span v-if="stop.trip">{{ stop.trip.distance }} m - {{ stop.trip.duration|seconds }}</span>
         </span>
 
         <ul v-if="line_stops_dict[stop.id].length">
@@ -36,6 +38,8 @@ ul.menu-list li ul {
 
 ul.menu-list span.name {
   display: block;
+  padding: 0 5px;
+  border-radius: 3px 3px;
 }
 
 ul.menu-list span.is-active {
@@ -67,6 +71,13 @@ module.exports = {
 
   data : function(){
     return {
+    }
+  },
+
+  filters : {
+    seconds : function(s){
+      var minutes = Math.round(s / 60);
+      return minutes + ' minutes';
     }
   },
 

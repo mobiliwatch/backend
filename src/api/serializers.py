@@ -4,6 +4,7 @@ from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, No
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeometrySerializerMethodField
 from mobili.helpers import haversine_distance
+import math
 
 
 class CitySerializer(serializers.ModelSerializer):
@@ -54,7 +55,7 @@ class LineStopSerializer(serializers.ModelSerializer):
 
 class StopSerializer(serializers.ModelSerializer):
     line_stops = LineStopSerializer(many=True)
-    distance = serializers.SerializerMethodField()
+    approximate_distance = serializers.SerializerMethodField()
 
     class Meta:
         model = Stop
@@ -64,10 +65,10 @@ class StopSerializer(serializers.ModelSerializer):
             'name',
             'point',
             'line_stops',
-            'distance',
+            'approximate_distance',
         )
 
-    def get_distance(self, stop):
+    def get_approximate_distance(self, stop):
         """
         Distance approximation
         """
@@ -76,7 +77,7 @@ class StopSerializer(serializers.ModelSerializer):
         try:
             location = self.context['view'].location
             d = haversine_distance(stop.point.tuple, location.point.tuple)
-            return int(d * 1000)
+            return math.ceil(d * 100) * 10
         except Exception as e:
             print(e)
             return 0
@@ -229,8 +230,8 @@ class ScreenSerializer(serializers.ModelSerializer):
         )
 
 class DistanceSerializer(serializers.Serializer):
-    distance = serializers.FloatField()
-    duration = serializers.FloatField()
+    distance = serializers.IntegerField()
+    duration = serializers.IntegerField()
     geometry = GeometrySerializerMethodField()
 
     def get_geometry(self, data):

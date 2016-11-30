@@ -55,6 +55,7 @@
 </template>
 
 <script>
+var _ = require('lodash');
 var TransportsMap = require('vue/transports/Map.vue');
 var Stop = require('vue/transports/Stop.vue');
 var Stops = require('vue/transports/Stops.vue');
@@ -89,11 +90,30 @@ module.exports = {
     selected_stop : function(stop){
       // Save selected stop
       this.$set(this, 'current_stop', stop);
+      if(stop.trip){
+        // avoid repeated requests
+        this.$nextTick(function(){
+          this.$set(this, 'path', stop.trip.geometry);
+        });
+        return;
+      }
 
-      // Load distance for this stop
+      // Find stop index
+      var index = _.findIndex(this.stops, function(s){
+        return s.id == stop.id;
+      });
+
+      // Load trip for this stop
       var url = '/api/location/' + this.location_id + '/distance/' + stop.id + '/';
       this.$http.get(url).then(function(resp){
+        // Save currently display path
         this.$set(this, 'path', resp.body.geometry);
+
+        // Update trip on stop
+        stop.trip = resp.body;
+        var stops = _.clone(this.stops);
+        stops[index] = stop;
+        this.$set(this, 'stops', stops);
       });
     },
 
@@ -153,7 +173,7 @@ module.exports = {
 
         // Sort stops by distance
         var stops = resp.body.sort(function(x, y){
-          return x.distance > y.distance;
+          return x.approximate_distance > y.approximate_distance;
         });
         this.$set(this, 'stops', stops); // weird
         this.$set(this, 'loading', false);

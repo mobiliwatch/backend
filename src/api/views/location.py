@@ -70,19 +70,29 @@ class LocationDistance(LocationMixin, RetrieveAPIView):
         if out['Status'].get('Code') != 'OK':
             raise APIException('Invalid response from itinisere')
 
+        duration_regex = re.compile('(\d+)(M|S)')
+        def _parse_duration(duration):
+            # Helper to parse dummy format :/
+            seconds = {
+                'H' : 3600,
+                'M' : 60,
+                'S' : 1,
+            }
+            return sum([seconds[t] * int(d) for d, t in duration_regex.findall(duration)])
+
         # Load LineString from result
         trip = out['trips']['Trip'][0] # use first solution
         lines = []
-        regex = re.compile(r'LINESTRING \(([\d\.]+) ([\d\.]+), ([\d\.]+) ([\d\.]+)\)')
+        duration = 0
+        regex = re.compile(r'([\d\.]+) ([\d\.]+)')
         for section in trip['sections']['Section']:
             for link in section['Leg']['pathLinks']['PathLink']:
-                out = regex.match(link['Geometry'])
-                if out is None:
+                duration += _parse_duration(link['Duration'])
+                points = [(float(x), float(y)) for x, y in regex.findall(link['Geometry'])]
+                if not points:
                     continue
-                start_x, start_y, end_x, end_y = map(float, out.groups())
-                lines.append(LineString((start_x, start_y), (end_x, end_y)))
+                lines.append(LineString(*points))
 
-        duration = 0.0 # TODO
         return {
             'distance' : trip['Distance'],
             'duration' : duration,
