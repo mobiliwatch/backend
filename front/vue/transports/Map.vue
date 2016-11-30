@@ -43,11 +43,10 @@ module.exports = {
       this.$set(this, 'map', map);
 
       // Use grayscale tiles
-      //var server = 'http://{s}.grayscale.osm.maptiles.xyz/{z}/{x}/{y}.png';
-      var server = 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png';
+      var server = 'https://{s}.tile.openstreetmap.se/hydda/full/{z}/{x}/{y}.png';
       L.tileLayer(server, {
         maxZoom: 18,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+        attribution: '&copy; OpenStreetMap <a href="http://openstreetmap.se/" target="_blank">tiles</a> &amp; <a href="http://www.openstreetmap.org/copyright">map data</a>'
       }).addTo(map);
 
       // Init layers
