@@ -1,12 +1,12 @@
 from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework.exceptions import APIException
 from api.serializers import StopSerializer, LocationSerializer, DistanceSerializer
-from django.contrib.gis.geos import LineString, MultiLineString
 from api import Itinisere
+from channels import Channel
 from transport.models import Stop
+from transport.trip import walk_trip
 from users.models import Location
 from django.http import Http404
-import re
 
 
 class LocationMixin(object):
@@ -60,7 +60,10 @@ class LocationDetails(LocationMixin, RetrieveAPIView, UpdateAPIView):
         for ls in line_stops:
             link, created = location.location_stops.get_or_create(line_stop=ls)
             if created:
-                print('UPDATE distance', location, ls)
+                print('GO UPDATED')
+                Channel('locationstop.update').send({
+                    'location_stop' : link.id,
+                })
 
         # Remove old line stops
         in_db = set([ls.id for ls in location.line_stops.all()])
@@ -83,38 +86,8 @@ class LocationDistance(LocationMixin, RetrieveAPIView):
         except Stop.DoesNotExist:
             raise Http404
 
-        # Search on itinisere
-        iti = Itinisere()
-        out = iti.calc_walk_trip(location.point, stop.itinisere_id)
-
-        if out['Status'].get('Code') != 'OK':
-            raise APIException('Invalid response from itinisere')
-
-        duration_regex = re.compile('(\d+)(M|S)')
-        def _parse_duration(duration):
-            # Helper to parse dummy format :/
-            seconds = {
-                'H' : 3600,
-                'M' : 60,
-                'S' : 1,
-            }
-            return sum([seconds[t] * int(d) for d, t in duration_regex.findall(duration)])
-
-        # Load LineString from result
-        trip = out['trips']['Trip'][0] # use first solution
-        lines = []
-        duration = 0
-        regex = re.compile(r'([\d\.]+) ([\d\.]+)')
-        for section in trip['sections']['Section']:
-            for link in section['Leg']['pathLinks']['PathLink']:
-                duration += _parse_duration(link['Duration'])
-                points = [(float(x), float(y)) for x, y in regex.findall(link['Geometry'])]
-                if not points:
-                    continue
-                lines.append(LineString(*points))
-
-        return {
-            'distance' : trip['Distance'],
-            'duration' : duration,
-            'geometry' : MultiLineString(lines),
-        }
+        # Calc trip
+        try:
+            return walk_trip(location, stop)
+        except Exception as e:
+            raise APIException('Trip calc failure: {}'.format(e))

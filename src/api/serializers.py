@@ -37,21 +37,16 @@ class DirectionSerializer(serializers.ModelSerializer):
 class LineStopSerializer(serializers.ModelSerializer):
     line = LineSerializer()
     direction = DirectionSerializer()
-    times = serializers.SerializerMethodField()
 
     class Meta:
         model = LineStop
         fields = (
+            # Stop data are added in WS handler
             'id',
             'point',
             'line',
             'direction',
-            'times',
         )
-
-    def get_times(self, widget):
-        # Placeholder for WS updates
-        return []
 
 class StopSerializer(serializers.ModelSerializer):
     line_stops = LineStopSerializer(many=True)

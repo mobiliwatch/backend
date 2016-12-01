@@ -1,6 +1,10 @@
 from django.contrib.gis.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-import json
+from transport.trip import walk_trip
+import logging
+
+
+logger = logging.getLogger('users.models')
 
 
 class UserManager(BaseUserManager):
@@ -132,4 +136,18 @@ class LocationStop(models.Model):
         unique_together = (
             ('location', 'line_stop'),
         )
+
+    def update_metadata(self):
+        """
+        Update distance & walking time in here
+        """
+        try:
+            trip = walk_trip(self.location, self.line_stop.stop)
+        except Exception as e:
+            logger.error('Failed to updated LocationStop #{} : {}'.format(self.id, e))
+            return
+
+        self.distance = trip['distance']
+        self.walking_time = trip['duration']
+        logger.info('Update location stop #{} with distance={} time={}'.format(self.id, self.distance, self.walking_time))
 

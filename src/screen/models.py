@@ -239,13 +239,24 @@ class LocationWidget(Widget):
         from api.serializers import LineStopSerializer
 
         def _serialize(ls):
-            out = LineStopSerializer(ls).data
-            out['times'] = ls.get_next_times()
+
+            # Start from line stop
+            out = LineStopSerializer(ls.line_stop).data
+
+            # Add trip metadata
+            out['stop'] = {
+                'name' : ls.line_stop.stop.name,
+                'distance' : ls.distance,
+                'walking_time' : ls.walking_time,
+            }
+
+            # Add times
+            out['times'] = ls.line_stop.get_next_times()
             return out
 
         return {
             'location' : {
-                'line_stops' : [_serialize(ls) for ls in self.location.line_stops.all()]
+                'line_stops' : [_serialize(ls) for ls in self.location.location_stops.all()]
             },
         }
 
