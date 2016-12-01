@@ -98,7 +98,11 @@ class Location(models.Model):
     city = models.ForeignKey('transport.City', related_name='locations')
     point = models.PointField()
 
-    line_stops = models.ManyToManyField('transport.LineStop', related_name='locations')
+    line_stops = models.ManyToManyField('transport.LineStop', through='users.LocationStop', related_name='locations')
+
+    # Dates
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return '{} : {} - {}'.format(self.name, self.address, self.city)
@@ -108,3 +112,24 @@ class Location(models.Model):
         # Used by API
         from screen.models import Screen
         return Screen.objects.filter(groups__locationwidget__location=self)
+
+class LocationStop(models.Model):
+    """
+    Link a location and a line stop
+    """
+    location = models.ForeignKey(Location, related_name='location_stops')
+    line_stop = models.ForeignKey('transport.LineStop', related_name='location_stops')
+
+    # Link metadata
+    distance = models.FloatField(default=0)
+    walking_time = models.FloatField(default=0) # as seconds
+
+    # Dates
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = (
+            ('location', 'line_stop'),
+        )
+

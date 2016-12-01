@@ -49,6 +49,26 @@ class LocationDetails(LocationMixin, RetrieveAPIView, UpdateAPIView):
     """
     serializer_class = LocationSerializer
 
+    def perform_update(self, serializer):
+        """
+        Save m2m links between location & line stops
+        """
+        line_stops = serializer.validated_data['line_stops']
+        location = self.get_object()
+
+        # Add new line stops
+        for ls in line_stops:
+            link, created = location.location_stops.get_or_create(line_stop=ls)
+            if created:
+                print('UPDATE distance', location, ls)
+
+        # Remove old line stops
+        in_db = set([ls.id for ls in location.line_stops.all()])
+        diff = in_db.difference([ls.id for ls in line_stops])
+        for ls_id in diff:
+            location.location_stops.filter(line_stop_id=ls_id).delete()
+
+
 class LocationDistance(LocationMixin, RetrieveAPIView):
     """
     Update details for a location
