@@ -1,4 +1,4 @@
-from datetime import datetime
+from django.utils import timezone
 from .cache import CachedApi
 
 
@@ -10,6 +10,10 @@ class Itinisere(CachedApi):
     POSITION_ADDRESS = 'ADDRESS'
     POSITION_STOP = 'STOP_PLACE'
     POSITION_ROAD_LINK = 'ROAD_LINK'
+
+    @property
+    def _now(self):
+        return timezone.localtime(timezone.now())
 
     def get_traffic(self):
         return self.request('traffic/v2/GetTrafficStatus/json')
@@ -28,11 +32,10 @@ class Itinisere(CachedApi):
     def get_next_departures_and_arrivals(self, stop_id, nb_items=10):
         assert isinstance(stop_id, int)
         assert isinstance(nb_items, int)
-        now = datetime.now()
         params = {
             'StopId' : stop_id,
             'MaxItemsByType' : nb_items,
-            'DateTime' : now.strftime('%Y-%m-%d_%H-%M'),
+            'DateTime' : self._now.strftime('%Y-%m-%d_%H-%M'),
         }
         return self.request('transport/v3/timetable/GetNextDeparturesAndArrivals/json', params)
 
@@ -42,11 +45,10 @@ class Itinisere(CachedApi):
     def get_line_hours(self, line, direction):
         assert isinstance(line, int)
         assert isinstance(direction, int)
-        now = datetime.now()
         params = {
             'LineId' : line,
             'Direction' : direction,
-            'DateTime' : now.strftime('%Y-%m-%d_%H-%M'),
+            'DateTime' : self._now.strftime('%Y-%m-%d_%H-%M'),
         }
         return self.request('transport/v3/timetable/GetLineHours/json', params)
 
@@ -60,16 +62,18 @@ class Itinisere(CachedApi):
         return self.request('transport/v3/stop/GetStopsByLine/json', params)
 
     def get_stop_hours(self, stop_ids, line, direction):
+        """
+        Times start from current hour, counted in minutes
+        """
         assert isinstance(stop_ids, list)
         assert isinstance(line, int)
         assert isinstance(direction, int)
-
-        now = datetime.now()
         params = {
-            'StopIds' : stop_ids,
+            'HourType' : 'Arrival',
+            'StopIds' : '|'.join(map(str, stop_ids)),
             'LineId' : line,
             'Direction' : direction,
-            'DateTime' : now.strftime('%Y-%m-%d_%H-%M'),
+            'DateTime' : self._now.strftime('%Y-%m-%d_%H-00'),
         }
         return self.request('transport/v3/timetable/GetStopHours/json', params)
 
@@ -78,14 +82,13 @@ class Itinisere(CachedApi):
         From a Point to a Stop
         """
         assert(isinstance(speed, int))
-        now = datetime.now()
         params = {
             'DepLat' : start_point.y,
             'DepLon' : start_point.x,
             'ArrId' : stop_id,
             'ArrType' : 'STOP_PLACE',
             'WalkSpeed' : speed,
-            'Date' : now.strftime('%Y-%m-%d'),
-            'DepartureTime' : now.strftime('%H-%M'),
+            'Date' : self._now.strftime('%Y-%m-%d'),
+            'DepartureTime' : self._now.strftime('%H-%M'),
         }
         return self.request('journeyplanner/v2/WalkTrip/json', params)

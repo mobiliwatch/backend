@@ -6,12 +6,12 @@ import os
 
 class CachedApi(object):
 
-    def __init__(self):
+    def __init__(self, use_cache=True):
         self.cache_dir = './cache' # TODO
         if not os.path.isdir(self.cache_dir):
             os.makedirs(self.cache_dir)
 
-        self.use_cache = True
+        self.use_cache = use_cache
 
     def request(self, path, params={}):
         """

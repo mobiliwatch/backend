@@ -3,9 +3,11 @@ from django.contrib.gis.geos import Point
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
 from api import Itinisere, MetroMobilite, Bano, Weather
-import re
+from django.utils import timezone
+import calendar
 import hashlib
 import logging
+import re
 
 logger = logging.getLogger('transport.models')
 
@@ -70,15 +72,36 @@ class LineStop(models.Model):
         Get stop hours for this stop
         and direction
         """
+        # Use current day timestamp as base
+        now = timezone.localtime(timezone.now())
+        now_stamp = calendar.timegm(now.timetuple())
 
-        def _clean_itinisere(time):
+        # Calc utc offset
+        tz = timezone.get_current_timezone()
+        utc_offset = tz.utcoffset(timezone.datetime.utcnow()).seconds
+
+        def _clean_itinisere_offset(time):
             # Build itinisere output
+            offset = time.get('RealDepartureTime') \
+                or time.get('PredictedDepartureTime') \
+                or time.get('TheoricDepartureTime')
+            if offset is None:
+                return
+            offset *= 60 # in seconds
+            limit = now_stamp % (24*3600)
+            if offset < limit:
+                return # already passed
+            return {
+                'time' : now_stamp - limit + offset - utc_offset,
+                'reference' : 'v:{}'.format(time['VehicleJourneyId']),
+            }
+
+        def _clean_itinisere_regex(time):
             regex = r'^/Date\((\d+)\+(\d+)\)/$'
             res = re.match(regex, time['AimedTime'])
             if not res:
                 return
             return {
-                'source' : 'itinisere',
                 'time' : int(res.group(1)) / 1000,
                 'reference' : time['VehicleJourneyRef'],
             }
@@ -88,16 +111,20 @@ class LineStop(models.Model):
             contents = '{stopId}:{serviceDay}:{realtimeArrival}'.format(**time)
             h = hashlib.md5(contents.encode('utf-8')).hexdigest()
             return {
-                'source' : 'metro',
                 'time' : time['serviceDay'] + time.get('realtimeArrival', time['scheduledArrival']),
                 'reference' : h[0:6],
             }
 
-        # Search on itinisere first
+        # First use itinisere next stops
         iti = Itinisere()
         out = iti.get_next_departures_and_arrivals(self.itinisere_id)
         if out.get('StatusCode') == 200 and 'Data' in out:
-            return [_clean_itinisere(t) for t in out['Data']]
+            return list(filter(None, [_clean_itinisere_regex(t) for t in out['Data']]))
+
+        # Then search itinisere timetable
+        out = iti.get_stop_hours([self.itinisere_id, ], self.line.itinisere_id, self.direction.itinisere_id)
+        if out.get('StatusCode') == 200 and 'Data' in out:
+            return list(filter(None, [_clean_itinisere_offset(t) for t in out['Data']['Hours']]))
 
         # Then search on metro mobilite
         if self.stop.metro_cluster and self.line.metro_id:
