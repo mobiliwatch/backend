@@ -1,3 +1,47 @@
+<script>
+var _ = require('lodash');
+
+module.exports = {
+  props : {
+    'stops' : {
+      type : Array,
+      required : true,
+    },
+    'current_stop' : Object,
+  },
+
+  computed : {
+    // List unique lines per stop
+    // TODO: use some lodash magic here
+    lines : function(){
+      var out = {}
+      this.stops.forEach(function(stop){
+        var lines = []
+        stop.line_stops.forEach(function(ls){
+          lines.push(ls.line);
+        });
+        out[stop.id] = _.uniqBy(lines, function(l){
+          return l.id;
+        });
+      });
+      return out;
+    },
+  },
+
+  filters : {
+    seconds : function(s){
+      var minutes = Math.round(s / 60);
+      return minutes + ' minutes';
+    },
+  },
+  methods : {
+    selected : function(stop){
+      this.$emit('selected_stop', stop);
+    },
+  },
+}
+</script>
+
 <template>
   <aside class="menu">
     <ul class="menu-list">
@@ -7,19 +51,9 @@
           <em v-if="!stop.trip">{{ stop.approximate_distance }} m</em>
           <span v-if="stop.trip">{{ stop.trip.distance }} m - {{ stop.trip.duration|seconds }}</span>
         </span>
-
-        <ul v-if="line_stops_dict[stop.id].length">
-          <li v-for="ls in line_stops_dict[stop.id]">
-            {{ ls.line.mode }} {{ ls.line.name }} vers {{ ls.direction.name }}
-          </li>
+        <ul>
+<span v-for="line in lines[stop.id]" class="tag" :class="{'is-success' : line.mode == 'tram', 'is-primary' : line.mode == 'bus', 'is-info' : line.mode == 'car'}">{{ line.name }}</span>
         </ul>
-        <p class="no-selection" v-else>
-          <span class="icon is-small">
-            <span class="fa fa-bus"></span>
-          </span>
-          Aucune ligne sélectionée pour cet arrêt.
-        </p>
-
       </li>
     </ul>
   </aside>
@@ -57,48 +91,3 @@ p.no-selection {
   color: #CCC;
 }
 </style>
-
-<script>
-module.exports = {
-  props : {
-    'stops' : {
-      type : Array,
-      required : true,
-    },
-    'line_stops' : Array,
-    'current_stop' : Object,
-  },
-
-  data : function(){
-    return {
-    }
-  },
-
-  filters : {
-    seconds : function(s){
-      var minutes = Math.round(s / 60);
-      return minutes + ' minutes';
-    }
-  },
-
-  computed : {
-    // Order line stops per parent stop
-    line_stops_dict : function(){
-      var out = {};
-      var selected_ls = this.line_stops;
-      this.stops.forEach(function(s, i){
-        out[s.id] = s.line_stops.filter(function(ls){
-          return selected_ls.includes(ls.id);
-        });
-      });
-      return out;
-    },
-  },
-
-  methods : {
-    selected : function(stop){
-      this.$emit('selected_stop', stop);
-    },
-  },
-}
-</script>

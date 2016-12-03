@@ -4,7 +4,7 @@
       <div class="tile is-parent">
         <div class="tile is-child box is-3">
           <p class="title">{{ stops.length }} arrêts trouvés</p>
-          <Stops :stops="stops" :current_stop="current_stop" :line_stops="line_stops" v-on:selected_stop="selected_stop" />
+          <Stops :stops="stops" :current_stop="current_stop" v-on:selected_stop="selected_stop" />
           <hr />
           <div>
             <label class="label">Changer la distance de recherche des arrêts</label>
@@ -44,6 +44,9 @@
             </span>
             Modifications sauvegardées.
           </div>
+
+          <TransportsSummary :stops="stops" :line_stops="line_stops"/>
+
         </div>
         <div class="tile is-child box">
           <p class="title">Choisir ses arrêts</p>
@@ -59,6 +62,7 @@ var _ = require('lodash');
 var TransportsMap = require('vue/transports/Map.vue');
 var Stop = require('vue/transports/Stop.vue');
 var Stops = require('vue/transports/Stops.vue');
+var Summary = require('vue/transports/Summary.vue');
 
 module.exports = {
   props : {
@@ -80,6 +84,7 @@ module.exports = {
     TransportsMap : TransportsMap,
     Stop : Stop,
     Stops : Stops,
+    TransportsSummary : Summary,
   },
   mounted : function(){
     this.load_location();
