@@ -26,14 +26,6 @@
             </div>
 
             <div class="level-right">
-              <p class="level-item" v-for="screen in location.screens">
-                <a :href="'/screen/' + screen.slug" class="button is-outlined is-success">
-                  <span class="icon is-small">
-                    <span class="fa fa-desktop"></span>
-                  </span>
-                  <span>{{ screen.name }}</span>
-                </a>
-              </p>
             </div>
           </div>
           <TransportsMap :name="location.name" :point="location.point" :stops="stops" :path="path" :current_stop="current_stop" v-on:selected_stop="selected_stop"></TransportsMap>
@@ -45,11 +37,9 @@
             Modifications sauvegardées.
           </div>
 
-          <TransportsSummary :stops="stops" :line_stops="line_stops"/>
-
+          <TransportsSummary :screens="location.screens" :stops="stops" :line_stops="line_stops"/>
         </div>
         <div class="tile is-child box">
-          <p class="title">Choisir ses arrêts</p>
           <Stop :current_stop="current_stop" :line_stops="line_stops" v-on:toggle_line_stop="toggle_line_stop"/>
         </div>
       </div>

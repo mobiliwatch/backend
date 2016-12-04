@@ -3,6 +3,7 @@ var _ = require('lodash');
 
 module.exports = {
   props : {
+    screens : Array,
     line_stops : Array,
     stops : {
       type : Array,
@@ -28,20 +29,35 @@ module.exports = {
 </script>
 
 <template>
-  <div>
-    <h1 class="title">Summary</h1>
+  <div class="columns">
+    <div class="column is-two-thirds">
+      <ul v-if="line_stops_list.length">
+        <li v-for="ls in line_stops_list">
+          {{ ls.stop.name }} : 
+          {{ ls.line.mode }} {{ ls.line.name }} vers {{ ls.direction.name }}
+        </li>
+      </ul>
+      <p class="no-selection" v-else>
+        <span class="icon is-small">
+          <span class="fa fa-bus"></span>
+        </span>
+        Aucune ligne sélectionée.
+      </p>
+    </div>
 
-    <ul v-if="line_stops_list.length">
-      <li v-for="ls in line_stops_list">
-        {{ ls.line.mode }} {{ ls.line.name }} vers {{ ls.direction.name }}
-      </li>
-    </ul>
-    <p class="no-selection" v-else>
-      <span class="icon is-small">
-        <span class="fa fa-bus"></span>
-      </span>
-      Aucune ligne sélectionée pour cet arrêt.
-    </p>
-
+    <div class="column is-one-third">
+      <a :href="'/screen/' + screen.slug" class="button is-outlined is-success" v-for="screen in screens">
+        <span class="icon is-small">
+          <span class="fa fa-desktop"></span>
+        </span>
+        <span>{{ screen.name }}</span>
+      </a>
+      <a href="/screen/new/" class="button is-outlined is-info">
+        <span class="icon is-small">
+          <span class="fa fa-plus"></span>
+        </span>
+        <span>Ajouter un écran</span>
+      </a>
+    </div>
   </div>
 </template>

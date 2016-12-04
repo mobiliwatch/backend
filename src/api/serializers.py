@@ -34,18 +34,28 @@ class DirectionSerializer(serializers.ModelSerializer):
             'name',
         )
 
+class StopLightSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Stop
+        fields = (
+            'id',
+            'name',
+        )
+
 class LineStopSerializer(serializers.ModelSerializer):
     line = LineSerializer()
     direction = DirectionSerializer()
+    stop = StopLightSerializer()
 
     class Meta:
         model = LineStop
         fields = (
-            # Stop data are added in WS handler
             'id',
             'point',
             'line',
             'direction',
+            'stop',
         )
 
 class StopSerializer(serializers.ModelSerializer):
