@@ -8,11 +8,11 @@
         vers {{ ls.direction.name }}
       </label>
     </div>
-    <div v-if="current_stop == null">
-      <p class="title">Choisir ses arrêts à ...</p>
-      <div class="notification is-info">
-        Veuillez sélectionner un arrêt pour voir les détails.
-      </div>
+  </div>
+  <div v-else>
+    <p class="title">Choisir ses arrêts à ...</p>
+    <div class="notification is-info">
+      Veuillez sélectionner un arrêt pour voir les détails.
     </div>
   </div>
 </template>

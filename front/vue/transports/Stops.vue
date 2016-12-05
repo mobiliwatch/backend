@@ -55,7 +55,7 @@ module.exports = {
 </script>
 
 <template>
-  <aside class="menu">
+  <aside>
     <ul>
       <li v-on:click="selected(stop)" v-for="(stop, i) in stops" v-bind:class="{'is-active' : stop == current_stop}">
         <p class="name">

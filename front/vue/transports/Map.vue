@@ -1,12 +1,12 @@
 <template>
-  <div class="map"></div>
+  <div class="map" :style="{height : height + 'px'}"></div>
 </template>
 
 <style scoped>
 .map {
   border: 1px solid #ccc;
   width: 100%;
-  height: 600px;
+  height: 400px;
 }
 </style>
 
@@ -23,6 +23,7 @@ module.exports = {
     path: Object,
     stops: Array,
     'current_stop' : Object,
+    height : Number,
   },
 
   data : function(){
@@ -90,7 +91,7 @@ module.exports = {
       for(var s in stops){
         // Build marker for each stop
         var stop = stops[s];
-        var marker = this.add_marker(stop.name, stop.point.coordinates, 'fa-star', 'blue');
+        var marker = this.add_marker(stop.name, stop.point.coordinates, 'fa-bus', 'blue');
         marker.on('click', function(){
           that.$emit('selected_stop', this.stop);
         });

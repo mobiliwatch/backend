@@ -4,7 +4,9 @@
       <div class="tile is-parent">
         <div class="tile is-child box is-3">
           <p class="title">{{ stops.length }} arrêts trouvés</p>
-          <Stops :stops="stops" :current_stop="current_stop" v-on:selected_stop="selected_stop" />
+          <div id="stops" :style="{height : heights.stops + 'px'}">
+            <Stops :stops="stops" :current_stop="current_stop" v-on:selected_stop="selected_stop" />
+          </div>
           <hr />
           <div>
             <label class="label">Changer la distance de recherche des arrêts</label>
@@ -26,18 +28,17 @@
             </div>
 
             <div class="level-right">
+              <div class="notification is-success" v-if="saved">
+                <span class="icon">
+                  <span class="fa fa-check"></span>
+                </span>
+                Modifications sauvegardées.
+              </div>
             </div>
           </div>
-          <TransportsMap :name="location.name" :point="location.point" :stops="stops" :path="path" :current_stop="current_stop" v-on:selected_stop="selected_stop"></TransportsMap>
+          <TransportsMap :height="heights.map" :name="location.name" :point="location.point" :stops="stops" :path="path" :current_stop="current_stop" v-on:selected_stop="selected_stop"></TransportsMap>
 
-          <div class="notification is-success" v-if="saved">
-            <span class="icon">
-              <span class="fa fa-check"></span>
-            </span>
-            Modifications sauvegardées.
-          </div>
-
-          <TransportsSummary :screens="location.screens" :stops="stops" :line_stops="line_stops"/>
+          <TransportsSummary :screens="location.screens" :stops="stops" :line_stops="line_stops" v-on:toggle_line_stop="toggle_line_stop"/>
         </div>
         <div class="tile is-child box">
           <Stop :current_stop="current_stop" :line_stops="line_stops" v-on:toggle_line_stop="toggle_line_stop"/>
@@ -68,6 +69,10 @@ module.exports = {
       current_stop : null,
       line_stops : [], // selected by user
       distance : 500,
+      heights : {
+        stops : 400, // default height
+        map : 400,
+      },
     };
   },
   components : {
@@ -79,6 +84,12 @@ module.exports = {
   mounted : function(){
     this.load_location();
     this.load_stops();
+
+    // Calc heights
+    this.$set(this, 'heights', {
+      stops : window.innerHeight - 270,
+      map : window.innerHeight - 180,
+    });
   },
 
   methods : {
@@ -182,10 +193,15 @@ module.exports = {
 }
 </script>
 
-<style scoped>
+<style>
 
 div.tile div.level.top {
   padding: 0 5px;
   margin-bottom: 0px;
+}
+
+div#stops {
+  height: 400px;
+  overflow-y: scroll;
 }
 </style>
