@@ -18,6 +18,9 @@ ITI_MODES = {
 class Command(BaseCommand):
     help = 'Setup transport lines'
 
+    def add_arguments(self, parser):
+        parser.add_argument('--with-stops', dest='with_stops', default=False, action='store_true')
+
     def handle(self, *args, **options):
 
         # Apis
@@ -39,7 +42,8 @@ class Command(BaseCommand):
             try:
                 line = self.build(l)
                 print(line)
-                self.build_stops(line)
+                if options['with_stops']:
+                    self.build_stops(line)
             except Exception as e:
                 print('ERROR: {}'.format(e))
                 pprint(l)
@@ -79,6 +83,8 @@ class Command(BaseCommand):
         metro = self.metro_lines.get(metro_key)
         if metro:
             line.metro_id = metro['id']
+            line.color_front = metro.get('textColor')
+            line.color_back = metro.get('color')
             line.save()
             print('Found metro id {}'.format(line.metro_id))
 

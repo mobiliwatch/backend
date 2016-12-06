@@ -70,7 +70,9 @@ module.exports = {
               <span class="fa fa-bus" title="Bus" v-if="mode == 'bus'"></span>
               <span class="fa fa-bus" title="Autocar" v-if="mode == 'car'"></span>
             </span>
-            <span v-for="line in mode_lines" class="tag" :class="{'is-success' : line.mode == 'tram', 'is-primary' : line.mode == 'bus', 'is-info' : line.mode == 'car'}">{{ line.name }}</span>
+            <span v-for="line in mode_lines" class="tag" :style="{'color': '#' + line.color_front, 'background-color': '#' + line.color_back}">
+              {{ line.name }}
+            </span>
           </p>
         </p>
       </li>

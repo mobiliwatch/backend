@@ -25,6 +25,10 @@ class Line(models.Model):
     itinisere_id = models.IntegerField(unique=True)
     metro_id = models.CharField(max_length=250, null=True, blank=True)
 
+    # Colors as hex values
+    color_back = models.CharField(max_length=6, null=True, blank=True)
+    color_front = models.CharField(max_length=6, null=True, blank=True)
+
     class Meta:
         unique_together = (
             ('mode', 'name'),

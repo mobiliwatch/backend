@@ -244,11 +244,10 @@ class LocationWidget(Widget):
             out = LineStopSerializer(ls.line_stop).data
 
             # Add trip metadata
-            out['stop'] = {
-                'name' : ls.line_stop.stop.name,
+            out['stop'].update({
                 'distance' : ls.distance,
                 'walking_time' : ls.walking_time,
-            }
+            })
 
             # Add times
             out['times'] = ls.line_stop.get_next_times()

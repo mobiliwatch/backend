@@ -23,6 +23,8 @@ class LineSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'mode',
+            'color_back',
+            'color_front',
         )
 
 class DirectionSerializer(serializers.ModelSerializer):
