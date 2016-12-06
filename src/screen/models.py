@@ -247,6 +247,10 @@ class LocationWidget(Widget):
             out['stop'].update({
                 'distance' : ls.distance,
                 'walking_time' : ls.walking_time,
+
+                # Calc bounds around walking time
+                'walking_min_time' : ls.walking_time * 1.2,
+                'walking_max_time' : ls.walking_time * 0.8,
             })
 
             # Add times
