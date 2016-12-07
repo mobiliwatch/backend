@@ -211,6 +211,10 @@ FRONTEND_SCREEN_SHARED_URL = 'http://localhost:8080/#/share/{}/{}'
 # Weather
 OPEN_WEATHER_MAP_API = None
 
+# Twitter
+TWITTER_API_KEY = None
+TWITTER_API_SECRET = None
+
 try:
     from .local_settings import *
 except ImportError:
