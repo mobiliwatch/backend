@@ -28,13 +28,19 @@ class LineSerializer(serializers.ModelSerializer):
         )
 
 class DirectionSerializer(serializers.ModelSerializer):
+    disruptions = serializers.SerializerMethodField()
 
     class Meta:
         model = Direction
         fields = (
             'id',
             'name',
+            'disruptions',
         )
+
+    def get_disruptions(self, direction):
+        # complex structure, not parsed
+        return direction.get_disruptions()
 
 class StopLightSerializer(serializers.ModelSerializer):
 

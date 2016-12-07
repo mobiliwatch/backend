@@ -92,3 +92,12 @@ class Itinisere(CachedApi):
             'DepartureTime' : self._now.strftime('%H-%M'),
         }
         return self.request('journeyplanner/v2/WalkTrip/json', params)
+
+    def get_disruptions(self):
+        """
+        List active disruptions for today
+        """
+        params = {
+            'DateTime' : self._now.strftime('%Y-%m-%d'),
+        }
+        return self.request('transport/v3/disruption/GetActiveDisruptions/json', params)

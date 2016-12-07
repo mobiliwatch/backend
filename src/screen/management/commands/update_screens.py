@@ -1,5 +1,8 @@
 from django.core.management.base import BaseCommand, CommandError
 from screen.models import Screen, NoteWidget, LocationWidget, WeatherWidget
+from mobili.helpers import itinisere_timestamp
+from django.core.cache import cache
+import lxml.html
 
 class Command(BaseCommand):
     help = 'Update all screens data though WebSockets'
@@ -26,8 +29,19 @@ class Command(BaseCommand):
             default=False,
             help='Update location data',
         )
+        parser.add_argument(
+            '--disruptions',
+            action='store_true',
+            dest='disruptions',
+            default=False,
+            help='Update disruptions data',
+        )
 
     def handle(self, *args, **options):
+
+        # Cache disruptions
+        if options['disruptions']:
+            self.update_disruptions()
 
         # Check we have some screens
         screens = Screen.objects.filter(active=True)
@@ -42,6 +56,56 @@ class Command(BaseCommand):
                 self.update_note(screen)
             if options['location']:
                 self.update_location(screen)
+
+    def update_disruptions(self):
+        """
+        Store Itinisere disruptions in cache
+        """
+        # Load disruptions
+        from api import Itinisere
+        iti = Itinisere()
+        out = iti.get_disruptions()
+
+        # Linearize disruptions per lines
+        to_cache = {}
+        for d in out['Data']:
+
+            # Cleanup description
+            # Removes ALL html attributes
+            html = lxml.html.fromstring(d['Description'])
+            for tag in html.xpath('//*[@*]'):
+                for a in tag.attrib:
+                    del tag.attrib[a]
+            desc = lxml.html.tostring(html).decode('utf-8')
+
+            # Cleanup data
+            disruption = {
+                'start' : itinisere_timestamp(d['BeginValidityDate']),
+                'end' : itinisere_timestamp(d['EndValidityDate']),
+                'name' : d['Name'],
+                'description' : desc,
+                'type' : d['DisruptionType'],
+                'id' : d['Id'],
+            }
+
+            for line in d['DisruptedLines']:
+
+                # Add level
+                disruption['level'] = line['ServiceLevel']
+
+                # Build cache path
+                line_id = line['LineId']
+                direction = line['Direction']
+                cache_path = 'disruption:{}:{}'.format(line_id, direction)
+                if cache_path not in to_cache:
+                    to_cache[cache_path] = []
+                to_cache[cache_path].append(disruption)
+
+        # Save in cache, for 2 hours
+        for path, disruptions in to_cache.items():
+            cache.set(path, disruptions, 2*3600)
+            print('Cache {} : {}'.format(path, [d['id'] for d in disruptions]))
+
 
     def update_weather(self, screen):
         """

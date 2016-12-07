@@ -3,11 +3,12 @@ from django.contrib.gis.geos import Point
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
 from api import Itinisere, MetroMobilite, Bano, Weather
+from mobili.helpers import itinisere_timestamp
 from django.utils import timezone
+from django.core.cache import cache
 import calendar
 import hashlib
 import logging
-import re
 
 logger = logging.getLogger('transport.models')
 
@@ -52,6 +53,13 @@ class Direction(models.Model):
 
     def __str__(self):
         return '#{} {}'.format(self.itinisere_id, self.name)
+
+    def get_disruptions(self):
+        """
+        Fetch disruptions from cache
+        """
+        return cache.get('disruption:{}:{}'.format(self.line.itinisere_id, self.itinisere_id))
+
 
 class LineStop(models.Model):
     """
@@ -101,12 +109,9 @@ class LineStop(models.Model):
             }
 
         def _clean_itinisere_regex(time):
-            regex = r'^/Date\((\d+)\+(\d+)\)/$'
-            res = re.match(regex, time['AimedTime'])
-            if not res:
-                return
+            t = itinisere_timestamp(time['AimedTime'])
             return {
-                'time' : int(res.group(1)) / 1000,
+                'time' : t,
                 'reference' : time['VehicleJourneyRef'],
             }
 
