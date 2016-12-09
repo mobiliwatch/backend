@@ -218,6 +218,7 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = (
+            'id',
             'position',
             'vertical',
             'widgets',

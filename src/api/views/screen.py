@@ -1,7 +1,8 @@
-from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView
-from api.serializers import ScreenLightSerializer, ScreenSerializer, get_widget_serializer
-from screen.models import Screen
+from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, CreateAPIView, DestroyAPIView
+from api.serializers import ScreenLightSerializer, ScreenSerializer, get_widget_serializer, GroupSerializer
+from screen.models import Screen, Group
 from django.http import Http404
+from rest_framework.response import Response
 
 class ScreenMixin(object):
     """
@@ -61,3 +62,25 @@ class WidgetUpdate(ScreenMixin, UpdateAPIView):
         if widget_id not in widgets:
             raise Http404
         return widgets[widget_id]
+
+class GroupManage(ScreenMixin, CreateAPIView, DestroyAPIView, UpdateAPIView):
+    """
+    Manage a group in a screen
+    * Add sub group
+    * Destroy group + widgets
+    """
+    serializer_class = GroupSerializer
+
+    def get_queryset(self):
+        screen = self.get_screen()
+        return screen.groups.all()
+
+    def create(self, *args, **kwargs):
+        """
+        Create sub group
+        """
+        group = self.get_object()
+        new_group = Group.objects.create(screen=group.screen, parent=group, position=group.groups.count())
+
+        return Response(self.get_serializer(instance=new_group).data)
+

@@ -13,6 +13,15 @@ module.exports = {
       screen : null,
     };
   },  
+  methods : {
+    add_groups : function(groups){
+      var that = this;
+      groups.forEach(function(g){
+        that.$store.commit('add_group', g);
+        that.add_groups(g.groups); // recurse
+      });
+    },
+  },
   mounted : function(){
     var url = '/api/screen/' + this.slug + '/';
     this.$http.get(url).then(function(resp){
@@ -23,6 +32,7 @@ module.exports = {
       this.screen.widgets.forEach(function(w){
         store.commit('add_widget', w);
       });
+      this.add_groups(this.screen.groups);
     });
   },
 };
@@ -30,6 +40,6 @@ module.exports = {
 
 <template>
   <div class="tile is-ancestor" v-if="screen">
-    <Group :group="group" :widgets="screen.widgets" v-for="group in screen.groups" />
+    <Group :groupId="group.id" v-for="group in screen.groups" />
   </div>
 </template>
