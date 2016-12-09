@@ -11,6 +11,11 @@ module.exports = {
   props : {
     groupId : Number,
   },
+  data : function(){
+    return {
+      editing : false,
+    };
+  },
   computed : {
     group : function(){
       return this.$store.state.groups[this.groupId];
@@ -38,38 +43,81 @@ module.exports = {
         vertical : !this.group.vertical,
       });
     },
+    
+    toggle_editing : function(){
+      this.$set(this, 'editing', !this.editing);
+    },
   },
 };
 </script>
 
 <template>
   <div class="group" v-if="group">
-    <div class="control has-addons">
-      <span class="button" v-on:click="add_subgroup()">
+    <p v-if="!editing">
+      <span class="button is-info" v-on:click="toggle_editing()">
         <span class="icon is-small">
+          <i class="fa fa-pencil"></i>
+        </span>
+        <span>Editer groupe/widget</span>
+      </span>
+    </p>
+
+    <nav class="panel" v-if="editing">
+      <a class="panel-block">
+        <span class="panel-icon is-small">
+          <i class="fa fa-window-maximize"></i>
+        </span>
+        <span>Ajouter widget météo</span>
+      </a>
+      <a class="panel-block">
+        <span class="panel-icon is-small">
+          <i class="fa fa-window-maximize"></i>
+        </span>
+        <span>Ajouter widget transports</span>
+      </a>
+      <a class="panel-block">
+        <span class="panel-icon is-small">
+          <i class="fa fa-window-maximize"></i>
+        </span>
+        <span>Ajouter widget horloge</span>
+      </a>
+      <a class="panel-block">
+        <span class="panel-icon is-small">
+          <i class="fa fa-window-maximize"></i>
+        </span>
+        <span>Ajouter widget notes</span>
+      </a>
+      <a class="panel-block" v-on:click="add_subgroup()">
+        <span class="panel-icon is-small">
           <i class="fa fa-object-group"></i>
         </span>
         <span>Ajouter sous-groupe</span>
-      </span>
-      <span class="button">
-        <span class="icon is-small">
-          <i class="fa fa-window-maximize"></i>
-        </span>
-        <span>Ajouter widget</span>
-      </span>
-      <span class="button" v-on:click="delete_group()">
-        <span class="icon is-small">
+      </a>
+      <a class="panel-block" v-on:click="delete_group()">
+        <span class="panel-icon is-small">
           <i class="fa fa-trash"></i>
         </span>
         <span>Supprimer groupe</span>
-      </span>
-      <span class="button" v-on:click="toggle_vertical()">
-        <span class="icon is-small">
+      </a>
+      <a class="panel-block" v-on:click="toggle_vertical()" v-if="group.vertical">
+        <span class="panel-icon is-small">
           <i class="fa fa-arrows-h"></i>
         </span>
-        <span>Vertical/Horizontal</span>
-      </span>
-    </div>
+        <span>Affichage horizontal</span>
+      </a>
+      <a class="panel-block" v-on:click="toggle_vertical()" v-else>
+        <span class="panel-icon is-small">
+          <i class="fa fa-arrows-v"></i>
+        </span>
+        <span>Affichage vertical</span>
+      </a>
+
+      <div class="panel-block">
+        <button class="button is-primary is-outlined is-fullwidth" v-on:click="toggle_editing()">
+          Fermer
+        </button>
+      </div>
+    </nav>
 
     <div class="tile" :class="{'is-vertical': group.vertical}">
       <Group :groupId="g.id" v-for="g in group.groups" />
@@ -94,8 +142,7 @@ div.tile, div.tile.is-parent {
   height: 90%;
 }
 
-div.control.has-addons {
-  height: 30px;
-  margin-left: 10px;
+nav {
+  background: #EEE;
 }
 </style>
