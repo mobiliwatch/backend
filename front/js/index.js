@@ -26,3 +26,6 @@ var app = new Vue({
 require('bulma/css/bulma.css');
 require('font-awesome/css/font-awesome.css');
 require('css/mobili.css');
+
+// Extra font
+require('fonts/Esphimere Bold.otf');

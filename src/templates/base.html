@@ -25,13 +25,11 @@
 
     <div class="nav-center">
       <a class="nav-item is-brand" href="{% url 'home' %}">
-        <span class="icon is-medium">
-          <span class="fa fa-bus"></span>
-        </span>
-        <span class="icon is-medium">
-          <span class="fa fa-clock-o"></span>
-        </span>
-        Mobili.Watch
+        <img src="{% static 'img/logo_small_grey.png' %}" alt="Logo"/>
+        <p>
+          <span class="project">{{ _('Mobili.Watch') }}</span>
+          <span class="baseline">{{ _('Baseline...') }}</span>
+        </p>
       </a>
     </div>
 
