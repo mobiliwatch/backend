@@ -8,6 +8,7 @@ module.exports = new Vuex.Store({
     groups : {},
     screen : '',
     locations : [],
+    cities : [],
   },
   mutations: {
     use_screen : function(state, screen){
@@ -20,8 +21,11 @@ module.exports = new Vuex.Store({
     },
 
     use_locations : function(state, locations){
-      // Store an initial widget declaration in store
       state.locations = locations;
+    },
+
+    use_cities : function(state, cities){
+      state.cities = cities;
     },
 
     add_group : function(state, group){

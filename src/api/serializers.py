@@ -7,12 +7,16 @@ from rest_framework_gis.serializers import GeometrySerializerMethodField
 from mobili.helpers import haversine_distance
 import math
 
+import logging
+logger = logging.getLogger('api.serializers')
+
 
 class CitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = City
         fields = (
+            'id',
             'name',
         )
 
@@ -189,30 +193,40 @@ class NoteWidgetSerializer(WidgetSerializer):
         return widget
 
 class WeatherWidgetSerializer(WidgetSerializer):
-    city = CitySerializer()
+    city = serializers.PrimaryKeyRelatedField(queryset=City.objects.all())
 
     def update(self, widget, data):
+        # Update city
+        city = data.get('city')
+        save = False
+        if city and city != widget.city:
+            widget.city = city
+            save = True
 
         # Send update through ws
-        widget.send_ws_update()
+        # it may fail due to cities missing positions
+        try:
+            widget.send_ws_update()
+            if save:
+                widget.save()
+        except Exception as e:
+            logger.error('Weather widget {} update failed: {}'.format(widget.id, e))
+            raise APIException('Update failed')
 
         return widget
 
 class LocationWidgetSerializer(WidgetSerializer):
-    #location = LocationSerializer()
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
 
     def update(self, widget, data):
 
         # Check location belongs to user
-        location = data['location']
-        if widget.location != location:
+        location = data.get('location')
+        if location and location != widget.location:
             if location.user != self.context['request'].user:
                 raise APIException('Invalid location')
             widget.location = location
             widget.save()
-
-        print('UPDATE Location', data)
 
         # Send update through ws
         widget.send_ws_update()

@@ -8,6 +8,7 @@ module.exports = {
     return {
       saving : false,
       deleting: false,
+      error : null,
     };
   },
   computed : {
@@ -17,6 +18,7 @@ module.exports = {
   },
   methods: {
     save : function(extra_data){
+      this.$set(this, 'error', null);
       var data = {
         id : this.widget.id,
       };
@@ -25,22 +27,24 @@ module.exports = {
 
       this.$set(this, 'saving', true);
       var that = this;
-      this.$store.dispatch('update_widget', data)
+      return this.$store.dispatch('update_widget', data)
       .then(function(){
         that.$set(that, 'saving', false);
       })
-      .catch(function(){
+      .catch(function(error){
         that.$set(that, 'saving', false);
+        that.$set(that, 'error', error);
       });
     },
     delete_widget : function(){
+      this.$set(this, 'error', null);
       var data = {
         id : this.widget.id,
       };
 
       this.$set(this, 'deleting', true);
       var that = this;
-      this.$store.dispatch('delete_widget', data)
+      return this.$store.dispatch('delete_widget', data)
       .then(function(){
         that.$set(that, 'deleting', false);
       })

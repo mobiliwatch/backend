@@ -13,8 +13,8 @@
 
     <p class="control">
       <select v-if="locations" class="select" v-model="selected_location">
-        <option v-for="location in locations" :value="location.id">
-          {{ location.name }} : {{ location.address }} à {{ location.city.name }}
+        <option v-for="l in locations" :value="l.id">
+          {{ l.name }} : {{ l.address }} à {{ l.city.name }}
         </option>
       </select>
     </p>
@@ -22,9 +22,9 @@
     <p class="control">
       <span v-on:click="save_location" class="button is-success" :class="{'is-loading' : saving}">
         <span class="icon">
-          <i class="fa fa-bolt"></i>
+          <i class="fa fa-check"></i>
         </span>
-        <span>Mettre à jour</span>
+        <span>Enregistrer</span>
       </span>
       <span v-on:click="delete_widget" class="button is-danger" :class="{'is-loading' : deleting}">
         <span class="icon">

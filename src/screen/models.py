@@ -276,6 +276,9 @@ class WeatherWidget(Widget):
         """
         weather = self.city.get_weather()
         return {
+            'city' : {
+                'name' : self.city.name,
+            },
             'observed' : weather.get_reference_time(),
             'wind' : weather.get_wind(),
             'humidity' : weather.get_humidity(),

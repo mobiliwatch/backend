@@ -42,6 +42,12 @@ module.exports = {
     this.$http.get(url).then(function(resp){
       this.$store.commit('use_locations', resp.body);
     });
+
+    // Load cities
+    var url = '/api/city/';
+    this.$http.get(url).then(function(resp){
+      this.$store.commit('use_cities', resp.body);
+    });
   },
 };
 </script>
