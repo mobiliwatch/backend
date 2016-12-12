@@ -31,18 +31,27 @@ class LocationStops(LocationMixin, ListAPIView):
     def get_queryset(self):
 
         # Load location
-        self.location = self.get_object()
+        try:
+          qs = super(LocationStops, self).get_queryset()
+          self.location = qs.get(pk=self.kwargs['pk'])
+        except:
+          raise Http404
+        print('location', self.location)
 
         # Find nearby stops
         distance = int(self.request.GET.get('distance', 400))
         iti = Itinisere()
         stops = iti.get_nearest_line_stops(self.location.point.x, self.location.point.y, distance)
-        if not stops or not stops.get('Data'):
-            return []
+        if stops and stops.get('Data'):
+            stop_ids = set(s['LogicalStopId'] for s in stops['Data'])
+        else:
+            stop_ids = []
+
+        # Add already selected stops
+        stop_ids = stop_ids.union(list(self.location.line_stops.values_list('stop__itinisere_id', flat=True)))
 
         # Load stops from database
-        stop_ids = set(s['LogicalStopId'] for s in stops['Data'])
-        return Stop.objects.filter(itinisere_id__in=stop_ids)
+        return Stop.objects.filter(itinisere_id__in=stop_ids).distinct()
 
 
 class LocationDetails(LocationMixin, RetrieveAPIView, UpdateAPIView):
