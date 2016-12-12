@@ -1,14 +1,16 @@
 <template>
   <form>
-    <h1 class="title">Météo à {{ widget.city.name }}</h1>
+
+    <h1 class="title">Prochains passages</h1>
     <div class="notification is-info">
       <span class="icon">
-        <span class="fa fa-bolt"></span>
+        <span class="fa fa-bus"></span>
       </span>
       <span>
-        Les prévisions météo s'afficheront ici.
+        Les horaires des prochains passages de vos arrêts choisis s'afficheront ici.
       </span>
     </div>
+
     <p class="control">
       <span v-on:click="save(null)" class="button is-success" :class="{'is-loading' : saving}">
         <span class="icon">

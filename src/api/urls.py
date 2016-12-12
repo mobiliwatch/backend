@@ -1,10 +1,11 @@
 from django.conf.urls import url, include
-from api.views import LocationStops, LocationDetails, ScreenDetails, WidgetUpdate, ScreenList, ScreenShared, LocationDistance, GroupManage
+from api.views import LocationStops, LocationDetails, ScreenDetails, WidgetManage, WidgetCreate, ScreenList, ScreenShared, LocationDistance, GroupManage
 
 screen_patterns = [
-    url(r'^(?P<widget>[\w\-]+)/$', WidgetUpdate.as_view(), name='widget-update'),
+    url(r'^widgets/$', WidgetCreate.as_view(), name='widget-create'),
     url(r'^group/(?P<pk>\d+)/$', GroupManage.as_view(), name='group-manage'),
     url(r'^shared/(?P<token>[\w\-]+)/$', ScreenShared.as_view(), name='screen-shared'),
+    url(r'^(?P<widget>[\w\-]+)/$', WidgetManage.as_view(), name='widget-update'),
     url(r'^$', ScreenDetails.as_view(), name='screen'),
 ]
 

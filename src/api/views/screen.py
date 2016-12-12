@@ -1,6 +1,7 @@
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, CreateAPIView, DestroyAPIView
-from api.serializers import ScreenLightSerializer, ScreenSerializer, get_widget_serializer, GroupSerializer
-from screen.models import Screen, Group
+from rest_framework.exceptions import APIException
+from api.serializers import ScreenLightSerializer, ScreenSerializer, get_widget_serializer, GroupSerializer, WidgetCreationSerializer
+from screen.models import Screen, Group, LocationWidget, WeatherWidget, NoteWidget, ClockWidget
 from django.http import Http404
 from rest_framework.response import Response
 
@@ -47,7 +48,12 @@ class ScreenShared(RetrieveAPIView):
         except Screen.DoesNotExist:
             raise Http404
 
-class WidgetUpdate(ScreenMixin, UpdateAPIView):
+class WidgetManage(ScreenMixin, UpdateAPIView, DestroyAPIView):
+    """
+    Manage existing widget
+    * update settings
+    * delete it
+    """
 
     def get_serializer_class(self):
         return get_widget_serializer(self.get_object())
@@ -62,6 +68,50 @@ class WidgetUpdate(ScreenMixin, UpdateAPIView):
         if widget_id not in widgets:
             raise Http404
         return widgets[widget_id]
+
+class WidgetCreate(ScreenMixin, CreateAPIView):
+    """
+    Create a new widget in a screen's group
+    """
+    serializer_class = WidgetCreationSerializer
+
+    def create(self, request, *args, **kwargs):
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # Check group is in screen
+        screen = self.get_screen()
+        group = serializer.validated_data['group']
+        if group.screen != screen:
+            raise APIException('Invalid group')
+
+        # Build widget
+        # TODO: move in central controller
+        widget_type = serializer.validated_data['widget_type']
+        last_location = self.request.user.locations.last()
+        if widget_type == 'note':
+            w = NoteWidget()
+        elif widget_type == 'weather':
+            if not last_location:
+                raise APIException('Missing location')
+            w = WeatherWidget(city=last_location.city)
+        elif widget_type == 'clock':
+            w = ClockWidget()
+        elif widget_type == 'location':
+            if not last_location:
+                raise APIException('Missing location')
+            w = LocationWidget(location=last_location)
+        else:
+            raise APIException('Invalid widget type')
+
+        w.group = group
+        w.save()
+
+        # Output widget
+        serializer = get_widget_serializer(w)(instance=w)
+        return Response(serializer.data, status=201)
+
 
 class GroupManage(ScreenMixin, CreateAPIView, DestroyAPIView, UpdateAPIView):
     """

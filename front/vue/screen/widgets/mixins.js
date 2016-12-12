@@ -7,6 +7,7 @@ module.exports = {
   data : function(){
     return {
       saving : false,
+      deleting: false,
     };
   },
   computed : {
@@ -30,6 +31,21 @@ module.exports = {
       })
       .catch(function(){
         that.$set(that, 'saving', false);
+      });
+    },
+    delete_widget : function(){
+      var data = {
+        id : this.widget.id,
+      };
+
+      this.$set(this, 'deleting', true);
+      var that = this;
+      this.$store.dispatch('delete_widget', data)
+      .then(function(){
+        that.$set(that, 'deleting', false);
+      })
+      .catch(function(){
+        that.$set(that, 'deleting', false);
       });
     },
   },

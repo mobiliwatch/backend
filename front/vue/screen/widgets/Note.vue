@@ -11,6 +11,12 @@
         </span>
         <span>Enregistrer</span>
       </span>
+      <span v-on:click="delete_widget" class="button is-danger" :class="{'is-loading' : deleting}">
+        <span class="icon">
+          <i class="fa fa-trash"></i>
+        </span>
+        <span>Supprimer</span>
+      </span>
     </p>
   </form>
 </template>
@@ -23,7 +29,6 @@ module.exports = {
   data : function(){
     return {
       text : null,
-      saving : false,
     };
   },
   mounted : function(){

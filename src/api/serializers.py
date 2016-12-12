@@ -184,6 +184,7 @@ def get_widget_serializer(widget):
     """
     Find correct serializer for an instance
     """
+    # TODO: move in central controller
     serializers = {
         ClockWidget : ClockWidgetSerializer,
         WeatherWidget : WeatherWidgetSerializer,
@@ -250,3 +251,9 @@ class DistanceSerializer(serializers.Serializer):
 
     def get_geometry(self, data):
         return data['geometry']
+
+
+class WidgetCreationSerializer(serializers.Serializer):
+    group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all())
+    widget_type = serializers.CharField()
+

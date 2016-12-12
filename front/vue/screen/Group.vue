@@ -36,6 +36,14 @@ module.exports = {
       });
     },
 
+    add_widget : function(widget_type){
+      // Add a new widget to the group
+      this.$store.dispatch('add_widget', {
+        group : this.groupId,
+        widget_type : widget_type,
+      });
+    },
+
     toggle_vertical : function(){
       // Toggle vertical orientation
       this.$store.dispatch('update_group', {
@@ -63,25 +71,25 @@ module.exports = {
     </p>
 
     <nav class="panel" v-if="editing">
-      <a class="panel-block">
+      <a class="panel-block" v-on:click="add_widget('weather')">
         <span class="panel-icon is-small">
           <i class="fa fa-window-maximize"></i>
         </span>
         <span>Ajouter widget météo</span>
       </a>
-      <a class="panel-block">
+      <a class="panel-block" v-on:click="add_widget('location')">
         <span class="panel-icon is-small">
           <i class="fa fa-window-maximize"></i>
         </span>
         <span>Ajouter widget transports</span>
       </a>
-      <a class="panel-block">
+      <a class="panel-block" v-on:click="add_widget('clock')">
         <span class="panel-icon is-small">
           <i class="fa fa-window-maximize"></i>
         </span>
         <span>Ajouter widget horloge</span>
       </a>
-      <a class="panel-block">
+      <a class="panel-block" v-on:click="add_widget('note')">
         <span class="panel-icon is-small">
           <i class="fa fa-window-maximize"></i>
         </span>

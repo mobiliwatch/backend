@@ -249,8 +249,8 @@ class LocationWidget(Widget):
                 'walking_time' : ls.walking_time,
 
                 # Calc bounds around walking time
-                'walking_min_time' : ls.walking_time * 1.2,
-                'walking_max_time' : ls.walking_time * 0.8,
+                'walking_min_time' : ls.walking_time * 0.8,
+                'walking_max_time' : ls.walking_time * 1.2,
             })
 
             # Add times

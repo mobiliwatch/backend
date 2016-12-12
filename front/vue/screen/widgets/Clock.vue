@@ -1,14 +1,15 @@
 <template>
   <form>
-    <h1 class="title">Météo à {{ widget.city.name }}</h1>
+    <h1 class="title">Horloge</h1>
     <div class="notification is-info">
       <span class="icon">
-        <span class="fa fa-bolt"></span>
+        <span class="fa fa-clock-o"></span>
       </span>
       <span>
-        Les prévisions météo s'afficheront ici.
+        Une horloge s'affichera ici.
       </span>
     </div>
+
     <p class="control">
       <span v-on:click="save(null)" class="button is-success" :class="{'is-loading' : saving}">
         <span class="icon">
@@ -34,4 +35,3 @@ module.exports = {
   mixins : [mixins, ],
 };
 </script>
-

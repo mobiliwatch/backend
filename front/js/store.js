@@ -90,6 +90,16 @@ module.exports = new Vuex.Store({
       Vue.set(state, 'widgets', widgets);
       console.debug('Updated widget', widget_id, payload);
     },
+
+    delete_widget: function(state, payload){
+      // Delete a widget
+      var widgets = _.clone(state.widgets);
+      if(!widgets[payload.id])
+        throw new Error("No widget "+parent_id);
+      delete widgets[payload.id];
+      Vue.set(state, 'widgets', widgets);
+    },
+
   },
 
   actions : {
@@ -140,5 +150,34 @@ module.exports = new Vuex.Store({
       });
     },
 
+    // Add a new widget in a group
+    add_widget : function(context, payload){
+      var group_id = payload.group;
+      var url = '/api/screen/' + context.state.screen + '/widgets/';
+      return Vue.http.post(url, payload).then(function(resp){
+          // Commit change on local store
+          context.commit('add_widget', resp.body);
+
+          // Update group to use this widget
+          var widgets = context.state.groups[group_id].widgets;
+          widgets.push(resp.body.id);
+          context.commit('update_group', {
+            id : payload.group_id,
+            widgets : widgets,
+          });
+      });
+    },
+
+    // Delete a widget on backend
+    delete_widget : function(context, payload){
+			var widget_id = payload.id;
+      var url = '/api/screen/' + context.state.screen + '/' + widget_id + '/';
+
+      return Vue.http.delete(url).then(function(){
+        context.commit('delete_widget', {
+          id : widget_id,
+        });
+      });
+    },
   }
 });

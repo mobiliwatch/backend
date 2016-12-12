@@ -1,2 +1,2 @@
 from .location import LocationStops, LocationDetails, LocationDistance
-from .screen import ScreenDetails, WidgetUpdate, ScreenList, ScreenShared, GroupManage
+from .screen import ScreenDetails, WidgetManage, WidgetCreate, ScreenList, ScreenShared, GroupManage
