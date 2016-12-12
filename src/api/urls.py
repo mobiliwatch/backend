@@ -1,5 +1,5 @@
 from django.conf.urls import url, include
-from api.views import LocationStops, LocationDetails, ScreenDetails, WidgetManage, WidgetCreate, ScreenList, ScreenShared, LocationDistance, GroupManage
+from api.views import LocationStops, LocationList, LocationDetails, ScreenDetails, WidgetManage, WidgetCreate, ScreenList, ScreenShared, LocationDistance, GroupManage
 
 screen_patterns = [
     url(r'^widgets/$', WidgetCreate.as_view(), name='widget-create'),
@@ -17,6 +17,7 @@ location_patterns = [
 
 urlpatterns = [
   url(r'^location/(?P<pk>\d+)/', include(location_patterns)),
+  url(r'^location/$', LocationList.as_view(), name='locations'),
 
   url(r'^screen/(?P<slug>[\w\-]+)/', include(screen_patterns)),
   url(r'^screen/$', ScreenList.as_view(), name='screens'),

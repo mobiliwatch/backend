@@ -1,24 +1,26 @@
 from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework.exceptions import APIException
-from api.serializers import StopSerializer, LocationSerializer, DistanceSerializer
+from api.serializers import StopSerializer, LocationSerializer, DistanceSerializer, LocationLightSerializer
 from api import Itinisere
 from channels import Channel
 from transport.models import Stop
 from transport.trip import walk_trip
-from users.models import Location
 from django.http import Http404
 
 
 class LocationMixin(object):
     """
-    Get a location
+    Get user locations
     """
-    def get_object(self):
-        try:
-            return self.request.user.locations.get(pk=self.kwargs['pk'])
-        except Location.DoesNotExist:
-            raise Http404
+    def get_queryset(self):
+        return self.request.user.locations.all()
 
+
+class LocationList(LocationMixin, ListAPIView):
+    """
+    List available locations
+    """
+    serializer_class = LocationLightSerializer
 
 class LocationStops(LocationMixin, ListAPIView):
     """

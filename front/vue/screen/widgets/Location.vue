@@ -12,7 +12,15 @@
     </div>
 
     <p class="control">
-      <span v-on:click="save(null)" class="button is-success" :class="{'is-loading' : saving}">
+      <select v-if="locations" class="select" v-model="selected_location">
+        <option v-for="location in locations" :value="location.id">
+          {{ location.name }} : {{ location.address }} à {{ location.city.name }}
+        </option>
+      </select>
+    </p>
+
+    <p class="control">
+      <span v-on:click="save_location" class="button is-success" :class="{'is-loading' : saving}">
         <span class="icon">
           <i class="fa fa-bolt"></i>
         </span>
@@ -34,6 +42,26 @@ var mixins = require('./mixins.js');
 
 module.exports = {
   mixins : [mixins, ],
+  data : function(){
+    return {
+      selected_location : null,
+    };
+  },
+  computed : {
+    locations : function(){
+      return this.$store.state.locations;
+    },
+  },
+  mounted : function(){
+    // Select inital location
+    this.$set(this, 'selected_location', this.widget.location);
+  },
+  methods: {
+    save_location: function(){
+      this.save({
+        'location': this.selected_location,
+      });
+    },
+  },
 };
 </script>
-

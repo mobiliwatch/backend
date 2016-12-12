@@ -23,6 +23,8 @@ module.exports = {
     },
   },
   mounted : function(){
+
+    // Load screen details
     var url = '/api/screen/' + this.slug + '/';
     this.$http.get(url).then(function(resp){
       this.$set(this, 'screen', resp.body);
@@ -33,6 +35,12 @@ module.exports = {
         store.commit('add_widget', w);
       });
       this.add_groups(this.screen.groups);
+    });
+
+    // Load locations
+    var url = '/api/location/';
+    this.$http.get(url).then(function(resp){
+      this.$store.commit('use_locations', resp.body);
     });
   },
 };

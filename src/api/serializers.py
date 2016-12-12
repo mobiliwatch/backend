@@ -2,6 +2,7 @@ from transport.models import Stop, LineStop, Line, Direction, City
 from users.models import Location
 from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget, Group
 from rest_framework import serializers
+from rest_framework.exceptions import APIException
 from rest_framework_gis.serializers import GeometrySerializerMethodField
 from mobili.helpers import haversine_distance
 import math
@@ -106,6 +107,22 @@ class ScreenLightSerializer(serializers.ModelSerializer):
         )
 
 
+class LocationLightSerializer(serializers.ModelSerializer):
+    """
+    Used by backend to select new locations
+    """
+    city = CitySerializer()
+
+    class Meta:
+        model = Location
+        fields = (
+            'id',
+            'name',
+            'address',
+            'city',
+        )
+
+
 class LocationSerializer(serializers.ModelSerializer):
     """
     Used by frontend to have full details on managed stops
@@ -150,6 +167,13 @@ class WidgetSerializer(serializers.Serializer):
 class ClockWidgetSerializer(WidgetSerializer):
     now = serializers.FloatField()
 
+    def update(self, widget, data):
+
+        # Send update through ws
+        widget.send_ws_update()
+
+        return widget
+
 class NoteWidgetSerializer(WidgetSerializer):
     text = serializers.CharField()
 
@@ -169,16 +193,31 @@ class WeatherWidgetSerializer(WidgetSerializer):
 
     def update(self, widget, data):
 
-        # Save on Db
-        #widget.save()
-
         # Send update through ws
         widget.send_ws_update()
 
         return widget
 
 class LocationWidgetSerializer(WidgetSerializer):
-    location = LocationSerializer()
+    #location = LocationSerializer()
+    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+
+    def update(self, widget, data):
+
+        # Check location belongs to user
+        location = data['location']
+        if widget.location != location:
+            if location.user != self.context['request'].user:
+                raise APIException('Invalid location')
+            widget.location = location
+            widget.save()
+
+        print('UPDATE Location', data)
+
+        # Send update through ws
+        widget.send_ws_update()
+
+        return widget
 
 def get_widget_serializer(widget):
     """
