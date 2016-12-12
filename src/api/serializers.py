@@ -45,7 +45,7 @@ class DirectionSerializer(serializers.ModelSerializer):
 
     def get_disruptions(self, direction):
         # complex structure, not parsed
-        return direction.get_disruptions()
+        return direction.get_disruptions(commercial=False)
 
 class StopLightSerializer(serializers.ModelSerializer):
 

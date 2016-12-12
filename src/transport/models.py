@@ -54,11 +54,17 @@ class Direction(models.Model):
     def __str__(self):
         return '#{} {}'.format(self.itinisere_id, self.name)
 
-    def get_disruptions(self):
+    def get_disruptions(self, commercial=True):
         """
         Fetch disruptions from cache
         """
-        return cache.get('disruption:{}:{}'.format(self.line.itinisere_id, self.itinisere_id))
+        disruptions = cache.get('disruption:{}:{}'.format(self.line.itinisere_id, self.itinisere_id))
+
+        # Remove commercial disruptions
+        if not commercial:
+            disruptions = [d for d in disruptions if d['type']['Id'] != 1]
+
+        return disruptions
 
 
 class LineStop(models.Model):
