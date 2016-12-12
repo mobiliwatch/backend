@@ -59,6 +59,8 @@ class Direction(models.Model):
         Fetch disruptions from cache
         """
         disruptions = cache.get('disruption:{}:{}'.format(self.line.itinisere_id, self.itinisere_id))
+        if disruptions is None:
+            return []
 
         # Remove commercial disruptions
         if not commercial:

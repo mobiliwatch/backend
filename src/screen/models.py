@@ -160,7 +160,8 @@ class Group(models.Model):
             list(self.locationwidget.all()) \
             + list(self.clockwidget.all()) \
             + list(self.weatherwidget.all()) \
-            + list(self.notewidget.all())
+            + list(self.notewidget.all()) \
+            + list(self.disruptionwidget.all())
 
 
 class Widget(models.Model):
@@ -301,4 +302,29 @@ class NoteWidget(Widget):
         """
         return {
             'text' : self.text,
+        }
+
+class DisruptionWidget(Widget):
+    """
+    List active disruptions for a location
+    """
+    location = models.ForeignKey('users.Location', related_name='widgets_disruptions')
+
+    def build_update(self):
+        """
+        Send active disruptions
+        """
+
+        # All disruptions, linearized
+        disruptions = sum([ls.direction.get_disruptions() for ls in self.location.line_stops.all()], [])
+
+        # Unique disruptions
+        seen = set()
+        disruptions = [seen.add(d['id']) or d for d in disruptions if d['id'] not in seen]
+
+        # Sort by date
+        disruptions = sorted(disruptions, key=lambda d : d['start'], reverse=True)
+
+        return {
+            'disruptions' : list(disruptions),
         }

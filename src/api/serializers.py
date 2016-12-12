@@ -1,6 +1,6 @@
 from transport.models import Stop, LineStop, Line, Direction, City
 from users.models import Location
-from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget, Group
+from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget, DisruptionWidget, Group
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 from rest_framework_gis.serializers import GeometrySerializerMethodField
@@ -233,6 +233,11 @@ class LocationWidgetSerializer(WidgetSerializer):
 
         return widget
 
+class DisruptionWidgetSerializer(LocationWidgetSerializer):
+    """
+    Just keep track of a location, same as above
+    """
+
 def get_widget_serializer(widget):
     """
     Find correct serializer for an instance
@@ -243,6 +248,7 @@ def get_widget_serializer(widget):
         WeatherWidget : WeatherWidgetSerializer,
         NoteWidget : NoteWidgetSerializer,
         LocationWidget : LocationWidgetSerializer,
+        DisruptionWidget : DisruptionWidgetSerializer,
     }
     return serializers.get(widget.__class__, WidgetSerializer)
 

@@ -1,7 +1,7 @@
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, CreateAPIView, DestroyAPIView
 from rest_framework.exceptions import APIException
 from api.serializers import ScreenLightSerializer, ScreenSerializer, get_widget_serializer, GroupSerializer, WidgetCreationSerializer
-from screen.models import Screen, Group, LocationWidget, WeatherWidget, NoteWidget, ClockWidget
+from screen.models import Screen, Group, LocationWidget, WeatherWidget, NoteWidget, ClockWidget, DisruptionWidget
 from django.http import Http404
 from rest_framework.response import Response
 
@@ -102,6 +102,10 @@ class WidgetCreate(ScreenMixin, CreateAPIView):
             if not last_location:
                 raise APIException('Missing location')
             w = LocationWidget(location=last_location)
+        elif widget_type == 'disruption':
+            if not last_location:
+                raise APIException('Missing location')
+            w = DisruptionWidget(location=last_location)
         else:
             raise APIException('Invalid widget type')
 

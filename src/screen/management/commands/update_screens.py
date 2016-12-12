@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from screen.models import Screen, NoteWidget, LocationWidget, WeatherWidget
+from screen.models import Screen, NoteWidget, LocationWidget, WeatherWidget, DisruptionWidget
 from mobili.helpers import itinisere_timestamp
 from django.core.cache import cache
 import lxml.html
@@ -41,7 +41,7 @@ class Command(BaseCommand):
 
         # Cache disruptions
         if options['disruptions']:
-            self.update_disruptions()
+            self.cache_disruptions()
 
         # Check we have some screens
         screens = Screen.objects.filter(active=True)
@@ -56,8 +56,10 @@ class Command(BaseCommand):
                 self.update_note(screen)
             if options['location']:
                 self.update_location(screen)
+            if options['disruptions']:
+                self.update_disruptions(screen)
 
-    def update_disruptions(self):
+    def cache_disruptions(self):
         """
         Store Itinisere disruptions in cache
         """
@@ -134,4 +136,13 @@ class Command(BaseCommand):
         widgets = LocationWidget.objects.filter(group__screen=screen)
         for w in widgets:
             print('Location: {}'.format(w.location))
+            w.send_ws_update()
+
+    def update_disruptions(self, screen):
+        """
+        Update disruptions data for a screen
+        """
+        print('Update disruptions for screen {}'.format(screen))
+        widgets = DisruptionWidget.objects.filter(group__screen=screen)
+        for w in widgets:
             w.send_ws_update()

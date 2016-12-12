@@ -83,6 +83,12 @@ module.exports = {
         </span>
         <span>Ajouter widget transports</span>
       </a>
+      <a class="panel-block" v-on:click="add_widget('disruption')">
+        <span class="panel-icon is-small">
+          <i class="fa fa-window-maximize"></i>
+        </span>
+        <span>Ajouter widget perturbations</span>
+      </a>
       <a class="panel-block" v-on:click="add_widget('clock')">
         <span class="panel-icon is-small">
           <i class="fa fa-window-maximize"></i>

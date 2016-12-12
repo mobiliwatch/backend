@@ -6,6 +6,7 @@
       <Weather v-if="widget.type == 'WeatherWidget'" :widgetId="widget.id" />
       <Clock v-if="widget.type == 'ClockWidget'" :widgetId="widget.id" />
       <LocationWidget v-if="widget.type == 'LocationWidget'" :widgetId="widget.id" />
+      <Disruption v-if="widget.type == 'DisruptionWidget'" :widgetId="widget.id" />
 
     </div>
   </article>
@@ -17,6 +18,7 @@ var Note = require('./widgets/Note.vue');
 var Weather = require('./widgets/Weather.vue');
 var Clock = require('./widgets/Clock.vue');
 var LocationWidget = require('./widgets/Location.vue');
+var Disruption = require('./widgets/Disruption.vue');
 
 module.exports = {
   mixins : [mixins, ],
@@ -25,6 +27,7 @@ module.exports = {
     Weather : Weather,
     Clock : Clock,
     LocationWidget : LocationWidget, // reserved word location
+    Disruption : Disruption,
   },
   data : function(){
     return {};

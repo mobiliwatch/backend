@@ -172,7 +172,7 @@ module.exports = new Vuex.Store({
           var widgets = context.state.groups[group_id].widgets;
           widgets.push(resp.body.id);
           context.commit('update_group', {
-            id : payload.group_id,
+            id : payload.group,
             widgets : widgets,
           });
       });
