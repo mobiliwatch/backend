@@ -87,7 +87,17 @@
     {% for screen in user.screens.all %}
     <div class="column is-one-third">
       <div class="box">
-        <h5 class="title">{{ screen.name }}</h5>
+        <h5 class="title">
+          {% if screen.is_template %}
+          <span class="tag is-warning">
+            <span class="icon is-small">
+              <span class="fa fa-clone"></span>
+            </span>
+            <span>Template</span>
+          </span>
+          {% endif %}
+          {{ screen.name }}
+        </h5>
         <nav class="level">
           <div class="level-left">
             <a class="level-item" href="{% url 'screen' screen.slug %}">
@@ -102,10 +112,12 @@
               <span class="icon is-small"><i class="fa fa-share"></i></span>
               <span>{{ _('Shared') }}</span>
             </a>
+            {% if not screen.is_template %}
             <a class="level-item is-primary" href="{% url 'screen-delete' screen.slug %}">
               <span class="icon is-small"><i class="fa fa-trash"></i></span>
               <span>{{ _('Delete') }}</span>
             </a>
+            {% endif %}
           </div>
         </nav>
       </div>

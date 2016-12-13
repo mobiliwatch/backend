@@ -107,7 +107,6 @@ class ScreenLightSerializer(serializers.ModelSerializer):
         fields = (
             'name',
             'slug',
-            'ratio',
         )
 
 
@@ -298,7 +297,6 @@ class ScreenSerializer(serializers.ModelSerializer):
         fields = (
             'name',
             'slug',
-            'ratio',
             'style',
             'admin',
             'groups',

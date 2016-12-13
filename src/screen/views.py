@@ -2,6 +2,7 @@ from django.views.generic import CreateView, DetailView, DeleteView
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
+from django.db import transaction
 from screen.forms import ScreenCreationForm
 
 
@@ -20,13 +21,16 @@ class ScreenCreate(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
 
         # Build screen with widgets
-        screen = form.save(commit=False)
-        screen.user = self.request.user
-        screen.slugify()
-        screen.save()
-        screen.build_default_widgets(form.cleaned_data['location'])
+        # inside a transaction
+        with transaction.atomic():
+            screen = form.save(commit=False)
+            screen.user = self.request.user
+            screen.slugify()
+            screen.save()
+            screen.clone_widgets(form.cleaned_data['screen_template'], form.cleaned_data['location'])
 
-        return HttpResponseRedirect(reverse('screen', args=(screen.slug, )))
+        # Redirect to screen view
+        return HttpResponseRedirect(screen.frontend_url)
 
 class ScreenMixin(LoginRequiredMixin):
     """

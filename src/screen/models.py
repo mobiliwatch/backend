@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from users.models import Location
 from django.utils.text import slugify
 from rest_framework.renderers import JSONRenderer
 from channels import Group as WsGroup
@@ -11,10 +10,6 @@ from datetime import datetime
 from django.utils.timezone import utc
 import calendar
 
-RATIOS = (
-  ('16:9', _('Landscape 16x9')),
-  ('9:16', _('Portrait 9x16')),
-)
 STYLES = (
     ('light', _('Light')),
     ('dark', _('Dark')),
@@ -27,9 +22,9 @@ class Screen(models.Model):
     user = models.ForeignKey('users.User', related_name='screens')
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=100)
-    ratio = models.CharField(max_length=20, choices=RATIOS, default='16:9')
     style = models.CharField(max_length=10, choices=STYLES, default='light')
     token = models.UUIDField(default=uuid.uuid4)
+    is_template = models.BooleanField(default=False)
 
     active = models.BooleanField(default=False) # triggered by WS
 
@@ -89,57 +84,59 @@ class Screen(models.Model):
 
         return self.slug
 
-    def build_default_widgets(self, location):
+    def clone_widgets(self, screen, location=None):
         """
-        Build default widgets
-        Based on a location
+        Build initial widgets
+        Based on an existing screen, by cloning their type
+        and not their property
         """
-        assert isinstance(location, Location)
+        assert isinstance(screen, Screen)
 
-        # Init widgets without positions
-        loc = LocationWidget(location=location)
-        clock = ClockWidget()
-        weather = WeatherWidget(city=location.city)
-        note = NoteWidget(text='Bienvenue sur Mobili.Watch !')
+        # Get a location
+        if location is None:
+            location = self.user.locations.last()
+            if location is None:
+                raise Exception('Missing location')
 
-        if self.ratio == '16:9':
-            # Build groups
-            left = self.groups.create(position=0, vertical=True)
-            right = self.groups.create(position=1, vertical=True)
-            right_top = right.groups.create(screen=self, position=0)
-            right_bottom = right.groups.create(screen=self, position=1)
+        # Check we have no groups
+        if self.groups.exists():
+            raise Exception('Screen not empty')
 
-            # Location widget on left
-            loc.group = left
-            loc.save()
+        def _clone_widget(widget):
+            cls = widget.__class__
+            w = cls()
+            if isinstance(w, LocationWidget) or isinstance(w, DisruptionWidget):
+                w.location = location
+            elif isinstance(w, WeatherWidget):
+                w.city = location.city
+            elif isinstance(w, NoteWidget):
+                w.text = widget.text
+            return w
 
-            # Clock & Weather on top right
-            clock.group = right_top
-            clock.save()
-            weather.group = right_top
-            weather.save()
+        def _clone_groups(groups, parent=None):
 
-            # Note below Weather
-            note.group = right_bottom
-            note.save()
+            for group_src in groups:
+                # Create a new group
+                data = {
+                    'parent': parent,
+                    'position': group_src.position,
+                    'vertical': group_src.vertical,
+                }
+                print('clone', group_src, data)
+                group = self.groups.create(**data)
 
-        elif self.ratio == '9:16':
-            # Build groups
-            base = self.groups.create(screen=self, vertical=True, position=0)
-            top = base.groups.create(screen=self, position=0)
-            bottom = base.groups.create(screen=self, position=1)
+                # Clone all widgets
+                for w_src in group_src.list_widgets():
+                    print('clone', w_src)
+                    w = _clone_widget(w_src)
+                    w.group = group
+                    w.save()
 
-            # Clock+Weather+Note on top
-            clock.group = top
-            clock.save()
-            weather.group = top
-            weather.save()
-            note.group = top
-            note.save()
+                # Recurse
+                _clone_groups(group_src.groups.all(), group)
 
-            # Location on bottom
-            location.group = bottom
-            location.save()
+        _clone_groups(screen.groups.filter(parent__isnull=True))
+
 
     def send_ws_update(self):
         """
