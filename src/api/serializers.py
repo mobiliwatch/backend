@@ -288,7 +288,7 @@ class GroupSerializer(serializers.ModelSerializer):
 GroupSerializer._declared_fields['groups'] = GroupSerializer(many=True) # recursive !
 
 class ScreenSerializer(serializers.ModelSerializer):
-
+    admin = serializers.SerializerMethodField()
     groups = GroupSerializer(many=True, source='top_groups')
 
     widgets = WidgetsSerializer(source='all_widgets')
@@ -299,9 +299,14 @@ class ScreenSerializer(serializers.ModelSerializer):
             'name',
             'slug',
             'ratio',
+            'admin',
             'groups',
             'widgets',
         )
+
+    def get_admin(self, screen):
+        # Used to show admin actions
+        return screen.user.is_admin
 
 class DistanceSerializer(serializers.Serializer):
     distance = serializers.IntegerField()
