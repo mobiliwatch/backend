@@ -1,24 +1,29 @@
 <script>
 var Group = require('./Group.vue');
+var Toggle = require('../ToggleButton.vue');
 
 module.exports = {
   components : {
     Group : Group,
+    Toggle : Toggle,
   },
   props : {
     slug : String,
   },
   data : function(){
     return {
-      screen : null,
     };
   },  
+  computed : {
+    screen : function(){
+      return this.$store.state.screen;
+    },
+  },
   methods : {
-    add_groups : function(groups){
-      var that = this;
-      groups.forEach(function(g){
-        that.$store.commit('add_group', g);
-        that.add_groups(g.groups); // recurse
+    update_screen : function(){
+      // Trigger a full screen update
+      this.$store.dispatch('update_screen', {
+        style : this.screen.style,
       });
     },
   },
@@ -27,14 +32,7 @@ module.exports = {
     // Load screen details
     var url = '/api/screen/' + this.slug + '/';
     this.$http.get(url).then(function(resp){
-      this.$set(this, 'screen', resp.body);
-
-      var store = this.$store;
-      store.commit('use_screen', this.slug);
-      this.screen.widgets.forEach(function(w){
-        store.commit('add_widget', w);
-      });
-      this.add_groups(this.screen.groups);
+      this.$store.commit('use_screen', resp.body);
     });
 
     // Load locations
@@ -53,7 +51,12 @@ module.exports = {
 </script>
 
 <template>
-  <div class="tile is-ancestor" v-if="screen">
-    <Group :groupId="group.id" v-for="group in screen.groups" />
+  <div class="editor" v-if="screen">
+    <div class="actions">
+      <Toggle option1="light" option2="dark" v-model="screen.style" v-on:input="update_screen"/>
+    </div>
+    <div class="tile is-ancestor">
+      <Group :groupId="group.id" v-for="group in screen.groups" />
+    </div>
   </div>
 </template>

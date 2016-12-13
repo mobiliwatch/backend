@@ -12,7 +12,22 @@ module.exports = new Vuex.Store({
   },
   mutations: {
     use_screen : function(state, screen){
+      // Save screen reference
       state.screen = screen;
+
+      // Save initial widgets
+      state.screen.widgets.forEach(function(w){
+        state.widgets[w.id] = w;
+      });
+
+      // Recursively add groups
+      var add_groups = function(groups){
+        groups.forEach(function(g){
+          state.groups[g.id] = g;
+          add_groups(g.groups); // recurse
+        });
+      };
+      add_groups(state.screen.groups);
     },
 
     add_widget : function(state, widget){
@@ -101,6 +116,12 @@ module.exports = new Vuex.Store({
       console.debug('Updated widget', widget_id, payload);
     },
 
+    update_screen : function(state, payload){
+      var screen = _.cloneDeep(state.screen);
+      var new_screen = _.merge(screen, payload);
+      Vue.set(state, 'screen', new_screen);
+    },
+
     delete_widget: function(state, payload){
       // Delete a widget
       var widgets = _.clone(state.widgets);
@@ -116,7 +137,7 @@ module.exports = new Vuex.Store({
     // Save widget update on backend, in a promise
     update_widget : function(context, payload){
 			var widget_id = payload.id;
-      var url = '/api/screen/' + context.state.screen + '/' + widget_id + '/';
+      var url = '/api/screen/' + context.state.screen.slug + '/' + widget_id + '/';
       return Vue.http.patch(url, payload).then(function(){
           // Commit change on local store
           context.commit('update_widget', payload);
@@ -126,7 +147,7 @@ module.exports = new Vuex.Store({
     // Save widget update on backend, in a promise
     add_subgroup : function(context, payload){
 			var group_id = payload.id;
-      var url = '/api/screen/' + context.state.screen + '/group/' + group_id + '/';
+      var url = '/api/screen/' + context.state.screen.slug + '/group/' + group_id + '/';
 
       return Vue.http.post(url).then(function(resp){
         // Add new group to local store
@@ -140,7 +161,7 @@ module.exports = new Vuex.Store({
     // Delete a group on backend
     delete_group : function(context, payload){
 			var group_id = payload.id;
-      var url = '/api/screen/' + context.state.screen + '/group/' + group_id + '/';
+      var url = '/api/screen/' + context.state.screen.slug + '/group/' + group_id + '/';
 
       return Vue.http.delete(url).then(function(resp){
         // Add new group to local store
@@ -153,17 +174,26 @@ module.exports = new Vuex.Store({
     // Save group update on backend, in a promise
     update_group : function(context, payload){
 			var group_id = payload.id;
-      var url = '/api/screen/' + context.state.screen + '/group/' + group_id + '/';
+      var url = '/api/screen/' + context.state.screen.slug + '/group/' + group_id + '/';
       return Vue.http.patch(url, payload).then(function(){
           // Commit change on local store
           context.commit('update_group', payload);
       });
     },
 
+    // Save screen changes on backend
+    update_screen : function(context, payload){
+      var url = '/api/screen/' + context.state.screen.slug + '/';
+      return Vue.http.patch(url, payload).then(function(resp){
+          // Commit change on local store
+          context.commit('update_screen', resp.body);
+      });
+    },
+
     // Add a new widget in a group
     add_widget : function(context, payload){
       var group_id = payload.group;
-      var url = '/api/screen/' + context.state.screen + '/widgets/';
+      var url = '/api/screen/' + context.state.screen.slug + '/widgets/';
       return Vue.http.post(url, payload).then(function(resp){
           // Commit change on local store
           context.commit('add_widget', resp.body);
@@ -181,7 +211,7 @@ module.exports = new Vuex.Store({
     // Delete a widget on backend
     delete_widget : function(context, payload){
 			var widget_id = payload.id;
-      var url = '/api/screen/' + context.state.screen + '/' + widget_id + '/';
+      var url = '/api/screen/' + context.state.screen.slug + '/' + widget_id + '/';
 
       return Vue.http.delete(url).then(function(){
         context.commit('delete_widget', {

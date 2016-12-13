@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from users.models import Location
 from django.utils.text import slugify
+from rest_framework.renderers import JSONRenderer
 from channels import Group as WsGroup
 import uuid
 import time
@@ -14,6 +15,10 @@ RATIOS = (
   ('16:9', _('Landscape 16x9')),
   ('9:16', _('Portrait 9x16')),
 )
+STYLES = (
+    ('light', _('Light')),
+    ('dark', _('Dark')),
+)
 
 class Screen(models.Model):
     """
@@ -23,6 +28,7 @@ class Screen(models.Model):
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=100)
     ratio = models.CharField(max_length=20, choices=RATIOS, default='16:9')
+    style = models.CharField(max_length=10, choices=STYLES, default='light')
     token = models.UUIDField(default=uuid.uuid4)
 
     active = models.BooleanField(default=False) # triggered by WS
@@ -135,6 +141,20 @@ class Screen(models.Model):
             location.group = bottom
             location.save()
 
+    def send_ws_update(self):
+        """
+        Send an update to screens through WebSockets
+        """
+        from api.serializers import ScreenSerializer
+        serializer = ScreenSerializer(instance=self)
+        data = {
+            'type' : 'screen',
+            'update' : serializer.data,
+        }
+        self.ws_group.send({
+            'text' : JSONRenderer().render(data).decode('utf-8')
+        })
+
 class Group(models.Model):
     """
     A group of widget, used for display
@@ -180,7 +200,6 @@ class Widget(models.Model):
         """
         # Build update data
         update = self.build_update()
-        print('sending', update)
 
         # Get utc now
         now = datetime.utcnow().replace(tzinfo=utc)
@@ -189,6 +208,7 @@ class Widget(models.Model):
         if isinstance(extra_data, dict):
             update.update(extra_data)
         data = {
+            'type' : 'widget',
             'time' : t,
             'widget': str(self.id),
             'update': update,

@@ -24,14 +24,24 @@ class ScreenList(ScreenMixin, ListAPIView):
     def get_queryset(self):
         return self.request.user.screens.all()
 
-class ScreenDetails(ScreenMixin,RetrieveAPIView):
+class ScreenManage(ScreenMixin, RetrieveAPIView, UpdateAPIView):
     """
-    Retrieve details for a screen + widgets
+    Manage a screen + widgets:
+     * Retrieve details
+     * Update screen
     """
     serializer_class = ScreenSerializer
 
     def get_object(self):
         return self.get_screen()
+
+    def perform_update(self, *args, **kwargs):
+        # Standard update
+        super(ScreenManage, self).perform_update(*args, **kwargs)
+
+        # Send WS update too
+        self.get_object().send_ws_update()
+
 
 class ScreenShared(RetrieveAPIView):
     """

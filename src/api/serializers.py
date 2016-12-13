@@ -299,6 +299,7 @@ class ScreenSerializer(serializers.ModelSerializer):
             'name',
             'slug',
             'ratio',
+            'style',
             'admin',
             'groups',
             'widgets',
