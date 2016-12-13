@@ -79,6 +79,20 @@ class WidgetManage(ScreenMixin, UpdateAPIView, DestroyAPIView):
             raise Http404
         return widgets[widget_id]
 
+    def perform_update(self, *args, **kwargs):
+        # Standard update
+        super(WidgetManage, self).perform_update(*args, **kwargs)
+
+        # Update screen
+        self.get_screen().send_ws_update()
+
+    def perform_destroy(self, *args, **kwargs):
+        # Standard update
+        super(WidgetManage, self).perform_destroy(*args, **kwargs)
+
+        # Update screen
+        self.get_screen().send_ws_update()
+
 class WidgetCreate(ScreenMixin, CreateAPIView):
     """
     Create a new widget in a screen's group
@@ -122,8 +136,14 @@ class WidgetCreate(ScreenMixin, CreateAPIView):
         w.group = group
         w.save()
 
-        # Output widget
+        # Send initial data to screens
         serializer = get_widget_serializer(w)(instance=w)
+        w.send_ws_update(serializer.data)
+
+        # Send structure update
+        w.group.screen.send_ws_update()
+
+        # Output widget
         return Response(serializer.data, status=201)
 
 
@@ -143,8 +163,25 @@ class GroupManage(ScreenMixin, CreateAPIView, DestroyAPIView, UpdateAPIView):
         """
         Create sub group
         """
+        # Create group
         group = self.get_object()
         new_group = Group.objects.create(screen=group.screen, parent=group, position=group.groups.count())
 
+        # Update screen
+        group.screen.send_ws_update()
+
         return Response(self.get_serializer(instance=new_group).data)
 
+    def perform_update(self, *args, **kwargs):
+        # Standard update
+        super(GroupManage, self).perform_update(*args, **kwargs)
+
+        # Update screen
+        self.get_screen().send_ws_update()
+
+    def perform_destroy(self, *args, **kwargs):
+        # Standard update
+        super(GroupManage, self).perform_destroy(*args, **kwargs)
+
+        # Update screen
+        self.get_screen().send_ws_update()
