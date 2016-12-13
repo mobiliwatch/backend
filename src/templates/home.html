@@ -97,6 +97,10 @@
           {% endif %}
           {{ screen.name }}
         </h5>
+        <div>
+          <img src="{% url 'screen-preview' screen.slug %}" alt="Preview"/>
+        </div>
+        <hr />
         <nav class="level">
           <div class="level-left">
             <a class="level-item" href="{% url 'screen' screen.slug %}">

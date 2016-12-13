@@ -22,3 +22,4 @@ txaio==2.5.1
 zope.interface==4.3.2
 pytz==2016.7
 lxml==3.6.4
+Pillow==3.4.2

@@ -1,5 +1,5 @@
-from django.views.generic import CreateView, DetailView, DeleteView
-from django.http import HttpResponseRedirect
+from django.views.generic import CreateView, DetailView, DeleteView, View
+from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.db import transaction
@@ -57,3 +57,14 @@ class ScreenDelete(ScreenMixin, DeleteView):
 
     def get_success_url(self):
         return reverse('home')
+
+class ScreenPreview(ScreenMixin, View):
+    """
+    Gives screen preview png
+    """
+    def get(self, request, slug, *args, **kwargs):
+        try:
+            screen = self.get_queryset().get(slug=slug)
+        except:
+            raise Http404
+        return HttpResponse(screen.get_preview(), content_type='image/png')

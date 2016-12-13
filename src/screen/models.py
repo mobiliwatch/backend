@@ -1,11 +1,14 @@
 from django.db import models
+from django.core.cache import cache
 from django.utils.translation import ugettext_lazy as _
 from django.utils.text import slugify
 from rest_framework.renderers import JSONRenderer
+from PIL import Image, ImageDraw
 from channels import Group as WsGroup
 import uuid
 import time
 import json
+from io import BytesIO
 from datetime import datetime
 from django.utils.timezone import utc
 import calendar
@@ -136,6 +139,71 @@ class Screen(models.Model):
                 _clone_groups(group_src.groups.all(), group)
 
         _clone_groups(screen.groups.filter(parent__isnull=True))
+
+    @property
+    def preview_key(self):
+        return 'screen:preview:{}'.format(self.id)
+
+    def get_preview(self):
+        """
+        Fetch preview from cache or build a new one
+        """
+        out = cache.get(self.preview_key)
+        if out is None:
+            out = self.build_preview()
+        return out
+
+    def build_preview(self, width=320, height=180):
+        """
+        Build an image preview
+        """
+        padding = 2
+        widget_color = '#3273dc'
+        group_color = '#888888'
+
+        def _draw_groups(groups, widgets, box, vertical=False):
+
+            objects = list(groups) + list(widgets)
+            nb = len(objects)
+            if not nb:
+                return
+
+            left, top, right, bottom = box
+
+            # Divide horizontally ?
+            w = vertical and (right-left) or (right-left) / nb
+            h = vertical and (bottom-top) / nb or (bottom-top)
+            for i, obj in enumerate(objects):
+                x = (not vertical and i*w or 0) + left
+                y = (vertical and i*h or 0) + top
+                box = (x+padding, y+padding, x+w-padding, y+h-padding)
+
+                if isinstance(obj, Group):
+                    # Outline groups
+                    draw.rectangle(box, outline=group_color)
+
+                    # Recurse
+                    _draw_groups(obj.groups.all(), obj.list_widgets(), box, obj.vertical)
+                else:
+                    # Fill widgets
+                    draw.rectangle(box, fill=widget_color)
+
+        # Init draw
+        img = Image.new('RGBA', (width, height), (255,255,255,0))
+        draw = ImageDraw.Draw(img)
+
+        # Draw all
+        top_groups = self.groups.filter(parent__isnull=True)
+        _draw_groups(top_groups, [], (0, 0, width, height))
+
+        # Store in cache, it's really lightweiight (<1kb)
+        output = BytesIO()
+        img.save(output, format='PNG')
+        contents = output.getvalue()
+        output.close()
+        cache.set(self.preview_key, contents, 12*3600)
+
+        return contents
 
 
     def send_ws_update(self):
