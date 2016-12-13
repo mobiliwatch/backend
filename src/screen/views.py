@@ -3,7 +3,9 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.db import transaction
+from django.db.models import Q
 from screen.forms import ScreenCreationForm
+from screen.models import Screen
 
 
 class ScreenCreate(LoginRequiredMixin, CreateView):
@@ -63,8 +65,10 @@ class ScreenPreview(ScreenMixin, View):
     Gives screen preview png
     """
     def get(self, request, slug, *args, **kwargs):
+        # Use own screens + templates
+        qs = Screen.objects.filter(Q(is_template=True) | Q(user=self.request.user))
         try:
-            screen = self.get_queryset().get(slug=slug)
+            screen = qs.get(slug=slug)
         except:
             raise Http404
         return HttpResponse(screen.get_preview(), content_type='image/png')

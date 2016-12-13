@@ -11,13 +11,32 @@
 
   {% form_errors form %}
   {% form_input form.name 'desktop' %}
-  {% form_select form.screen_template %}
   {% form_select form.location %}
+
+  <label class="label">{{ _('Pick a template') }}</label>
+  <div class="control">
+    <div class="columns">
+      {% for template in form.screen_template.field.queryset.all %}
+      <div class="column is-3">
+        <img src="{% url 'screen-preview' template.slug %}" alt="Preview {{ template.slug }}" />
+        <label class="label">
+          <input type="radio" name="screen_template" value="{{ template.pk }}" />
+          {{ template.name }}
+        </label>
+      </div>
+      {% endfor %}
+    </div>
+    {% if form.screen_template.errors %}
+      {% for err in form.screen_template.errors %}
+      <span class="help is-danger">{{ err }}</span>
+      {% endfor %}
+    {% endif %}
+  </div>
 
   <hr />
   <p class="control">
     <button class="button is-success" type="submit">
-      {{ _('Add a screen') }}
+      {{ _('Create a screen') }}
     </button>
     <a class="button" href="{% url 'home' %}">
       {{ _('Cancel') }}
