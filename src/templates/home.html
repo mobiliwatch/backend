@@ -4,7 +4,7 @@
 {% block fullcontent %}
 
 {% if user.is_authenticated %}
-<div class="container">
+<div class="container" id="home">
 
   <div class="columns">
     <div class="column">
@@ -52,7 +52,7 @@
         <nav class="level">
           <div class="level-left">
             <a class="level-item" href="{% url 'location-transports' location.pk %}">
-              <span class="icon is-small"><i class="fa fa-plus"></i></span>
+              <span class="icon is-small"><i class="fa fa-pencil"></i></span>
               <span>{{ _('Transport stops') }}</span>
             </a>
             <a class="level-item" href="{% url 'location-delete' location.pk %}">
@@ -88,7 +88,7 @@
 
   <div class="columns is-multiline">
     {% for screen in user.screens.all %}
-    <div class="column is-one-third">
+    <div class="column is-one-third screen">
       <div class="box">
         <h5 class="title">
           {% if screen.is_template %}
@@ -99,10 +99,14 @@
             <span>Template</span>
           </span>
           {% endif %}
-          {{ screen.name }}
+          <a href="{{ screen.frontend_url }}" target="_blank">
+            {{ screen.name }}
+          </a>
         </h5>
         <div>
-          <img src="{% url 'screen-preview' screen.slug %}" alt="Preview"/>
+          <a href="{{ screen.frontend_url }}" target="_blank">
+            <img src="{% url 'screen-preview' screen.slug %}" alt="Preview"/>
+          </a>
         </div>
         <hr />
         <nav class="level">
@@ -110,10 +114,6 @@
             <a class="level-item" href="{% url 'screen' screen.slug %}">
               <span class="icon is-small"><i class="fa fa-pencil"></i></span>
               <span>{{ _('Edit') }}</span>
-            </a>
-            <a class="level-item is-primary" href="{{ screen.frontend_url }}" target="_blank">
-              <span class="icon is-small"><i class="fa fa-desktop"></i></span>
-              <span>{{ _('View') }}</span>
             </a>
             <a class="level-item is-info" href="{{ screen.frontend_shared_url }}" target="_blank">
               <span class="icon is-small"><i class="fa fa-share"></i></span>

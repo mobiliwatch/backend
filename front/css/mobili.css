@@ -54,6 +54,11 @@ nav#top a.is-brand span.baseline {
   line-height: 22px;
 }
 
+/* Home cards */
+#home .screen h5 a {
+  color: #363636;
+}
+
 /* Home hero */
 section.hero div.welcome {
   padding-top: 70px;
