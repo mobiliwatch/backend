@@ -1,8 +1,13 @@
 <script>
 var _ = require('lodash');
+var ScreenCreator = require('../screen/Creator.vue');
 
 module.exports = {
+  components : {
+    ScreenCreator : ScreenCreator,
+  },
   props : {
+    location : Number,
     screens : Array,
     line_stops : Array,
     stops : {
@@ -33,7 +38,6 @@ module.exports = {
       this.$set(this, 'show_modal', !this.show_modal);
     },
     delete_stop : function(line_stop){
-console.log('ls', line_stop);
       this.$emit('toggle_line_stop', line_stop);
     },
   },
@@ -99,12 +103,6 @@ console.log('ls', line_stop);
             </span>
             <span>Écran {{ screen.name }}</span>
           </a>
-          <a href="/screen/new/" class="button is-info">
-            <span class="icon is-small">
-              <span class="fa fa-plus"></span>
-            </span>
-            <span>Ajouter un écran</span>
-          </a>
           <span class="button" v-on:click="toggle_modal()">
             Annuler
           </span>
@@ -132,12 +130,7 @@ console.log('ls', line_stop);
           </span>
           <span>Voir les arrêts sélectionnés</span>
         </span>
-        <a href="/screen/new/" class="button is-info level-item">
-          <span class="icon is-small">
-            <span class="fa fa-plus"></span>
-          </span>
-          <span>Ajouter un écran</span>
-        </a>
+        <ScreenCreator :location="location" />
       </p>
     </div>
     <div class="level" v-else>

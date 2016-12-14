@@ -102,11 +102,16 @@ class StopSerializer(serializers.ModelSerializer):
 
 
 class ScreenLightSerializer(serializers.ModelSerializer):
+    preview = serializers.HyperlinkedIdentityField(view_name='screen-preview', read_only=True, lookup_field='slug')
+
     class Meta:
         model = Screen
         fields = (
+            'id',
             'name',
             'slug',
+            'preview',
+            'frontend_url',
         )
 
 
@@ -320,3 +325,7 @@ class WidgetCreationSerializer(serializers.Serializer):
     group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all())
     widget_type = serializers.CharField()
 
+class ScreenCreationSerializer(serializers.Serializer):
+    template = serializers.PrimaryKeyRelatedField(queryset=Screen.objects.filter(is_template=True))
+    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    name = serializers.CharField()

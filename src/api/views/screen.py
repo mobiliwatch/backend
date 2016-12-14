@@ -1,6 +1,6 @@
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, CreateAPIView, DestroyAPIView
 from rest_framework.exceptions import APIException
-from api.serializers import ScreenLightSerializer, ScreenSerializer, get_widget_serializer, GroupSerializer, WidgetCreationSerializer
+from api.serializers import ScreenLightSerializer, ScreenSerializer, get_widget_serializer, GroupSerializer, WidgetCreationSerializer, ScreenCreationSerializer
 from screen.models import Screen, Group, LocationWidget, WeatherWidget, NoteWidget, ClockWidget, DisruptionWidget
 from django.http import Http404
 from rest_framework.response import Response
@@ -23,6 +23,40 @@ class ScreenList(ScreenMixin, ListAPIView):
 
     def get_queryset(self):
         return self.request.user.screens.all()
+
+class TemplateManage(ListAPIView, CreateAPIView):
+    """
+    Manage screen templates:
+     * List simplified templates
+     * Create new screen from a template
+    """
+    serializer_class = ScreenLightSerializer
+
+    def get_queryset(self):
+        return Screen.objects.filter(is_template=True)
+
+    def create(self, request, *args, **kwargs):
+        # Check input
+        serializer = ScreenCreationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        template = data['template']
+        assert template.is_template
+        location = data['location']
+        if location.user != self.request.user:
+            raise APIException('Invalid location')
+
+        # Create new screen
+        screen = Screen(name=data['name'])
+        screen.user = self.request.user
+        screen.slugify()
+        screen.save()
+        screen.clone_widgets(template, location)
+
+        # Output serialized new screen
+        serializer = ScreenLightSerializer(instance=screen, context={'request': request})
+        return Response(serializer.data, status=201)
+
 
 class ScreenManage(ScreenMixin, RetrieveAPIView, UpdateAPIView):
     """

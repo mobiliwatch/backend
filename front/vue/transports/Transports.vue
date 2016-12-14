@@ -38,7 +38,7 @@
           </div>
           <TransportsMap :height="heights.map" :name="location.name" :point="location.point" :stops="stops" :path="path" :current_stop="current_stop" v-on:selected_stop="selected_stop"></TransportsMap>
 
-          <TransportsSummary :screens="location.screens" :stops="stops" :line_stops="line_stops" v-on:toggle_line_stop="toggle_line_stop"/>
+          <TransportsSummary :location="location.id" :screens="location.screens" :stops="stops" :line_stops="line_stops" v-on:toggle_line_stop="toggle_line_stop"/>
         </div>
         <div class="tile is-child box">
           <Stop :current_stop="current_stop" :line_stops="line_stops" v-on:toggle_line_stop="toggle_line_stop"/>
