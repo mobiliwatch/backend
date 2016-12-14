@@ -1,3 +1,6 @@
+from django.conf import settings
+
+
 class ForceDefaultLanguageMiddleware(object):
     """
     Ignore Accept-Language HTTP headers
@@ -17,3 +20,11 @@ class ForceDefaultLanguageMiddleware(object):
             del request.META['HTTP_ACCEPT_LANGUAGE']
 
         return self.get_response(request)
+
+def version(request):
+    """
+    Add version from settings to every template context
+    """
+    return {
+        'VERSION' : settings.VERSION,
+    }

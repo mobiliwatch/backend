@@ -28,6 +28,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Load version
+try:
+    with open('../VERSION') as f:
+        VERSION = f.read()
+except:
+    VERSION = 'unknown'
+
 
 # Application definition
 
@@ -82,6 +89,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
+                'mobili.middlewares.version',
             ],
         },
     },
