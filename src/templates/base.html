@@ -11,21 +11,8 @@
 <body>
   <nav class="nav" id="top">
     <div class="nav-left">
-      <a class="nav-item" href="#">
-        <span class="icon">
-          <i class="fa fa-github"></i>
-        </span>
-      </a>
-      <a class="nav-item" href="#">
-        <span class="icon">
-          <i class="fa fa-twitter"></i>
-        </span>
-      </a>
-    </div>
-
-    <div class="nav-center">
       <a class="nav-item is-brand" href="{% url 'home' %}">
-        <img src="{% static 'img/logo_small_grey.png' %}" alt="Logo"/>
+        <img src="{% static 'img/logo_small.png' %}" alt="Logo"/>
         <p>
           <span class="project">{{ _('Mobili.Watch') }}</span>
           <span class="baseline">{{ _('Baseline...') }}</span>
@@ -41,19 +28,21 @@
 
     <div class="nav-right nav-menu">
 
+      {% if user.is_authenticated %}
       <span class="nav-item">
-        {% if user.is_authenticated %}
-        <span>
-          Hello {{ user.first_name }}
-        </span>
+        Hello {{ user.first_name }}
+      </span>
+      <span class="nav-item">
         <a class="button is-danger is-outlined" href="{% url 'logout' %}">
           <span>{{ _('Logout') }}</span>
           <span class="icon is-small">
             <i class="fa fa-sign-out"></i>
           </span>
         </a>
+      </span>
 
-        {% else %}
+      {% else %}
+      <span class="nav-item">
         <a class="button is-outlined" href="{% url 'signup' %}">
           <span class="icon is-small">
             <i class="fa fa-user-plus"></i>
@@ -66,8 +55,8 @@
           </span>
           <span>{{ _('Login') }}</span>
         </a>
-        {% endif %}
       </span>
+      {% endif %}
 
     </div>
   </nav>

@@ -33,18 +33,22 @@
         <h4 class="subtitle">{{ location.address }} - {{ location.city }}</h5>
         {% for ls in location.line_stops.all %}
         <p class="line">
+          <span class="icon" style="color: #{{ ls.line.color_back }};">
           {% if ls.line.mode == 'tram' %}
-          <span class="tag is-success">{{ _('Tramway') }} {{ ls.line.name }}</span>
+            <span class="fa fa-subway" title="{{ _('Tramway') }}"></span>
           {% elif ls.line.mode == 'bus' %}
-          <span class="tag is-primary">{{ _('Bus') }} {{ ls.line.name }}</span>
+            <span class="fa fa-bus" title="{{ _('Bus') }}"></span>
           {% elif ls.line.mode == 'car' %}
-          <span class="tag is-info">{{ _('Autocar') }} {{ ls.line.name }}</span>
+            <span class="fa fa-bus" title="{{ _('Autocar') }}"></span>
           {% else %}
-          <span class="tag">{{ ls.line.mode }} {{ ls.line.mode }}</span>
+            <span class="fa fa-car" title="{{ ls.line.mode }}"></span>
           {% endif %}
+          </span>
+          <span class="tag" style="background: #{{ ls.line.color_back }}; color: #{{ ls.line.color_front }};">{{ ls.line.name }}</span>
           {{ _('towards') }} {{ ls.direction.name }}
         </p>
         {% endfor %}
+        <hr />
         <nav class="level">
           <div class="level-left">
             <a class="level-item" href="{% url 'location-transports' location.pk %}">

@@ -13,18 +13,23 @@ p.line {
 /* Font */
 @font-face {
   font-family: 'Esphimere';
-  font-weight: normal;
-  font-style: normal;
-  src: url("../fonts/Esphimere Bold.otf") format("opentype");
+  font-weight: bold;
+  src: url("../fonts/EsphimereBold.otf") format("opentype"),
+       url("../fonts/EsphimereBold.ttf") format("truetype");
 }
 
 /* Nav branding */
 nav#top a.is-brand {
   padding: 0;
-  font-family: 'Esphimere', Arial, serif;
+}
+
+nav#top a.is-brand span {
+  font-family: Esphimere;
+  font-weight: bold;
 }
 
 nav#top a.is-brand img {
+  margin-left: 4px;
   max-height: 50px;
 }
 
