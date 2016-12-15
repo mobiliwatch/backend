@@ -223,5 +223,13 @@ module.exports = new Vuex.Store({
         });
       });
     },
+
+    // Replace a widget by another one
+    replace_widget : function(context, payload){
+			var widget_id = payload.id;
+      var type = payload.type;
+      console.log('Replace', widget_id, type);
+      // TODO !
+    },
   }
 });

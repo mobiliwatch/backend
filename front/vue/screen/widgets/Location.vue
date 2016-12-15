@@ -1,7 +1,5 @@
 <template>
   <form>
-
-    <h1 class="title">Prochains passages</h1>
     <div class="notification is-info">
       <span class="icon">
         <span class="fa fa-bus"></span>

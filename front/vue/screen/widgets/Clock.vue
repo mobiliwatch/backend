@@ -1,6 +1,5 @@
 <template>
   <form>
-    <h1 class="title">Horloge</h1>
     <div class="notification is-info">
       <span class="icon">
         <span class="fa fa-clock-o"></span>

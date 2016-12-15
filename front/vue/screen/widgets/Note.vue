@@ -1,6 +1,5 @@
 <template>
   <form>
-    <h1 class="title">Notes</h1>
     <p class="control">
       <textarea class="textarea" placeholder="Saisissez du texte à afficher sur votre écran..." v-model="text"></textarea>
     </p>

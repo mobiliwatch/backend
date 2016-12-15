@@ -1,7 +1,5 @@
 <template>
   <form>
-    <h1 class="title">Météo</h1>
-
     <div class="notification is-danger" v-if="error">
       <span class="icon">
         <span class="fa fa-exclamation-triangle"></span>
