@@ -9,8 +9,12 @@ module.exports = new Vuex.Store({
     screen : '',
     locations : [],
     cities : [],
+    editor : 'normal', // normal | advanced
   },
   mutations: {
+    use_editor : function(state, editor){
+      state.editor = editor;
+    },
     use_screen : function(state, screen){
       // Save screen reference
       state.screen = screen;

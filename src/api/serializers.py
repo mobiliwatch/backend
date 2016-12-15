@@ -302,6 +302,7 @@ class ScreenSerializer(serializers.ModelSerializer):
         fields = (
             'name',
             'slug',
+            'frontend_url',
             'style',
             'admin',
             'groups',

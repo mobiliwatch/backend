@@ -1,21 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1 class="title">{{ screen.name }}</h1>
-<p>
-  <a href="{{ screen.frontend_url }}" target="_blank" class="button is-primary">
-    <span class="icon">
-      <span class="fa fa-desktop"></span>
-    </span>
-    <span>Voir l'écran</span>
-  </a>
-</p>
+<h1 class="title">Edition de l'écran {{ screen.name }}</h1>
 {% if screen.is_template %}
 <div class="notification is-danger">
   Cet écran est un template utilisé par les utilisateurs !
 </div>
 {% endif %}
-<hr />
 
 <div id="app">
   <Screen slug="{{ screen.slug }}" />

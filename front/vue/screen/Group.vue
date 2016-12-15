@@ -20,6 +20,9 @@ module.exports = {
     group : function(){
       return this.$store.state.groups[this.groupId];
     },
+    editor : function(){
+      return this.$store.state.editor;
+    },
   },
   methods : {
     add_subgroup : function(){
@@ -60,8 +63,8 @@ module.exports = {
 </script>
 
 <template>
-  <div class="group" v-if="group">
-    <p v-if="!editing">
+  <div class="group" v-if="group" :class="{'tile' : editor == 'normal'}">
+    <p v-if="!editing && editor == 'advanced'">
       <span class="button is-info" v-on:click="toggle_editing()">
         <span class="icon is-small">
           <i class="fa fa-pencil"></i>
@@ -70,7 +73,7 @@ module.exports = {
       </span>
     </p>
 
-    <nav class="panel" v-if="editing">
+    <nav class="panel" v-if="editing && editor == 'advanced'">
       <a class="panel-block" v-on:click="add_widget('weather')">
         <span class="panel-icon is-small">
           <i class="fa fa-window-maximize"></i>
@@ -143,20 +146,23 @@ module.exports = {
   </div>
 </template>
 
-<style scoped>
-div.group {
-  border: 1px solid #EEE;
-  padding-top: 5px;
-  margin-left: 5px;
-  margin-right: 5px;
-  margin-bottom: 5px;
-}
+<style scoped lang="sass">
+div.editor.advanced {
+  div.group {
+    border: 1px solid #EEE;
+    padding-top: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
 
-div.tile, div.tile.is-parent {
-  height: 90%;
-}
+  div.tile {
+    height: 90%;
 
-nav {
-  background: #EEE;
+  }
+
+  nav {
+    background: #EEE;
+  }
 }
 </style>
