@@ -5,6 +5,7 @@ import json
 import os
 
 class CachedApi(object):
+    timeout = 4
 
     def __init__(self, use_cache=True):
         self.cache_dir = './cache' # TODO
@@ -31,7 +32,7 @@ class CachedApi(object):
                 return cached_data
 
         # Make request
-        resp = requests.get(url, params=params)
+        resp = requests.get(url, params=params, timeout=self.timeout)
         if not resp.ok:
             print(resp.content)
             raise Exception('Invalid resp {} on {}'.format(resp.status_code, url))
