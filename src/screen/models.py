@@ -324,6 +324,7 @@ class LocationWidget(Widget):
     Display location on a screen
     """
     location = models.ForeignKey('users.Location', related_name='widgets')
+    auto_pagination = models.BooleanField(default=False)
 
     def build_update(self):
         """
@@ -351,6 +352,7 @@ class LocationWidget(Widget):
             return out
 
         return {
+            'auto_pagination' : self.auto_pagination,
             'location' : {
                 'line_stops' : [_serialize(ls) for ls in self.location.location_stops.all()]
             },

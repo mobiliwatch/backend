@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Load version
 try:
     with open(os.path.join(BASE_DIR, '../VERSION')) as f:
-        VERSION = f.read()
+        VERSION = f.read().replace('\n', '')
 except:
     VERSION = 'unknown'
 

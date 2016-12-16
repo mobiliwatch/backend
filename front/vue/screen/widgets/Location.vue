@@ -10,11 +10,19 @@
     </div>
 
     <p class="control">
+      <label class="label">Choisir un lieu:</label>
       <select v-if="locations" class="select" v-model="selected_location">
         <option v-for="l in locations" :value="l.id">
           {{ l.name }} : {{ l.address }} à {{ l.city.name }}
         </option>
       </select>
+    </p>
+
+    <p class="control">
+      <label class="label">
+        <input type="checkbox" v-model="widget.auto_pagination" />
+        <span>Auto pagination</span>
+      </label>
     </p>
 
     <p class="control">
@@ -37,9 +45,13 @@
 
 <script>
 var mixins = require('./mixins.js');
+var Toggle = require('../../ToggleButton.vue');
 
 module.exports = {
   mixins : [mixins, ],
+  components : {
+    Toggle : Toggle,
+  },
   data : function(){
     return {
       selected_location : null,
@@ -58,6 +70,7 @@ module.exports = {
     save_location: function(){
       this.save({
         'location': this.selected_location,
+        'auto_pagination' : this.widget.auto_pagination,
       });
     },
   },

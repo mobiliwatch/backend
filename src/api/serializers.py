@@ -222,15 +222,23 @@ class WeatherWidgetSerializer(WidgetSerializer):
 
 class LocationWidgetSerializer(WidgetSerializer):
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    auto_pagination = serializers.BooleanField()
 
     def update(self, widget, data):
 
         # Check location belongs to user
         location = data.get('location')
+        save = False
         if location and location != widget.location:
             if location.user != self.context['request'].user:
                 raise APIException('Invalid location')
             widget.location = location
+            save = True
+        auto_pagination = data.get('auto_pagination')
+        if auto_pagination != widget.auto_pagination:
+            widget.auto_pagination = auto_pagination
+            save = True
+        if save:
             widget.save()
 
         # Send update through ws
