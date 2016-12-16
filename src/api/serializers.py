@@ -168,6 +168,7 @@ class WidgetSerializer(serializers.Serializer):
     """
     id = serializers.UUIDField()
     type = serializers.SerializerMethodField()
+    position = serializers.IntegerField()
 
     def get_type(self, widget):
         return widget.__class__.__name__
@@ -325,6 +326,7 @@ class DistanceSerializer(serializers.Serializer):
 class WidgetCreationSerializer(serializers.Serializer):
     group = serializers.PrimaryKeyRelatedField(queryset=Group.objects.all())
     widget_type = serializers.CharField()
+    position = serializers.IntegerField(required=False)
 
 class ScreenCreationSerializer(serializers.Serializer):
     template = serializers.PrimaryKeyRelatedField(queryset=Screen.objects.filter(is_template=True))

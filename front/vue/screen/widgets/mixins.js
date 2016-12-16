@@ -3,6 +3,7 @@ var _ = require('lodash');
 module.exports = {
   props : {
     widgetId : String,
+    groupId : Number,
   },
   data : function(){
     return {

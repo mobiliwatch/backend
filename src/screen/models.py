@@ -132,6 +132,7 @@ class Screen(models.Model):
                 for w_src in group_src.list_widgets():
                     print('clone', w_src)
                     w = _clone_widget(w_src)
+                    w.position = w_src.position
                     w.group = group
                     w.save()
 
@@ -241,12 +242,12 @@ class Group(models.Model):
         List all widgets instances
         Used by API
         """
-        return \
-            list(self.locationwidget.all()) \
+        all_widgets = list(self.locationwidget.all()) \
             + list(self.clockwidget.all()) \
             + list(self.weatherwidget.all()) \
             + list(self.notewidget.all()) \
             + list(self.disruptionwidget.all())
+        return sorted(all_widgets, key=lambda w: w.position)
 
 
 class Widget(models.Model):
@@ -255,9 +256,15 @@ class Widget(models.Model):
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     group = models.ForeignKey(Group, related_name='%(class)s')
+    position = models.PositiveIntegerField(default=0)
+
 
     class Meta:
         abstract = True
+        ordering = ('group', 'position')
+        unique_together = (
+            ('group', 'position'),
+        )
 
     def send_ws_update(self, extra_data=None):
         """

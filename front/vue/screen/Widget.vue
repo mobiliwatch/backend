@@ -7,7 +7,7 @@
         </h1>
       </div>
       <div class="level-right">
-        <span class="button level-item" v-on:click="toggle_modal()">
+        <span class="button level-item" v-on:click="open()">
           <span class="icon is-small">
             <span class="fa fa-pencil"></span>
           </span>
@@ -27,13 +27,13 @@
       <div class="modal-card">
         <header class="modal-card-head">
           <p class="modal-card-title">Changer le widget</p>
-          <button class="delete" v-on:click="toggle_modal()"></button>
+          <button class="delete" v-on:click="close()"></button>
         </header>
         <section class="modal-card-body">
           <div v-for="(meta, type) in types" v-if="type != widget.type">
             <h5 class="title is-5">{{ meta.title }}</h5>
             <p>{{ meta.description }}</p>
-            <span class="button is-primary" v-on:click="replace(type)">
+            <span class="button is-primary" v-on:click="replace(type)" :disabled="replacing">
               <span class="icon is-small">
                 <span class="fa fa-check"></span>
               </span>
@@ -43,7 +43,7 @@
           </div>
         </section>
         <footer class="modal-card-foot">
-          <a class="button" v-on:click="toggle_modal()">Annuler</a>
+          <a class="button" v-on:click="close()">Annuler</a>
         </footer>
       </div>
     </div>
@@ -68,20 +68,29 @@ module.exports = {
     Disruption : Disruption,
   },
   methods : {
-    toggle_modal : function(){
-      this.$set(this, 'modal', !this.modal);
+    open : function(){
+      this.$set(this, 'modal', true);
+    },
+    close : function(){
+      this.$set(this, 'modal', false);
     },
     replace : function(type){
       // Replace current widget with a new type
+      this.$set(this, 'replacing', true);
       this.$store.dispatch('replace_widget', {
         id : this.widgetId,
         type : type,
+        group : this.groupId,
+      }).then(function(){
+        this.$set(this, 'modal', false);
+        this.$set(this, 'replacing', false);
       });
     },
   },
   data : function(){
     return {
       modal : false,
+      replacing : false,
       types : {
         'LocationWidget' : {
           title : 'Prochains passages',

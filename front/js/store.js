@@ -90,6 +90,10 @@ module.exports = new Vuex.Store({
       // Merge items from payload update
       var new_group = _.merge(group, payload);
 
+      // But override wigdets list
+      if(payload.widgets)
+        new_group.widgets = payload.widgets;
+
 			groups[group_id] = new_group;
 
       // Update groups in state
@@ -204,7 +208,11 @@ module.exports = new Vuex.Store({
 
           // Update group to use this widget
           var widgets = context.state.groups[group_id].widgets;
-          widgets.push(resp.body.id);
+          if(payload.position){
+            widgets.splice(payload.position, 0, resp.body.id);
+          }else{
+            widgets.push(resp.body.id);
+          }
           context.commit('update_group', {
             id : payload.group,
             widgets : widgets,
@@ -228,8 +236,32 @@ module.exports = new Vuex.Store({
     replace_widget : function(context, payload){
 			var widget_id = payload.id;
       var type = payload.type;
-      console.log('Replace', widget_id, type);
-      // TODO !
+      var group = payload.group;
+      if(!group)
+        throw new Error("Missing group");
+
+      // Save position in group
+      var old_widget = context.state.widgets[widget_id];
+      if(!old_widget)
+        throw new Error("Missing widget");
+
+      var remove = {
+        id : widget_id,
+      };
+      var add = {
+        group : group,
+        widget_type : type,
+        position : old_widget.position,
+      }
+      return new Promise(function(resolve, reject){
+
+        // First delete existing widget
+        context.dispatch('delete_widget', remove).then(function(){
+
+          // Then add new widget
+          context.dispatch('add_widget', add).then(resolve).catch(reject);
+        }).catch(reject);
+      });
     },
   }
 });

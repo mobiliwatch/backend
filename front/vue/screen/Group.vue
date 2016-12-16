@@ -74,31 +74,31 @@ module.exports = {
     </p>
 
     <nav class="panel" v-if="editing && editor == 'advanced'">
-      <a class="panel-block" v-on:click="add_widget('weather')">
+      <a class="panel-block" v-on:click="add_widget('Weather')">
         <span class="panel-icon is-small">
           <i class="fa fa-window-maximize"></i>
         </span>
         <span>Ajouter widget météo</span>
       </a>
-      <a class="panel-block" v-on:click="add_widget('location')">
+      <a class="panel-block" v-on:click="add_widget('Location')">
         <span class="panel-icon is-small">
           <i class="fa fa-window-maximize"></i>
         </span>
         <span>Ajouter widget transports</span>
       </a>
-      <a class="panel-block" v-on:click="add_widget('disruption')">
+      <a class="panel-block" v-on:click="add_widget('Disruption')">
         <span class="panel-icon is-small">
           <i class="fa fa-window-maximize"></i>
         </span>
         <span>Ajouter widget perturbations</span>
       </a>
-      <a class="panel-block" v-on:click="add_widget('clock')">
+      <a class="panel-block" v-on:click="add_widget('Clock')">
         <span class="panel-icon is-small">
           <i class="fa fa-window-maximize"></i>
         </span>
         <span>Ajouter widget horloge</span>
       </a>
-      <a class="panel-block" v-on:click="add_widget('note')">
+      <a class="panel-block" v-on:click="add_widget('Note')">
         <span class="panel-icon is-small">
           <i class="fa fa-window-maximize"></i>
         </span>
@@ -140,7 +140,7 @@ module.exports = {
       <Group :groupId="g.id" v-for="g in group.groups" />
 
       <div class="tile is-parent" v-for="w in group.widgets">
-        <Widget :widgetId="w" />
+        <Widget :widgetId="w" :groupId="groupId" />
       </div>
     </div>
   </div>

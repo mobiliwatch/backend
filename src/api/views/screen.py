@@ -147,6 +147,7 @@ class WidgetCreate(ScreenMixin, CreateAPIView):
         # Build widget
         # TODO: move in central controller
         widget_type = serializer.validated_data['widget_type']
+        widget_type = widget_type.lower().replace('widget', '')
         last_location = self.request.user.locations.last()
         if widget_type == 'note':
             w = NoteWidget()
@@ -167,6 +168,7 @@ class WidgetCreate(ScreenMixin, CreateAPIView):
         else:
             raise APIException('Invalid widget type')
 
+        w.position = serializer.validated_data.get('position', len(group.list_widgets()))
         w.group = group
         w.save()
 
