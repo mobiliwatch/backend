@@ -139,9 +139,7 @@ module.exports = {
     <div class="tile" :class="{'is-vertical': group.vertical}">
       <Group :groupId="g.id" v-for="g in group.groups" />
 
-      <div class="tile is-parent" v-for="w in group.widgets">
-        <Widget :widgetId="w" :groupId="groupId" />
-      </div>
+      <Widget :widgetId="w" :groupId="groupId" v-for="w in group.widgets"/>
     </div>
   </div>
 </template>
