@@ -246,10 +246,26 @@ class LocationWidgetSerializer(WidgetSerializer):
 
         return widget
 
-class DisruptionWidgetSerializer(LocationWidgetSerializer):
+class DisruptionWidgetSerializer(WidgetSerializer):
     """
     Just keep track of a location, same as above
     """
+    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+
+    def update(self, widget, data):
+
+        # Check location belongs to user
+        location = data.get('location')
+        if location and location != widget.location:
+            if location.user != self.context['request'].user:
+                raise APIException('Invalid location')
+            widget.location = location
+            widget.save()
+
+        # Send update through ws
+        widget.send_ws_update()
+
+        return widget
 
 def get_widget_serializer(widget):
     """
