@@ -7,72 +7,81 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-12 16:24+0100\n"
-"PO-Revision-Date: 2016-12-12 16:25+0100\n"
-"Last-Translator: \n"
+"POT-Creation-Date: 2016-12-18 11:23+0100\n"
+"PO-Revision-Date: 2016-12-18 11:24+0100\n"
+"Last-Translator: Bastien Abadie <bastien@nextcairn.com>\n"
 "Language-Team: \n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 1.8.7.1\n"
+"X-Generator: Poedit 1.5.4\n"
 
-#: mobili/settings.py:149
+#: mobili/settings.py:157
 msgid "French"
 msgstr "Français"
 
-#: mobili/settings.py:150
+#: mobili/settings.py:158
 msgid "English"
 msgstr "Anglais"
 
-#: screen/models.py:14
-msgid "Landscape 16x9"
-msgstr "Paysage (16:9)"
+#: screen/models.py:17
+msgid "Light"
+msgstr "Clair"
 
-#: screen/models.py:15
-msgid "Portrait 9x16"
-msgstr "Portrait (9:16)"
+#: screen/models.py:18
+msgid "Dark"
+msgstr "Sombre"
 
 #: screen/templates/screen/create.html:9
 msgid "Add a screen "
 msgstr "Ajouter un écran"
 
-#: screen/templates/screen/create.html:20 templates/home.html:80
-msgid "Add a screen"
-msgstr "Ajouter un écran"
+#: screen/templates/screen/create.html:16
+msgid "Pick a template"
+msgstr "Choisir une disposition"
 
-#: screen/templates/screen/create.html:23
+#: screen/templates/screen/create.html:39
+#| msgid "Add a screen"
+msgid "Create a screen"
+msgstr "Créer un écran"
+
+#: screen/templates/screen/create.html:42
 #: screen/templates/screen/delete.html:15
 #: users/templates/location/create.html:22
 #: users/templates/location/delete.html:15
 msgid "Cancel"
 msgstr "Annuler"
 
-#: screen/templates/screen/delete.html:12 templates/home.html:57
-#: templates/home.html:107 users/templates/location/delete.html:12
+#: screen/templates/screen/delete.html:12 templates/home.html:60
+#: templates/home.html:125 users/templates/location/delete.html:12
 msgid "Delete"
 msgstr "Supprimer"
 
-#: templates/base.html:30
+#: templates/base.html:18
 msgid "Mobili.Watch"
 msgstr "Mobili.Watch"
 
-#: templates/base.html:31 templates/home.html:140
+#: templates/base.html:19 templates/home.html:159
 msgid "Baseline..."
 msgstr "Embarquez sans attendre"
 
-#: templates/base.html:50
+#: templates/base.html:41
+msgid "Help"
+msgstr "Aide"
+
+#: templates/base.html:44
 msgid "Logout"
 msgstr "Déconnection"
 
-#: templates/base.html:61 templates/home.html:146
+#: templates/base.html:57 templates/home.html:165
 #: users/templates/registration/signup.html:7
 #: users/templates/registration/signup.html:20
 msgid "Signup"
 msgstr "Créer un compte"
 
-#: templates/base.html:67 templates/home.html:152
+#: templates/base.html:63 templates/home.html:171
 #: users/templates/registration/login.html:7
 #: users/templates/registration/login.html:17
 msgid "Login"
@@ -81,6 +90,10 @@ msgstr "Connection"
 #: templates/forms/errors.html:3
 msgid "Error"
 msgstr "Erreur"
+
+#: templates/help.html:8
+msgid "Table of contents"
+msgstr "Table des matières"
 
 #: templates/home.html:12
 msgid "Your locations"
@@ -107,38 +120,49 @@ msgstr "Bus"
 msgid "Autocar"
 msgstr "Autocar"
 
-#: templates/home.html:46
+#: templates/home.html:48
 msgid "towards"
 msgstr "vers"
 
-#: templates/home.html:53
+#: templates/home.html:56
 msgid "Transport stops"
 msgstr "Arrêt de transports"
 
-#: templates/home.html:69
+#: templates/home.html:73
 msgid "Your screens"
 msgstr "Vos écrans"
 
-#: templates/home.html:72
+#: templates/home.html:76
 msgid "Manage all your screens to display informations"
 msgstr "Gérez tous vos écrans pour afficher des informations en temps réel"
 
-#: templates/home.html:95
+#: templates/home.html:84
+msgid "Add a screen"
+msgstr "Ajouter un écran"
+
+#: templates/home.html:116
 msgid "Edit"
 msgstr "Editer"
 
-#: templates/home.html:99
-msgid "View"
-msgstr "Voir l'écran"
-
-#: templates/home.html:103
+#: templates/home.html:120
 msgid "Shared"
 msgstr "Partager"
 
-#: templates/home.html:119
+#: templates/home.html:138
 msgid "You can create new screens to display notes, bus & tramway stops, ..."
-msgstr "Vous pouvez créer de nouveaux écrans pour afficher des notes, la météo, vos arrêts de bus/tram favoris..."
+msgstr ""
+"Vous pouvez créer de nouveaux écrans pour afficher des notes, la météo, vos "
+"arrêts de bus/tram favoris..."
 
-#: templates/home.html:137
+#: templates/home.html:156
 msgid "Welcome on Mobili.Watch !"
 msgstr "Bienvenue sur Mobili.Watch !"
+
+#~ msgid "Landscape 16x9"
+#~ msgstr "Paysage (16:9)"
+
+#~ msgid "Portrait 9x16"
+#~ msgstr "Portrait (9:16)"
+
+#~ msgid "View"
+#~ msgstr "Voir l'écran"

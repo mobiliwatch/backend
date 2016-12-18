@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div id="help" class="columns">
+
+<aside class="menu toc column is-3">
+  <p class="menu-label">
+    {{ _('Table of contents') }}
+  </p>
+  <ul class="menu-list">
+    {% for page in toc %}
+    <li>
+      <a class="{% if page.slug == slug %}is-active{% endif %}" href="{% url 'help' page.slug %}">{{ page.title }}</a>
+      {% if page.paragraphs %}
+      <ul>
+        {% for p in page.paragraphs %}
+        <li><a href="#">{{ p }}</a></li>
+        {% endfor %}
+      </ul>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</aside>
+
+<div class="content column is-9">
+  {{ content|safe }}
+</div>
+
+</div>
+{% endblock %}

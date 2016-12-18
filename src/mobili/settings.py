@@ -170,6 +170,7 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, '../front'),
+    os.path.join(BASE_DIR, '../help'),
 ]
 
 # Cache on FS

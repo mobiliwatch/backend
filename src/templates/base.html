@@ -34,6 +34,12 @@
         Hello {{ user.first_name }}
       </span>
       <span class="nav-item">
+        <a class="button is-info is-outlined" href="{% url 'help-home' %}">
+          <span class="icon is-small">
+            <i class="fa fa-question-circle"></i>
+          </span>
+          <span>{{ _('Help') }}</span>
+        </a>
         <a class="button is-danger is-outlined" href="{% url 'logout' %}">
           <span>{{ _('Logout') }}</span>
           <span class="icon is-small">
