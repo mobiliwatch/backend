@@ -224,6 +224,9 @@ OPEN_WEATHER_MAP_API = None
 TWITTER_API_KEY = None
 TWITTER_API_SECRET = None
 
+# Our demo screen
+SCREEN_DEMO_ID = None
+
 try:
     from .local_settings import *
 except ImportError:

@@ -1,0 +1,36 @@
+nav#top {
+  margin-bottom: 6px;
+
+  a.is-brand {
+    padding: 0;
+
+    span {
+      font-family: Esphimere;
+      font-weight: bold;
+      display: block;
+      vertical-align: middle;
+
+      &.project {
+        font-size: 1.6em;
+        height: 38px;
+        line-height: 38px;
+      }
+      &.baseline {
+        font-size: 1.2em;
+        height: 22px;
+        line-height: 22px;
+      }
+    }
+
+    img {
+      margin-left: 4px;
+      max-height: 50px;
+    }
+
+    p {
+      height: 60px;
+      margin-left: 10px;
+      text-align: left;
+    }
+  }
+}

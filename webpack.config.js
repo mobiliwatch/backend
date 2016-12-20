@@ -24,7 +24,12 @@ module.exports = {
       {
         // Load css directly
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract("style-loader", "css-loader")
+        loader: ExtractTextPlugin.extract('css')
+      },
+      {
+        // Build sass and extract it
+        test: /\.scss|sass$/,
+        loader: ExtractTextPlugin.extract('css!sass')
       },
       {
         // Support images

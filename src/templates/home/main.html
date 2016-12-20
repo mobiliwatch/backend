@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block fullcontent %}
+<div class="container" id="home">
+
+  {% include 'home/locations.html' %}
+
+  <hr />
+
+  {% include 'home/screens.html' %}
+
+</div>
+{% endblock %}

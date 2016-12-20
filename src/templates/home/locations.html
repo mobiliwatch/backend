@@ -1,0 +1,59 @@
+<div class="columns">
+  <div class="column">
+    <h1 class="title">
+      {{ _('Your locations') }}
+    </h1>
+    <h2 class="subtitle">
+      {{ _('Add some locations to display them on your screens') }}
+    </h2>
+  </div>
+  <div class="column has-text-right">
+    <a href="{% url 'location-create' %}" class="button is-info is-medium">
+      <span class="icon">
+        <span class="fa fa-globe"></span>
+      </span>
+      <span>{{ _('Add a location') }}</span>
+    </a>
+  </div>
+</div>
+
+<div class="columns is-multiline">
+  {% for location in user.locations.all %}
+  <div class="column is-one-third">
+    <div class="box">
+      <h5 class="title">{{ location.name }}</h5>
+      <h4 class="subtitle">{{ location.address }} - {{ location.city }}</h5>
+      {% for ls in location.line_stops.all %}
+      <p class="line">
+        <span class="icon" style="color: #{{ ls.line.color_back }};">
+        {% if ls.line.mode == 'tram' %}
+          <span class="fa fa-subway" title="{{ _('Tramway') }}"></span>
+        {% elif ls.line.mode == 'bus' %}
+          <span class="fa fa-bus" title="{{ _('Bus') }}"></span>
+        {% elif ls.line.mode == 'car' %}
+          <span class="fa fa-bus" title="{{ _('Autocar') }}"></span>
+        {% else %}
+          <span class="fa fa-car" title="{{ ls.line.mode }}"></span>
+        {% endif %}
+        </span>
+        <span class="tag" style="background: #{{ ls.line.color_back }}; color: #{{ ls.line.color_front }};">{{ ls.line.name }}</span>
+        {{ _('towards') }} {{ ls.direction.name }}
+      </p>
+      {% endfor %}
+      <hr />
+      <nav class="level">
+        <div class="level-left">
+          <a class="level-item" href="{% url 'location-transports' location.pk %}">
+            <span class="icon is-small"><i class="fa fa-pencil"></i></span>
+            <span>{{ _('Transport stops') }}</span>
+          </a>
+          <a class="level-item" href="{% url 'location-delete' location.pk %}">
+            <span class="icon is-small"><i class="fa fa-trash"></i></span>
+            <span>{{ _('Delete') }}</span>
+          </a>
+        </div>
+      </nav>
+    </div>
+  </div>
+  {% endfor %}
+</div>

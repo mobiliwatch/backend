@@ -1,0 +1,23 @@
+@font-face {
+  font-family: 'Esphimere';
+  font-weight: bold;
+  src: url("../fonts/EsphimereBold.otf") format("opentype"),
+       url("../fonts/EsphimereBold.ttf") format("truetype");
+}
+
+// WHERE ?
+h1.title span.icon {
+  margin-top: 4px;
+}
+
+p.line {
+  margin-bottom: 6px;
+}
+
+/* Home cards */
+#home .screen h5 a {
+  color: #363636;
+}
+
+@import 'nav';
+@import 'welcome';

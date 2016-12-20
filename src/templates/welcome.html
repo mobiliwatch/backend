@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block fullcontent %}
+<div id="welcome">
+  <section id="image" class="hero is-large">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns">
+          <div class="column is-6">
+            <h1 class="title">
+              {{ _('Tired of waiting for the bus at Grenoble ?') }}
+            </h1>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="actions" class="hero is-medium is-dark">
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns">
+
+          <div class="column is-3">
+            <img src="{% static 'img/logo.png' %}" alt="Logo mobili.watch" />
+          </div>
+          <div class="column is-9">
+            <h1 class="title">
+              {{ _('Welcome on Mobili.Watch !') }}
+            </h1>
+            <h2 class="subtitle">
+               {{ _('Baseline...') }}
+            </h2>
+            <a class="button is-large is-light is-outlined" href="{% url 'signup' %}">
+              <span class="icon is-medium">
+                <i class="fa fa-user-plus"></i>
+              </span>
+              <span>{{ _('Signup') }}</span>
+            </a>
+            <a class="button is-large is-success is-outlined" href="{% url 'login' %}">
+              <span class="icon is-medium">
+                <i class="fa fa-sign-in"></i>
+              </span>
+              <span>{{ _('Login') }}</span>
+            </a>
+            {% if demo_url %}
+            <a class="button is-large is-primary is-outlined" href="{{ demo_url }}" target="_blank">
+              <span class="icon is-medium">
+                <i class="fa fa-bus"></i>
+              </span>
+              <span>{{ _('Try our demo') }}</span>
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="hero is-medium">
+    <div class="hero-body container">
+      <div class="columns is-multiline">
+        <div class="column is-6">
+          <article class="media">
+            <div class="media-left">
+              <figure class="image is-96x96">
+                <img src="{% static 'img/buses.png' %}" alt="">
+              </figure>
+            </div>
+            <div class="media-content">
+              <div class="content">
+                <h3 class="title">N'attendez plus vos bus dans le froid</h3>
+                <p class="subtitle">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div class="column is-6">
+          <article class="media">
+            <div class="media-left">
+              <figure class="image is-96x96">
+                <img src="{% static 'img/tramway.png' %}" alt="">
+              </figure>
+            </div>
+            <div class="media-content">
+              <div class="content">
+                <h3 class="title">Ni vos tramways !</h3>
+                <p class="subtitle">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div class="column is-6">
+          <article class="media">
+            <div class="media-left">
+              <figure class="image is-96x96">
+                <img src="{% static 'img/monitor.png' %}" alt="">
+              </figure>
+            </div>
+            <div class="media-content">
+              <div class="content">
+                <h3 class="title">Conçu pour être vu en grand</h3>
+                <p class="subtitle">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+        <div class="column is-6">
+          <article class="media">
+            <div class="media-left">
+              <figure class="image is-96x96">
+                <img src="{% static 'img/sunny.png' %}" alt="">
+              </figure>
+            </div>
+            <div class="media-content">
+              <div class="content">
+                <h3 class="title">Affichez toutes vos informations</h3>
+                <p class="subtitle">
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
+                </p>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="team" class="hero is-medium is-dark">
+    <div class="hero-body container">
+      <div class="columns has-text-centered is-multiline">
+        
+        <div class="column is-12">
+          <h2 class="title">Conçu à Grenoble pour le challenge Mobili'Play</h2>
+        </div>
+        <div class="column is-4 is-offset-2">
+          <figure class="image is-square">
+            <img src="{% static 'img/bastien.jpg' %}" alt="Bastien Abadie">
+          </figure>
+          <h4 class="title">Bastien Abadie</h4>
+          <p>
+            <a href="https://github.com/La0" title="Github" target="_blank">
+              <span class="icon is-medium">
+                <span class="fa fa-github"></span>
+              </span>
+            </a>
+            <a href="https://twitter.com/La0" title="Twitter" target="_blank">
+              <span class="icon is-medium">
+                <span class="fa fa-twitter"></span>
+              </span>
+            </a>
+            <a href="https://nextcairn.com" title="NextCairn" target="_blank">
+              <span class="icon is-medium">
+                <span class="fa fa-user"></span>
+              </span>
+            </a>
+          </p>
+        </div>
+        <div class="column is-4">
+          <figure class="image is-square">
+            <img src="{% static 'img/laurent.jpg' %}" alt="Laurent Ducerf">
+          </figure>
+          <h4 class="title">Laurent Ducerf</h4>
+          <p>
+            <a href="https://twitter.com/laurentducerf" title="Twitter" target="_blank">
+              <span class="icon is-medium">
+                <span class="fa fa-twitter"></span>
+              </span>
+            </a>
+            <a href="http://scienticulture.fr/" title="NextCairn" target="_blank">
+              <span class="icon is-medium">
+                <span class="fa fa-user"></span>
+              </span>
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+{% endblock %}

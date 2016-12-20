@@ -1,0 +1,33 @@
+/* Home hero */
+#welcome {
+  section#image {
+    background: url(../img/home.png) no-repeat center center grey;
+    background-size: cover;
+    min-height: 500px;
+  }
+
+  section#actions {
+    h1 {
+      padding-top: 70px;
+    }
+  }
+
+  section#features {
+    div.column {
+      margin-bottom: 40px;
+
+      .subtitle {
+        color: #888;
+      }
+    }
+  }
+
+  section#team {
+    a {
+      color: #888;
+    }
+    a:hover {
+      color: #EEE;
+    }
+  }
+}

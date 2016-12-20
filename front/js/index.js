@@ -23,6 +23,6 @@ var app = new Vue({
 });
 
 // Css
-require('bulma/css/bulma.css');
-require('font-awesome/css/font-awesome.css');
-require('css/mobili.css');
+require('bulma/bulma.sass');
+require('font-awesome/scss/font-awesome.scss');
+require("../style/main.scss");
