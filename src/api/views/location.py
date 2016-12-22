@@ -45,7 +45,7 @@ class LocationStops(LocationMixin, ListAPIView):
         if stops and stops.get('Data'):
             stop_ids = set(s['LogicalStopId'] for s in stops['Data'])
         else:
-            stop_ids = []
+            stop_ids = set()
 
         # Add already selected stops
         stop_ids = stop_ids.union(list(self.location.line_stops.values_list('stop__itinisere_id', flat=True)))
