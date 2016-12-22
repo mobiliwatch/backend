@@ -2,7 +2,7 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
-from api import Itinisere, MetroMobilite, Bano, Weather
+from api import Itinisere, MetroMobilite, Bano, Weather, AirQuality
 from mobili.helpers import itinisere_timestamp
 from django.utils import timezone
 from django.core.cache import cache
@@ -229,3 +229,13 @@ class City(models.Model):
 
         w = Weather()
         return w.now(self.position)
+
+    def get_air_quality(self):
+        """
+        Get current & past air quality
+        """
+        aq = AirQuality()
+        data = aq.get_city(self.insee_code)
+        if 'series' not in data:
+            return None
+        return data['series'][0]['data']

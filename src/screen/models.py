@@ -369,7 +369,13 @@ class WeatherWidget(Widget):
         """
         Send weather to screens
         """
+
+        # Load weather
         weather = self.city.get_weather()
+
+        # Load air quality
+        air_quality = self.city.get_air_quality()
+
         return {
             'city' : {
                 'name' : self.city.name,
@@ -382,6 +388,7 @@ class WeatherWidget(Widget):
             'code' : weather.get_weather_code(),
             'sunrise' : weather.get_sunrise_time(),
             'sunset' : weather.get_sunset_time(),
+            'air_quality' : air_quality,
         }
 
 class NoteWidget(Widget):

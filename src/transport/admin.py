@@ -18,6 +18,7 @@ class StopAdmin(admin.ModelAdmin):
 
 class CityAdmin(admin.ModelAdmin):
     list_display = ('name', 'insee_code')
+    search_fields = ('name', 'insee_code')
 
 admin.site.register(Line, LineAdmin)
 admin.site.register(Stop, StopAdmin)
