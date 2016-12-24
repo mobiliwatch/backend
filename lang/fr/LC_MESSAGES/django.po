@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-18 11:23+0100\n"
-"PO-Revision-Date: 2016-12-18 11:24+0100\n"
+"POT-Creation-Date: 2016-12-24 10:55+0100\n"
+"PO-Revision-Date: 2016-12-24 10:56+0100\n"
 "Last-Translator: Bastien Abadie <bastien@nextcairn.com>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -43,7 +43,6 @@ msgid "Pick a template"
 msgstr "Choisir une disposition"
 
 #: screen/templates/screen/create.html:39
-#| msgid "Add a screen"
 msgid "Create a screen"
 msgstr "Créer un écran"
 
@@ -54,8 +53,8 @@ msgstr "Créer un écran"
 msgid "Cancel"
 msgstr "Annuler"
 
-#: screen/templates/screen/delete.html:12 templates/home.html:60
-#: templates/home.html:125 users/templates/location/delete.html:12
+#: screen/templates/screen/delete.html:12 templates/home/locations.html:52
+#: templates/home/screens.html:56 users/templates/location/delete.html:12
 msgid "Delete"
 msgstr "Supprimer"
 
@@ -63,7 +62,7 @@ msgstr "Supprimer"
 msgid "Mobili.Watch"
 msgstr "Mobili.Watch"
 
-#: templates/base.html:19 templates/home.html:159
+#: templates/base.html:19 templates/welcome.html:23
 msgid "Baseline..."
 msgstr "Embarquez sans attendre"
 
@@ -75,13 +74,13 @@ msgstr "Aide"
 msgid "Logout"
 msgstr "Déconnection"
 
-#: templates/base.html:57 templates/home.html:165
+#: templates/base.html:57 templates/welcome.html:29
 #: users/templates/registration/signup.html:7
 #: users/templates/registration/signup.html:20
 msgid "Signup"
 msgstr "Créer un compte"
 
-#: templates/base.html:63 templates/home.html:171
+#: templates/base.html:63 templates/welcome.html:35
 #: users/templates/registration/login.html:7
 #: users/templates/registration/login.html:17
 msgid "Login"
@@ -95,68 +94,76 @@ msgstr "Erreur"
 msgid "Table of contents"
 msgstr "Table des matières"
 
-#: templates/home.html:12
+#: templates/home/locations.html:4
 msgid "Your locations"
 msgstr "Vos lieux"
 
-#: templates/home.html:15
+#: templates/home/locations.html:7
 msgid "Add some locations to display them on your screens"
 msgstr "Ajouter des lieux pour les afficher sur vos écrans"
 
-#: templates/home.html:23 users/templates/location/create.html:8
+#: templates/home/locations.html:15 users/templates/location/create.html:8
 #: users/templates/location/create.html:19
 msgid "Add a location"
 msgstr "Ajouter un lieu"
 
-#: templates/home.html:38
+#: templates/home/locations.html:30
 msgid "Tramway"
 msgstr "Tramway"
 
-#: templates/home.html:40
+#: templates/home/locations.html:32
 msgid "Bus"
 msgstr "Bus"
 
-#: templates/home.html:42
+#: templates/home/locations.html:34
 msgid "Autocar"
 msgstr "Autocar"
 
-#: templates/home.html:48
+#: templates/home/locations.html:40
 msgid "towards"
 msgstr "vers"
 
-#: templates/home.html:56
+#: templates/home/locations.html:48
 msgid "Transport stops"
 msgstr "Arrêt de transports"
 
-#: templates/home.html:73
+#: templates/home/screens.html:4
 msgid "Your screens"
 msgstr "Vos écrans"
 
-#: templates/home.html:76
+#: templates/home/screens.html:7
 msgid "Manage all your screens to display informations"
 msgstr "Gérez tous vos écrans pour afficher des informations en temps réel"
 
-#: templates/home.html:84
+#: templates/home/screens.html:15
 msgid "Add a screen"
 msgstr "Ajouter un écran"
 
-#: templates/home.html:116
+#: templates/home/screens.html:47
 msgid "Edit"
 msgstr "Editer"
 
-#: templates/home.html:120
+#: templates/home/screens.html:51
 msgid "Shared"
 msgstr "Partager"
 
-#: templates/home.html:138
+#: templates/home/screens.html:69
 msgid "You can create new screens to display notes, bus & tramway stops, ..."
 msgstr ""
 "Vous pouvez créer de nouveaux écrans pour afficher des notes, la météo, vos "
 "arrêts de bus/tram favoris..."
 
-#: templates/home.html:156
+#: templates/welcome.html:7
+msgid "Tired of waiting for the bus at Grenoble ?"
+msgstr "Marre d'attendre le bus à Grenoble ?"
+
+#: templates/welcome.html:20
 msgid "Welcome on Mobili.Watch !"
 msgstr "Bienvenue sur Mobili.Watch !"
+
+#: templates/welcome.html:42
+msgid "Try our demo"
+msgstr "Essayez notre démo"
 
 #~ msgid "Landscape 16x9"
 #~ msgstr "Paysage (16:9)"

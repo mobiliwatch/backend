@@ -1,9 +1,22 @@
 /* Home hero */
 #welcome {
   section#image {
-    background: url(../img/home.png) no-repeat center center grey;
+    background: url(../img/home_top.jpg) no-repeat top center grey;
     background-size: cover;
-    min-height: 500px;
+    min-height: 600px;
+    color: white;
+
+    // To position title on bottom
+    position: relative;
+
+    h1 {
+      color: white;
+      font-size: 2.4em;
+      position: absolute;
+      bottom: 50px;
+      left: 20px;
+      text-shadow: 2px 2px #111;
+    }
   }
 
   section#actions {
@@ -12,14 +25,31 @@
     }
   }
 
-  section#features {
+  section#steps {
+    background: #00d1b2;
     div.column {
       margin-bottom: 40px;
+  
+      div.step {
+        margin-bottom: 20px;
+        text-align: center;
+        figure.image {
+          margin: 0 auto;
+        }
+      }
+
+      .title {
+        font-weight: bold;
+      }
 
       .subtitle {
-        color: #888;
+        color: #333;
       }
     }
+  }
+
+  section#features {
+    background: #ff3860;
   }
 
   section#team {

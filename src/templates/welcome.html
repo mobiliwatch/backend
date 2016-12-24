@@ -4,17 +4,7 @@
 {% block fullcontent %}
 <div id="welcome">
   <section id="image" class="hero is-large">
-    <div class="hero-body">
-      <div class="container">
-        <div class="columns">
-          <div class="column is-6">
-            <h1 class="title">
-              {{ _('Tired of waiting for the bus at Grenoble ?') }}
-            </h1>
-          </div>
-        </div>
-      </div>
-    </div>
+    <h1>{{ _('Tired of waiting for the bus at Grenoble ?') }}</h1>
   </section>
 
   <section id="actions" class="hero is-medium is-dark">
@@ -58,77 +48,68 @@
     </div>
   </section>
 
+  <section id="steps" class="hero is-medium">
+    <div class="hero-body container">
+      <div class="columns">
+        <div class="column is-4">
+          <div class="step">
+            <figure class="image is-128x128">
+              <img src="{% static 'img/home_step_1.png' %}" alt="">
+            </figure>
+          </div>
+          <h3 class="title">1. Je sélectionne les lignes qui m'intéressent</h3>
+          <p class="subtitle">
+Attrapez votre bus au bon moment ! Grâce aux données temps réel Itinisère, Mobili.Watch calcule le temps qu'il vous reste avant de partir de la maison ou du bureau pour arriver pile au moment où votre bus ou le tram passe à votre arrêt favoris. 
+          </p>
+        </div>
+        <div class="column is-4">
+          <div class="step">
+            <figure class="image is-128x128">
+              <img src="{% static 'img/home_step_2.png' %}" alt="">
+            </figure>
+          </div>
+          <h3 class="title">2. Je crée mon tableau des départs</h3>
+          <p class="subtitle">
+Domicile, travail, lieux publics : créez l'affichage personnalisé de vos modes de transports. Un écran pour chacun de vos besoins : sur une tablette à la maison, sur un écran au bureau ou dans un espace public.
+          </p>
+        </div>
+        <div class="column is-4">
+          <div class="step">
+            <figure class="image is-128x128">
+              <img src="{% static 'img/home_step_3.png' %}" alt="">
+            </figure>
+          </div>
+          <h3 class="title">3. J'attends tranquillement le moment de partir</h3>
+          <p class="subtitle">
+Mobili.Watch permet de suivre en direct les déplacements des transports en
+commun en Isère et vous propose des informations contextuelles pour créer
+le tableau de bord de vos déplacements : interruptions de services ou incidents, météo, niveau de pollution...
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="features" class="hero is-medium">
     <div class="hero-body container">
-      <div class="columns is-multiline">
-        <div class="column is-6">
-          <article class="media">
-            <div class="media-left">
-              <figure class="image is-96x96">
-                <img src="{% static 'img/buses.png' %}" alt="">
-              </figure>
-            </div>
-            <div class="media-content">
-              <div class="content">
-                <h3 class="title">N'attendez plus vos bus dans le froid</h3>
-                <p class="subtitle">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
-                </p>
-              </div>
-            </div>
-          </article>
+      <div class="columns has-text-centered is-multiline">
+
+        <div class="column is-12">
+          <h2 class="title">Interfaces intuitives et ergonomiques</h2>
         </div>
+
         <div class="column is-6">
-          <article class="media">
-            <div class="media-left">
-              <figure class="image is-96x96">
-                <img src="{% static 'img/tramway.png' %}" alt="">
-              </figure>
-            </div>
-            <div class="media-content">
-              <div class="content">
-                <h3 class="title">Ni vos tramways !</h3>
-                <p class="subtitle">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
-                </p>
-              </div>
-            </div>
-          </article>
+          <img src="{% static 'img/home_demo.jpg' %}" alt="Demo" />
         </div>
+
         <div class="column is-6">
-          <article class="media">
-            <div class="media-left">
-              <figure class="image is-96x96">
-                <img src="{% static 'img/monitor.png' %}" alt="">
-              </figure>
-            </div>
-            <div class="media-content">
-              <div class="content">
-                <h3 class="title">Conçu pour être vu en grand</h3>
-                <p class="subtitle">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
-                </p>
-              </div>
-            </div>
-          </article>
+          <img src="{% static 'img/home_editor.jpg' %}" alt="Demo" />
         </div>
-        <div class="column is-6">
-          <article class="media">
-            <div class="media-left">
-              <figure class="image is-96x96">
-                <img src="{% static 'img/sunny.png' %}" alt="">
-              </figure>
-            </div>
-            <div class="media-content">
-              <div class="content">
-                <h3 class="title">Affichez toutes vos informations</h3>
-                <p class="subtitle">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean efficitur sit amet massa fringilla egestas. Nullam condimentum luctus turpis.
-                </p>
-              </div>
-            </div>
-          </article>
+
+        <div class="column is-6 is-offset-3">
+          <img src="{% static 'img/home_front.jpg' %}" alt="Demo" />
         </div>
+
       </div>
     </div>
   </section>
