@@ -31,7 +31,7 @@
 
       {% if user.is_authenticated %}
       <span class="nav-item">
-        Hello {{ user.first_name }}
+        {{ _('Hello') }} {{ user.first_name }}
       </span>
       <span class="nav-item">
         <a class="button is-info is-outlined" href="{% url 'help-home' %}">

@@ -128,7 +128,7 @@ module.exports = {
           <span class="icon is-small">
             <span class="fa fa-bus"></span>
           </span>
-          <span>Voir les arrêts sélectionnés</span>
+          <span>Voir les trajets</span>
         </span>
         <ScreenCreator :location="location" />
       </p>

@@ -1,6 +1,6 @@
 <template>
   <div class="stop" v-if="current_stop != null">
-    <p class="title">Choisir ses arrêts à {{ current_stop.name }}</p>
+    <p class="title">Choisir ses trajets depuis {{ current_stop.name }}</p>
     <div v-for="(ls, i) in current_stop.line_stops">
       <label>
         <input type="checkbox" :name="ls.id" v-on:click="toggle_line_stop(ls)" :value="ls.id" v-model="line_stops"/>
@@ -10,9 +10,9 @@
     </div>
   </div>
   <div v-else>
-    <p class="title">Choisir ses arrêts à ...</p>
+    <p class="title">Choisir ses trajets ...</p>
     <div class="notification is-info">
-      Veuillez sélectionner un arrêt pour voir les détails.
+      Veuillez sélectionner un arrêt pour ajouter un trajet.
     </div>
   </div>
 </template>

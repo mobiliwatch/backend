@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-24 10:55+0100\n"
-"PO-Revision-Date: 2016-12-24 10:56+0100\n"
+"POT-Creation-Date: 2016-12-24 11:40+0100\n"
+"PO-Revision-Date: 2016-12-24 11:40+0100\n"
 "Last-Translator: Bastien Abadie <bastien@nextcairn.com>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -66,6 +66,10 @@ msgstr "Mobili.Watch"
 msgid "Baseline..."
 msgstr "Embarquez sans attendre"
 
+#: templates/base.html:34
+msgid "Hello"
+msgstr "Bonjour"
+
 #: templates/base.html:41
 msgid "Help"
 msgstr "Aide"
@@ -102,10 +106,10 @@ msgstr "Vos lieux"
 msgid "Add some locations to display them on your screens"
 msgstr "Ajouter des lieux pour les afficher sur vos écrans"
 
-#: templates/home/locations.html:15 users/templates/location/create.html:8
-#: users/templates/location/create.html:19
-msgid "Add a location"
-msgstr "Ajouter un lieu"
+#: templates/home/locations.html:15
+#| msgid "Add a location"
+msgid "Create a location"
+msgstr "Créer un lieu"
 
 #: templates/home/locations.html:30
 msgid "Tramway"
@@ -164,6 +168,11 @@ msgstr "Bienvenue sur Mobili.Watch !"
 #: templates/welcome.html:42
 msgid "Try our demo"
 msgstr "Essayez notre démo"
+
+#: users/templates/location/create.html:8
+#: users/templates/location/create.html:19
+msgid "Add a location"
+msgstr "Ajouter un lieu"
 
 #~ msgid "Landscape 16x9"
 #~ msgstr "Paysage (16:9)"

@@ -4,7 +4,7 @@
       <span class="icon is-small">
         <span class="fa fa-plus"></span>
       </span>
-      <span>Ajouter un écran</span>
+      <span>Créer un écran</span>
     </span>
 
     <div class="modal" :class="{'is-active' : active }">
