@@ -26,7 +26,7 @@ class Command(BaseCommand):
         toc = sorted(toc, key=lambda x : x['position'])
 
         # Save toc in cache
-        cache.set('help-toc', toc, 0)
+        cache.set('help-toc', toc, None)
 
     def render(self, path):
         # Build cache key
@@ -43,7 +43,7 @@ class Command(BaseCommand):
         with open(path) as f:
             output = markdown.markdown(f.read())
 
-        cache.set(cache_key, output, 0)
+        cache.set(cache_key, output, None)
 
         # Parse H1/H2
         out = {
