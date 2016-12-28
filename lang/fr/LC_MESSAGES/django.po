@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-24 11:40+0100\n"
-"PO-Revision-Date: 2016-12-24 11:40+0100\n"
+"POT-Creation-Date: 2016-12-28 19:14+0100\n"
+"PO-Revision-Date: 2016-12-28 19:14+0100\n"
 "Last-Translator: Bastien Abadie <bastien@nextcairn.com>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -25,6 +25,20 @@ msgstr "Français"
 #: mobili/settings.py:158
 msgid "English"
 msgstr "Anglais"
+
+#: screen/forms.py:20 users/forms.py:55
+msgid "Name"
+msgstr "Nom"
+
+#: screen/forms.py:21
+#| msgid "Your locations"
+msgid "Location"
+msgstr "Lieu"
+
+#: screen/forms.py:22
+#| msgid "Pick a template"
+msgid "Screen template"
+msgstr "Disposition d'affichage"
 
 #: screen/models.py:17
 msgid "Light"
@@ -70,7 +84,7 @@ msgstr "Embarquez sans attendre"
 msgid "Hello"
 msgstr "Bonjour"
 
-#: templates/base.html:41
+#: templates/base.html:41 templates/base.html:57
 msgid "Help"
 msgstr "Aide"
 
@@ -78,13 +92,13 @@ msgstr "Aide"
 msgid "Logout"
 msgstr "Déconnection"
 
-#: templates/base.html:57 templates/welcome.html:29
+#: templates/base.html:63 templates/welcome.html:29
 #: users/templates/registration/signup.html:7
 #: users/templates/registration/signup.html:20
 msgid "Signup"
 msgstr "Créer un compte"
 
-#: templates/base.html:63 templates/welcome.html:35
+#: templates/base.html:69 templates/welcome.html:35
 #: users/templates/registration/login.html:7
 #: users/templates/registration/login.html:17
 msgid "Login"
@@ -107,7 +121,6 @@ msgid "Add some locations to display them on your screens"
 msgstr "Ajouter des lieux pour les afficher sur vos écrans"
 
 #: templates/home/locations.html:15
-#| msgid "Add a location"
 msgid "Create a location"
 msgstr "Créer un lieu"
 
@@ -168,6 +181,34 @@ msgstr "Bienvenue sur Mobili.Watch !"
 #: templates/welcome.html:42
 msgid "Try our demo"
 msgstr "Essayez notre démo"
+
+#: users/forms.py:11
+msgid "Password"
+msgstr "Mot de passe"
+
+#: users/forms.py:12
+msgid "Password confirmation"
+msgstr "Confirmation du mot de passe"
+
+#: users/forms.py:18
+msgid "Email"
+msgstr "Email"
+
+#: users/forms.py:19
+msgid "First name"
+msgstr "Prénom"
+
+#: users/forms.py:20
+msgid "Last name"
+msgstr "Nom de famille"
+
+#: users/forms.py:56
+msgid "Address"
+msgstr "Addresse postale"
+
+#: users/forms.py:57
+msgid "City"
+msgstr "Ville"
 
 #: users/templates/location/create.html:8
 #: users/templates/location/create.html:19

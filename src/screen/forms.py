@@ -1,6 +1,7 @@
 from django import forms
 from screen.models import Screen
 from users.models import Location
+from django.utils.translation import ugettext_lazy as _
 
 
 class ScreenCreationForm(forms.ModelForm):
@@ -15,6 +16,11 @@ class ScreenCreationForm(forms.ModelForm):
         fields = (
             'name',
         )
+        labels = {
+            'name' : _('Name'),
+            'location' : _('Location'),
+            'screen_template' : _('Screen template'),
+        }
 
     def __init__(self, user, *args, **kwargs):
         super(ScreenCreationForm, self).__init__(*args, **kwargs)
