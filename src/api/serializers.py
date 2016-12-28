@@ -328,6 +328,7 @@ class ScreenSerializer(serializers.ModelSerializer):
             'name',
             'slug',
             'frontend_url',
+            'frontend_shared_url',
             'style',
             'admin',
             'groups',

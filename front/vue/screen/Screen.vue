@@ -81,6 +81,12 @@ module.exports = {
             </span>
             <span>Voir l'écran</span>
           </a>
+          <a :href="screen.frontend_shared_url" target="_blank" class="button is-warning">
+            <span class="icon is-small">
+              <span class="fa fa-link"></span>
+            </span>
+            <span>Partager l'écran</span>
+          </a>
         </div>
         <div class="level-right">
           <span class="level-item">
