@@ -50,6 +50,12 @@
 
       {% else %}
       <span class="nav-item">
+        <a class="button is-info is-outlined" href="{% url 'help-home' %}">
+          <span class="icon is-small">
+            <i class="fa fa-question-circle"></i>
+          </span>
+          <span>{{ _('Help') }}</span>
+        </a>
         <a class="button is-outlined" href="{% url 'signup' %}">
           <span class="icon is-small">
             <i class="fa fa-user-plus"></i>

@@ -6,6 +6,8 @@ import re
 import glob
 import markdown
 
+regex = re.compile(r'(\d+)-([\w\-]+).md')
+
 class Command(BaseCommand):
     help = 'Build all help pages'
 
@@ -20,14 +22,20 @@ class Command(BaseCommand):
         for path in glob.glob(help_dir + '/*.md'):
             toc.append(self.render(path))
 
+        # Sort by position
+        toc = sorted(toc, key=lambda x : x['position'])
+
         # Save toc in cache
         cache.set('help-toc', toc)
 
     def render(self, path):
         # Build cache key
-        slug = os.path.basename(path)
-        if slug.endswith('.md'):
-            slug = slug[:-3]
+        res = regex.match(os.path.basename(path))
+        if res is None:
+            raise Exception('Invalid slug format {}'.format(path))
+
+        position, slug = res.groups()
+        position = int(position)
         cache_key = 'help:{}'.format(slug)
         print('Rendering: {}'.format(cache_key))
 
@@ -40,6 +48,7 @@ class Command(BaseCommand):
         # Parse H1/H2
         out = {
             'slug' : slug,
+            'position' : position,
         }
         title = self.re_h1.search(output)
         if title is None:

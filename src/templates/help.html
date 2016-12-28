@@ -11,7 +11,7 @@
     {% for page in toc %}
     <li>
       <a class="{% if page.slug == slug %}is-active{% endif %}" href="{% url 'help' page.slug %}">{{ page.title }}</a>
-      {% if page.paragraphs %}
+      {% if page.paragraphs and page.slug == slug %}
       <ul>
         {% for p in page.paragraphs %}
         <li><a href="#">{{ p }}</a></li>
