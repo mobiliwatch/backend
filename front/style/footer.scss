@@ -1,0 +1,24 @@
+footer {
+  background: #363636;
+  color: #DDD;
+
+  p {
+    display: inline-block;
+    min-height: 26px;
+    padding: 5px 2px;
+    line-height: 26px;
+
+    span.icon {
+      margin-top: 4px;
+    }
+  }
+
+  a:hover {
+    color: rgb(214, 10, 0);
+  }
+  
+  .muted {
+    color: #AAA;
+  }
+
+}
