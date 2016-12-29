@@ -1,8 +1,8 @@
 from django.views.generic import TemplateView
-from django.http import Http404
-from django.core.cache import cache
 from django.conf import settings
 from screen.models import Screen
+from django.http import Http404
+from mobili.static import Pages
 
 
 class Home(TemplateView):
@@ -48,18 +48,12 @@ class Help(TemplateView):
         """
         Load help content from cache
         """
-
-        # Load page
-        cache_key = 'help:{}'.format(slug)
-        content = cache.get(cache_key)
-        if not content:
+        pages = Pages('help')
+        if not pages.has(slug):
             raise Http404
 
-        # Load TOC
-        toc = cache.get('help-toc')
-
         return {
-            'toc': toc,
             'slug': slug,
-            'content': content,
+            'toc': pages.toc,
+            'content': pages.render(slug),
         }
