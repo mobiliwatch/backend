@@ -98,7 +98,7 @@ class Pages(object):
         Update TOC with new infos from rendered page
         """
         # Use toc without current item
-        toc = [i for i in self.toc if i['slug'] != 'slug']
+        toc = [i for i in self.toc if i['slug'] != slug]
 
         # Parse H1/H2 to update TOC
         page = {
