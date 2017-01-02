@@ -45,6 +45,36 @@
         </div>
       </div>
     </div>
+
+    <div class="modal" :class="{'is-active': error != null}" v-if="error">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">Erreur {{ error.status || 'unknown' }}</p>
+          <button class="delete" v-on:click="clear_error()"></button>
+        </header>
+        <section class="modal-card-body">
+
+          <p v-if="error.body.detail == 'itinisere'" class="notification is-danger">
+            Les données nécessaires n'ont pu être récupérés du site Itinisère.
+          </p>
+          <p v-else class="notification is-danger">
+            Une erreur est survenue : <pre>{{ error.body.detail || error.body }}</pre>
+          </p>
+
+          <p>
+            L'équipe Mobili.Watch a été prévenu de cette erreur et corrigera le problème au plus vite.
+          </p>
+          <p>
+            Vous pouvez cependant nous contacter par mail pour avoir plus d'informations: contact@mobili.watch
+          </p>
+        </section>
+        <footer class="modal-card-foot">
+          <a class="button" v-on:click="clear_error()">Fermer</a>
+          <span class="button is-danger" v-on:click="reload()">Recharger la page</span>
+        </footer>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -61,6 +91,7 @@ module.exports = {
   },
   data : function(){
     return {
+      error : null,
       location: null,
       loading: false,
       saved : false,
@@ -160,6 +191,7 @@ module.exports = {
         this.$set(this, 'line_stops', line_stops);
       }).catch(function(resp){
         console.warn('No data', resp);
+        this.$set(this, 'error', resp);
       });
     },
     load_stops : function(evt){
@@ -186,8 +218,18 @@ module.exports = {
 
       }).catch(function(resp){
         this.$set(this, 'loading', false);
+        this.$set(this, 'error', resp);
         console.warn('No data', resp);
       });
+    },
+
+    
+
+    clear_error : function(){
+      this.$set(this, 'error', null);
+    },
+    reload : function(){
+      window.location.href = window.location.href + '';
     },
   },
 }

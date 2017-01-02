@@ -6,6 +6,9 @@ from channels import Channel
 from transport.models import Stop
 from transport.trip import walk_trip
 from django.http import Http404
+import logging
+
+logger = logging.getLogger('api')
 
 
 class LocationMixin(object):
@@ -36,12 +39,15 @@ class LocationStops(LocationMixin, ListAPIView):
           self.location = qs.get(pk=self.kwargs['pk'])
         except:
           raise Http404
-        print('location', self.location)
 
         # Find nearby stops
         distance = int(self.request.GET.get('distance', 400))
         iti = Itinisere()
-        stops = iti.get_nearest_line_stops(self.location.point.x, self.location.point.y, distance)
+        try:
+            stops = iti.get_nearest_line_stops(self.location.point.x, self.location.point.y, distance)
+        except Exception as e:
+            logger.error('Itinisere error on location {} : {}'.format(self.location.id, e))
+            raise APIException('itinisere')
         if stops and stops.get('Data'):
             stop_ids = set(s['LogicalStopId'] for s in stops['Data'])
         else:
@@ -71,7 +77,6 @@ class LocationDetails(LocationMixin, RetrieveAPIView, UpdateAPIView):
         for ls in line_stops:
             link, created = location.location_stops.get_or_create(line_stop=ls)
             if created:
-                print('GO UPDATED')
                 Channel('locationstop.update').send({
                     'location_stop' : link.id,
                 })
