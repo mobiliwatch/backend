@@ -31,16 +31,21 @@
             <button class="delete" v-on:click="close()"></button>
           </header>
           <section class="modal-card-body">
-            <div v-for="(meta, type) in types" v-if="type != widget.type">
-              <h5 class="title is-5">{{ meta.title }}</h5>
-              <p>{{ meta.description }}</p>
-              <span class="button is-primary" v-on:click="replace(type)" :disabled="replacing">
-                <span class="icon is-small">
-                  <span class="fa fa-check"></span>
+            <div v-for="(meta, type) in types" v-if="type != widget.type" class="columns is-multiline widget-description">
+              <div class="column is-8">
+                <h5 class="title is-5">{{ meta.title }}</h5>
+              </div>
+              <div class="column is-4 has-text-right">
+                <span class="button is-primary" v-on:click="replace(type)" :disabled="replacing">
+                  <span class="icon is-small">
+                    <span class="fa fa-check"></span>
+                  </span>
+                  <span>Utiliser ce widget</span>
                 </span>
-                <span>Utiliser</span>
-              </span>
-              <hr />
+              </div>
+              <div class="column is-12">
+                {{ meta.description }}
+              </div>
             </div>
           </section>
           <footer class="modal-card-foot">
@@ -97,26 +102,34 @@ module.exports = {
       types : {
         'LocationWidget' : {
           title : 'Prochains passages',
-          description : '...',
+          description : 'Ce widget vous permet de savoir quand partir du lieu vers un arrêt sélectionné afin de ne plus jamais attendre vos transports en commun !',
         },
         'ClockWidget' : {
           title : 'Horloge',
-          description : '...',
+          description : 'Afichez une horloge (date et heure) sur votre écran avec ce widget.',
         },
         'WeatherWidget' : {
           title : 'Météo',
-          description : '...',
+          description : 'Ce widget affiche la tendance météo de la journée de la ville choisie, ainsi que l\'indice de pollution.',
         },
         'DisruptionWidget' : {
           title : 'Perturbations',
-          description : '...',
+          description : 'Avec ce widget vous aurez accès à toutes les perturbations en cours pour les lignes sélectionnées dans votre lieu (alertes pollutions, promotions commerciales, perturbations techniques, etc.)',
         },
         'NoteWidget' : {
           title : 'Notes',
-          description : '...',
+          description : 'Avec ce widget vous pouvez laisser un message sur l\'écran: une liste de courses, un memo, un gentil mot...',
         },
       },
     };
   },
 };
 </script>
+
+<style scoped>
+.widget-description {
+  border-bottom: 1px solid #F1F1F1;
+  padding-bottom: 3px;
+  margin-bottom: 12px;
+}
+</style>
