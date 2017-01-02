@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-28 19:14+0100\n"
-"PO-Revision-Date: 2016-12-28 19:14+0100\n"
+"POT-Creation-Date: 2017-01-02 21:44+0100\n"
+"PO-Revision-Date: 2017-01-02 21:45+0100\n"
 "Last-Translator: Bastien Abadie <bastien@nextcairn.com>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -31,12 +31,10 @@ msgid "Name"
 msgstr "Nom"
 
 #: screen/forms.py:21
-#| msgid "Your locations"
 msgid "Location"
 msgstr "Lieu"
 
 #: screen/forms.py:22
-#| msgid "Pick a template"
 msgid "Screen template"
 msgstr "Disposition d'affichage"
 
@@ -62,7 +60,7 @@ msgstr "Créer un écran"
 
 #: screen/templates/screen/create.html:42
 #: screen/templates/screen/delete.html:15
-#: users/templates/location/create.html:22
+#: users/templates/location/create.html:32
 #: users/templates/location/delete.html:15
 msgid "Cancel"
 msgstr "Annuler"
@@ -144,6 +142,13 @@ msgstr "vers"
 msgid "Transport stops"
 msgstr "Arrêt de transports"
 
+#: templates/home/locations.html:64
+msgid ""
+"You can create new locations to select your favorite bus & tramway stops."
+msgstr ""
+"Vous pouvez créer de nouveaux lieux pour sélectionner vos arrêts favoris de "
+"bus et tramways. "
+
 #: templates/home/screens.html:4
 msgid "Your screens"
 msgstr "Vos écrans"
@@ -211,9 +216,27 @@ msgid "City"
 msgstr "Ville"
 
 #: users/templates/location/create.html:8
-#: users/templates/location/create.html:19
+#: users/templates/location/create.html:29
 msgid "Add a location"
 msgstr "Ajouter un lieu"
+
+#: users/templates/location/create.html:16
+#| msgid ""
+#| "You can create new locations to select your favorite bus & tramway stops."
+msgid ""
+"You must create at least one location to select bus & tramway stops (your "
+"home, workplace, school, ...)"
+msgstr ""
+"Vous devez créer au moins un lieu pour sélectionner vos arrêts favorus de "
+"bus et tramway (chez vous, votre lieu de travail, votre école, ...)"
+
+#: users/templates/location/create.html:17
+msgid ""
+"For more informations, please <a target=\"_blank\" href=\"/help/location/"
+"\">read the help page</a>"
+msgstr ""
+"Pour plus d'informations <a target=\"_blank\" href=\"/help/location/"
+"\">veuillez lire la page d'aide</a>"
 
 #~ msgid "Landscape 16x9"
 #~ msgstr "Paysage (16:9)"

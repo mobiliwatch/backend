@@ -8,6 +8,16 @@
   <h3 class="title">{{ _('Add a location') }}</h3>
   {% csrf_token %}
 
+  {% if not user.locations.exists %}
+  <div class="notification is-info">
+    <span class="icon">
+      <span class="fa fa-question-circle"></span>
+    </span>
+    {{ _('You must create at least one location to select bus & tramway stops (your home, workplace, school, ...)') }}
+    {{ _('For more informations, please <a target="_blank" href="/help/location/">read the help page</a>') }}
+  </div>
+  {% endif %}
+
   {% form_errors form %}
   {% form_input form.name 'globe' %}
   {% form_input form.address 'address-card' %}

@@ -55,5 +55,14 @@
       </nav>
     </div>
   </div>
+  {% empty %}
+  <div class="column is-12">
+    <div class="notification is-info">
+      <span class="icon">
+        <span class="fa fa-question-circle"></span>
+      </span>
+      {{ _('You can create new locations to select your favorite bus & tramway stops.') }}
+    </div>
+  </div>
   {% endfor %}
 </div>
