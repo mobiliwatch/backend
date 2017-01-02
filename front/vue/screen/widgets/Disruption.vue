@@ -24,7 +24,7 @@
         </span>
         <span>Enregistrer</span>
       </span>
-      <span v-on:click="delete_widget" class="button is-danger" :class="{'is-loading' : deleting}">
+      <span v-on:click="delete_widget" class="button is-danger" :class="{'is-loading' : deleting}" v-if="editor == 'advanced'">
         <span class="icon">
           <i class="fa fa-trash"></i>
         </span>

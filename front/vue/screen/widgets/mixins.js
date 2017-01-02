@@ -16,6 +16,9 @@ module.exports = {
     widget : function(){
       return this.$store.state.widgets[this.widgetId];
     },
+    editor : function(){
+      return this.$store.state.editor;
+    },
   },
   methods: {
     save : function(extra_data){
@@ -38,6 +41,10 @@ module.exports = {
       });
     },
     delete_widget : function(){
+      if(this.editor != 'advanced'){
+        console.warn("Deletion only in advanced editor");
+        return;
+      }
       this.$set(this, 'error', null);
       var data = {
         id : this.widget.id,
