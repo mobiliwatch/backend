@@ -4,13 +4,13 @@ from django.contrib.postgres.fields import HStoreField
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
 from providers.isere import Itinisere, MetroMobilite
-from providers import Bano, Weather, AirQuality
 from mobili.helpers import itinisere_timestamp
 from django.utils import timezone
 from django.core.cache import cache
 import calendar
 import hashlib
 import logging
+import region
 
 logger = logging.getLogger('transport.models')
 
@@ -18,7 +18,9 @@ logger = logging.getLogger('transport.models')
 class ProvidersModel(models.Model):
     """
     A model with several providers ids
+    And a link to a region
     """
+    region = models.CharField(max_length=50, choices=region.ALL, default=region.DEFAULT)
     providers = HStoreField(default='')
 
     class Meta:
@@ -188,7 +190,7 @@ class Stop(ProvidersModel):
     """
     lines = models.ManyToManyField(Line, through=LineStop, related_name='stops')
     name = models.CharField(max_length=250)
-    city = models.ForeignKey('transport.City', related_name='stops')
+    city = models.ForeignKey('region.City', related_name='stops')
     point = models.PointField(null=True, blank=True) # computed average point
 
 
@@ -206,49 +208,3 @@ class Stop(ProvidersModel):
         x, y = map(mean, zip(*points))
         self.point = Point(x, y)
         return self.point
-
-
-class City(models.Model):
-    """
-    A city, used by transport & location
-    """
-    insee_code = models.CharField(max_length=8, unique=True)
-    name = models.CharField(max_length=250)
-    position = models.PointField(null=True, blank=True)
-
-    class Meta:
-        ordering = ('name', )
-
-    def __str__(self):
-        return self.name
-
-    def find_position(self):
-        api = Bano()
-        resp = api.get_city(self.name, self.insee_code)
-        if not resp or not resp.get('features'):
-            raise Exception('No result found')
-
-        best = resp['features'][0]['geometry']['coordinates']
-        self.position = Point(*best)
-        return self.position
-
-    def get_weather(self):
-        """
-        Get current weather
-        """
-        if not self.position:
-            self.find_position()
-            self.save()
-
-        w = Weather()
-        return w.now(self.position)
-
-    def get_air_quality(self):
-        """
-        Get current & past air quality
-        """
-        aq = AirQuality()
-        data = aq.get_city(self.insee_code)
-        if 'series' not in data:
-            return None
-        return data['series'][0]['data']

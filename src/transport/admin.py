@@ -1,5 +1,5 @@
 from django.contrib import admin
-from transport.models import Line, LineStop, Stop, City
+from transport.models import Line, LineStop, Stop
 
 class LineStopInline(admin.TabularInline):
     model = LineStop
@@ -16,10 +16,5 @@ class StopAdmin(admin.ModelAdmin):
     list_filter = ('city', )
     inlines = (LineStopInline, )
 
-class CityAdmin(admin.ModelAdmin):
-    list_display = ('name', 'insee_code')
-    search_fields = ('name', 'insee_code')
-
 admin.site.register(Line, LineAdmin)
 admin.site.register(Stop, StopAdmin)
-admin.site.register(City, CityAdmin)

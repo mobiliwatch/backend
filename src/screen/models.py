@@ -363,7 +363,7 @@ class WeatherWidget(Widget):
     """
     Display current weather on a screen
     """
-    city = models.ForeignKey('transport.City', related_name='weather_widgets')
+    city = models.ForeignKey('region.City', related_name='weather_widgets')
 
     def build_update(self):
         """

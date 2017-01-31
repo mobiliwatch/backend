@@ -1,6 +1,6 @@
 from rest_framework.generics import ListAPIView
 from api.serializers import CitySerializer
-from transport.models import City
+from region.models import City
 
 
 class CityList(ListAPIView):

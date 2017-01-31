@@ -99,7 +99,7 @@ class Location(models.Model):
     user = models.ForeignKey(User, related_name='locations')
     name = models.CharField(max_length=250)
     address = models.TextField()
-    city = models.ForeignKey('transport.City', related_name='locations')
+    city = models.ForeignKey('region.City', related_name='locations')
     point = models.PointField()
 
     line_stops = models.ManyToManyField('transport.LineStop', through='users.LocationStop', related_name='locations')

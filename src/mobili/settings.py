@@ -56,6 +56,7 @@ INSTALLED_APPS = [
 
     # Our apps
     'mobili',
+    'region',
     'transport',
     'users',
     'screen',

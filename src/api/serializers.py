@@ -1,4 +1,5 @@
-from transport.models import Stop, LineStop, Line, Direction, City
+from transport.models import Stop, LineStop, Line, Direction
+from region.models import City
 from users.models import Location
 from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget, DisruptionWidget, Group
 from rest_framework import serializers
