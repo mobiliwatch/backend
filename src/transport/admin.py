@@ -6,13 +6,13 @@ class LineStopInline(admin.TabularInline):
     readonly_fields = ('direction', 'stop')
 
 class LineAdmin(admin.ModelAdmin):
-    list_display = ('name', 'mode', 'full_name', 'itinisere_id', 'metro_id')
+    list_display = ('name', 'mode', 'full_name', 'providers')
     list_filter = ('mode', )
-    search_fields = ('name', 'full_name', 'itinisere_id', 'metro_id')
+    search_fields = ('name', 'full_name', )
     inlines = (LineStopInline, )
 
 class StopAdmin(admin.ModelAdmin):
-    list_display = ('name', 'city', 'itinisere_id', 'metro_id', 'metro_cluster')
+    list_display = ('name', 'city', 'providers')
     list_filter = ('city', )
     inlines = (LineStopInline, )
 

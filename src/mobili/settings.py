@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    'django.contrib.postgres',
     'widget_tweaks',
     'webpack_loader',
     'rest_framework',
@@ -231,3 +232,5 @@ try:
     from .local_settings import *
 except ImportError:
     pass
+
+assert 'postgis' in DATABASES['default']['ENGINE']

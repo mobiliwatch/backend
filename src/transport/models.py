@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
+from django.contrib.postgres.fields import HStoreField
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
 from providers.isere import Itinisere, MetroMobilite
@@ -14,7 +15,30 @@ import logging
 logger = logging.getLogger('transport.models')
 
 
-class Line(models.Model):
+class ProvidersModel(models.Model):
+    """
+    A model with several providers ids
+    """
+    providers = HStoreField(default='')
+
+    class Meta:
+        abstract = True
+
+    def __getattr__(self, key):
+        if not key.endswith('_id'):
+            raise KeyError
+
+        return self.providers.get(key[:-3])
+
+    def __setattr__(self, key, value):
+        if key.endswith('_id'):
+            key = key[:-3]
+            self.data[key] = value
+        else:
+            return super(ProvidersModel, self).__setattr__(key, value)
+
+
+class Line(ProvidersModel):
     """
     A transport line
     """
@@ -22,10 +46,6 @@ class Line(models.Model):
     operator = models.CharField(max_length=250, null=True, blank=True)
     name = models.CharField(max_length=250)
     full_name = models.TextField()
-
-    # Api ids
-    itinisere_id = models.IntegerField(unique=True)
-    metro_id = models.CharField(max_length=250, null=True, blank=True)
 
     # Colors as hex values
     color_back = models.CharField(max_length=6, null=True, blank=True)
@@ -39,17 +59,16 @@ class Line(models.Model):
     def __str__(self):
         return '{} {}'.format(self.mode, self.name)
 
-class Direction(models.Model):
+class Direction(ProvidersModel):
     """
     A direction for a transport line
     """
     line = models.ForeignKey(Line, related_name='directions')
-    itinisere_id = models.IntegerField() # 1|2
     name = models.CharField(max_length=250)
 
     class Meta:
         unique_together = (
-            ('line', 'itinisere_id'),
+            ('line', 'providers'),
         )
 
     def __str__(self):
@@ -70,7 +89,7 @@ class Direction(models.Model):
         return disruptions
 
 
-class LineStop(models.Model):
+class LineStop(ProvidersModel):
     """
     M2M between a line/direction and a stop
     """
@@ -79,8 +98,6 @@ class LineStop(models.Model):
     order = models.PositiveIntegerField()
     stop = models.ForeignKey('transport.Stop', related_name='line_stops')
     point = models.PointField()
-
-    itinisere_id = models.IntegerField() # Stop
 
     class Meta:
         ordering = ('line', 'direction', 'order')
@@ -145,12 +162,12 @@ class LineStop(models.Model):
             return list(filter(None, [_clean_itinisere_offset(t) for t in out['Data']['Hours']]))
 
         # Then search on metro mobilite
-        if self.stop.metro_cluster and self.line.metro_id:
+        if self.stop.metro_cluster_id and self.line.metro_id:
 
             # Reorder results per directions
             try:
                 api = MetroMobilite()
-                results = api.get_next_times(self.stop.metro_cluster, self.line.metro_id)
+                results = api.get_next_times(self.stop.metro_cluster_id, self.line.metro_id)
                 directions = dict([(r['pattern']['dir'],r['times']) for r in results])
                 times = directions.get(self.direction.itinisere_id) # yes, use itinisere id here. looks liek it matches
                 if times is None:
@@ -164,7 +181,7 @@ class LineStop(models.Model):
         # No times :/
         return []
 
-class Stop(models.Model):
+class Stop(ProvidersModel):
     """
     A Logical stop on some transport lines
     Linked to lines, by direction
@@ -174,10 +191,6 @@ class Stop(models.Model):
     city = models.ForeignKey('transport.City', related_name='stops')
     point = models.PointField(null=True, blank=True) # computed average point
 
-    # Api ids
-    itinisere_id = models.IntegerField(unique=True) # LogicalStop
-    metro_id = models.CharField(max_length=250, null=True, blank=True)
-    metro_cluster = models.CharField(max_length=250, null=True, blank=True)
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.city)
@@ -193,7 +206,6 @@ class Stop(models.Model):
         x, y = map(mean, zip(*points))
         self.point = Point(x, y)
         return self.point
-
 
 
 class City(models.Model):
