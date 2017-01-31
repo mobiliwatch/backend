@@ -1,4 +1,5 @@
-from api import Bano, Itinisere
+from providers import Bano
+from providers.isere import Itinisere
 
 def distance(slat, slng, elat, elng):
     """

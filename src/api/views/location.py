@@ -1,7 +1,7 @@
 from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework.exceptions import APIException
 from api.serializers import StopSerializer, LocationSerializer, DistanceSerializer, LocationLightSerializer
-from api import Itinisere
+from providers.isere import Itinisere
 from channels import Channel
 from transport.models import Stop
 from transport.trip import walk_trip

@@ -64,7 +64,7 @@ class Command(BaseCommand):
         Store Itinisere disruptions in cache
         """
         # Load disruptions
-        from api import Itinisere
+        from providers.isere import Itinisere
         iti = Itinisere()
         out = iti.get_disruptions()
 

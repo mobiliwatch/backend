@@ -1,5 +1,5 @@
 from django.contrib.gis.geos import LineString, MultiLineString
-from api import Itinisere
+from providers.isere import Itinisere
 import re
 
 

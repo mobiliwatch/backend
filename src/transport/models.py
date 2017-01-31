@@ -2,7 +2,8 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
-from api import Itinisere, MetroMobilite, Bano, Weather, AirQuality
+from providers.isere import Itinisere, MetroMobilite
+from providers import Bano, Weather, AirQuality
 from mobili.helpers import itinisere_timestamp
 from django.utils import timezone
 from django.core.cache import cache

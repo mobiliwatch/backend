@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.contrib.gis.geos import Point
 from transport.models import Line, Stop, City
-from api import MetroMobilite, Itinisere
+from providers.isere import MetroMobilite, Itinisere
 from transport.constants import TRANSPORT_BUS, TRANSPORT_TRAM, TRANSPORT_CAR, TRANSPORT_TRAIN, TRANSPORT_TAD, TRANSPORT_AVION
 from pprint import pprint
 
