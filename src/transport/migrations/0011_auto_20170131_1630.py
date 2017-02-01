@@ -32,12 +32,4 @@ class Migration(migrations.Migration):
             name='region',
             field=models.CharField(choices=[('isere', 'Isere')], default='isere', max_length=50),
         ),
-
-        migrations.SeparateDatabaseAndState(
-            state_operations=[
-                migrations.DeleteModel(
-                    name='City',
-                ),
-            ]
-        ),
     ]

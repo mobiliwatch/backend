@@ -37,10 +37,10 @@ class Migration(migrations.Migration):
             model_name='stop',
             name='metro_id',
         ),
-        migrations.RemoveField(
-            model_name='direction',
-            name='itinisere_id',
-        ),
+        #migrations.RemoveField(
+        #    model_name='direction',
+        #    name='itinisere_id',
+        #),
 
         # Update constraint
         migrations.AlterUniqueTogether(

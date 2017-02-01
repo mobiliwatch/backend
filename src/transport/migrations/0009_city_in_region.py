@@ -11,12 +11,10 @@ class Migration(migrations.Migration):
         ('transport', '0008_providers_part_2'),
     ]
 
-    database_operations = [
-        migrations.AlterModelTable('City', 'region_city'),
-    ]
-
     operations = [
         migrations.SeparateDatabaseAndState(
-            database_operations=database_operations,
+            database_operations=[
+                migrations.AlterModelTable('City', 'region_city'),
+            ]
         ),
     ]
