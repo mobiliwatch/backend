@@ -1,14 +1,14 @@
 from __future__ import absolute_import
 from django.contrib.gis.geos import Point
 from django.core.cache import cache
-import lxml.html
+from django.utils import timezone
 from region.base import Region
 from providers.isere import MetroMobilite, Itinisere
 from transport.constants import (
     TRANSPORT_BUS, TRANSPORT_TRAM, TRANSPORT_CAR,
     TRANSPORT_TRAIN, TRANSPORT_TAD, TRANSPORT_AVION
 )
-from django.utils import timezone
+import lxml.html
 import calendar
 import hashlib
 import re
@@ -289,23 +289,23 @@ class Isere(Region):
             }
 
         # First use itinisere next stops
-        out = self.itinisere.get_next_departures_and_arrivals(self.itinisere_id)
+        out = self.itinisere.get_next_departures_and_arrivals(line_stop.itinisere_id)
         if out.get('StatusCode') == 200 and 'Data' in out:
             return list(filter(None, [_clean_itinisere_regex(t) for t in out['Data']]))
 
         # Then search itinisere timetable
-        out = self.itinisere.get_stop_hours([self.itinisere_id, ], self.line.itinisere_id, self.direction.itinisere_id)
+        out = self.itinisere.get_stop_hours([line_stop.itinisere_id, ], line_stop.line.itinisere_id, line_stop.direction.itinisere_id)
         if out.get('StatusCode') == 200 and 'Data' in out:
             return list(filter(None, [_clean_itinisere_offset(t) for t in out['Data']['Hours']]))
 
         # Then search on metro mobilite
-        if self.stop.metro_cluster_id and self.line.metro_id:
+        if line_stop.stop.metro_cluster_id and line_stop.line.metro_id:
 
             # Reorder results per directions
             try:
-                results = self.mertro.get_next_times(self.stop.metro_cluster_id, self.line.metro_id)
+                results = self.metro.get_next_times(line_stop.stop.metro_cluster_id, line_stop.line.metro_id)
                 directions = dict([(r['pattern']['dir'],r['times']) for r in results])
-                times = directions.get(self.direction.itinisere_id) # yes, use itinisere id here. looks liek it matches
+                times = directions.get(line_stop.direction.itinisere_id) # yes, use itinisere id here. looks liek it matches
                 if times is None:
                     raise Exception('Missing metro mobilite times')
 
@@ -316,3 +316,16 @@ class Isere(Region):
 
         # No times :/
         return []
+
+    def find_stops(self, location, distance):
+        """
+        Find bus/tram/car stops near a location in isere
+        """
+        from transport.models import Stop
+
+        stops = self.itinisere.get_nearest_line_stops(location.point.x, location.point.y, distance)
+        if stops and stops.get('Data'):
+            ids = set(s['LogicalStopId'] for s in stops['Data'])
+            return Stop.objects.filter(providers__itinisere__in=ids)
+
+        return Stop.objects.none()

@@ -37,3 +37,9 @@ class Region(object):
         and direction using region providers
         """
         raise NotImplementedError
+
+    def find_stops(self, location, distance):
+        """
+        Find stops near a location, under a given distance
+        """
+        raise NotImplementedError

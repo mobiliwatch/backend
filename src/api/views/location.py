@@ -1,7 +1,6 @@
 from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework.exceptions import APIException
 from api.serializers import StopSerializer, LocationSerializer, DistanceSerializer, LocationLightSerializer
-from providers.isere import Itinisere
 from channels import Channel
 from transport.models import Stop
 from transport.trip import walk_trip
@@ -40,24 +39,20 @@ class LocationStops(LocationMixin, ListAPIView):
         except:
           raise Http404
 
-        # Find nearby stops
+        # Find nearby stops from region
         distance = int(self.request.GET.get('distance', 400))
-        iti = Itinisere()
+        region = self.location.get_region()
         try:
-            stops = iti.get_nearest_line_stops(self.location.point.x, self.location.point.y, distance)
+            new_stops = region.find_stops(self.location, distance)
+            new_stops = new_stops.distinct() # needed to merge
         except Exception as e:
             logger.error('Itinisere error on location {} : {}'.format(self.location.id, e))
             raise APIException('itinisere')
-        if stops and stops.get('Data'):
-            stop_ids = set(s['LogicalStopId'] for s in stops['Data'])
-        else:
-            stop_ids = set()
 
-        # Add already selected stops
-        stop_ids = stop_ids.union(list(self.location.line_stops.values_list('stop__itinisere_id', flat=True)))
+        # Fetch already selected stops
+        selected_stops = Stop.objects.filter(line_stops__location_stops__location=self.location).distinct()
 
-        # Load stops from database
-        return Stop.objects.filter(itinisere_id__in=stop_ids).distinct()
+        return new_stops | selected_stops
 
 
 class LocationDetails(LocationMixin, RetrieveAPIView, UpdateAPIView):
