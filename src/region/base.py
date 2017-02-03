@@ -30,3 +30,10 @@ class Region(object):
         Build an optional cache for a widget type
         """
         raise NotImplementedError
+
+    def next_times(self, line_stop):
+        """
+        Get stop hours for a line stop instance
+        and direction using region providers
+        """
+        raise NotImplementedError

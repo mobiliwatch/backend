@@ -6,6 +6,7 @@ import re
 def walk_trip(location, stop):
     """
     Calc a walk trip between a location & a (logical) stop
+    TODO: find a generic provider for this
     """
 
     # Search on itinisere

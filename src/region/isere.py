@@ -8,7 +8,13 @@ from transport.constants import (
     TRANSPORT_BUS, TRANSPORT_TRAM, TRANSPORT_CAR,
     TRANSPORT_TRAIN, TRANSPORT_TAD, TRANSPORT_AVION
 )
+from django.utils import timezone
+import calendar
+import hashlib
 import re
+import logging
+
+logger = logging.getLogger('region.isere')
 
 ITI_MODES = {
     0 : TRANSPORT_BUS,
@@ -236,3 +242,77 @@ class Isere(Region):
         for path, disruptions in to_cache.items():
             cache.set(path, disruptions, 2*3600)
             print('Cache {} : {}'.format(path, [d['id'] for d in disruptions]))
+
+    def next_times(self, line_stop):
+        """
+        Get stop hours for a line stop instance
+        and direction using both  providers
+        """
+        # Use current day timestamp as base
+        now = timezone.localtime(timezone.now())
+        now_stamp = calendar.timegm(now.timetuple())
+
+        # Calc utc offset
+        tz = timezone.get_current_timezone()
+        utc_offset = tz.utcoffset(timezone.datetime.utcnow()).seconds
+
+        def _clean_itinisere_offset(time):
+            # Build itinisere output
+            offset = time.get('RealDepartureTime') \
+                or time.get('PredictedDepartureTime') \
+                or time.get('TheoricDepartureTime')
+            if offset is None:
+                return
+            offset *= 60 # in seconds
+            limit = now_stamp % (24*3600)
+            if offset < limit:
+                return # already passed
+            return {
+                'time' : now_stamp - limit + offset - utc_offset,
+                'reference' : 'v:{}'.format(time['VehicleJourneyId']),
+            }
+
+        def _clean_itinisere_regex(time):
+            t = itinisere_timestamp(time['AimedTime'])
+            return {
+                'time' : t,
+                'reference' : time['VehicleJourneyRef'],
+            }
+
+        def _clean_metro(time):
+            # Build metro mobilite output
+            contents = '{stopId}:{serviceDay}:{realtimeArrival}'.format(**time)
+            h = hashlib.md5(contents.encode('utf-8')).hexdigest()
+            return {
+                'time' : time['serviceDay'] + time.get('realtimeArrival', time['scheduledArrival']),
+                'reference' : h[0:6],
+            }
+
+        # First use itinisere next stops
+        out = self.itinisere.get_next_departures_and_arrivals(self.itinisere_id)
+        if out.get('StatusCode') == 200 and 'Data' in out:
+            return list(filter(None, [_clean_itinisere_regex(t) for t in out['Data']]))
+
+        # Then search itinisere timetable
+        out = self.itinisere.get_stop_hours([self.itinisere_id, ], self.line.itinisere_id, self.direction.itinisere_id)
+        if out.get('StatusCode') == 200 and 'Data' in out:
+            return list(filter(None, [_clean_itinisere_offset(t) for t in out['Data']['Hours']]))
+
+        # Then search on metro mobilite
+        if self.stop.metro_cluster_id and self.line.metro_id:
+
+            # Reorder results per directions
+            try:
+                results = self.mertro.get_next_times(self.stop.metro_cluster_id, self.line.metro_id)
+                directions = dict([(r['pattern']['dir'],r['times']) for r in results])
+                times = directions.get(self.direction.itinisere_id) # yes, use itinisere id here. looks liek it matches
+                if times is None:
+                    raise Exception('Missing metro mobilite times')
+
+                # Convert in nice timestamps
+                return [_clean_metro(t) for t in times]
+            except Exception as e:
+                logger.error('Metro time lookup failed: {}'.format(e))
+
+        # No times :/
+        return []
