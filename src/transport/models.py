@@ -28,14 +28,15 @@ class ProvidersModel(models.Model):
 
     def __getattr__(self, key):
         if not key.endswith('_id'):
-            raise KeyError
+            # raise KeyError
+            return None
 
         return self.providers.get(key[:-3])
 
     def __setattr__(self, key, value):
         if key.endswith('_id'):
             key = key[:-3]
-            self.data[key] = value
+            self.providers[key] = value
         else:
             return super(ProvidersModel, self).__setattr__(key, value)
 
