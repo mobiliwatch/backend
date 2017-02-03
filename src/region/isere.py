@@ -1,11 +1,14 @@
 from __future__ import absolute_import
 from django.contrib.gis.geos import Point
+from django.core.cache import cache
+import lxml.html
 from region.base import Region
 from providers.isere import MetroMobilite, Itinisere
 from transport.constants import (
     TRANSPORT_BUS, TRANSPORT_TRAM, TRANSPORT_CAR,
     TRANSPORT_TRAIN, TRANSPORT_TAD, TRANSPORT_AVION
 )
+import re
 
 ITI_MODES = {
     0 : TRANSPORT_BUS,
@@ -15,6 +18,18 @@ ITI_MODES = {
     7 : TRANSPORT_TAD,
     16 : TRANSPORT_AVION,
 }
+
+
+def itinisere_timestamp(time):
+    """
+    Extract date as timestamp from weird
+    Itinisere format
+    """
+    regex = r'^/Date\((\d+)\+(\d+)\)/$'
+    res = re.match(regex, time)
+    if not res:
+        return
+    return int(res.group(1)) / 1000
 
 
 class Isere(Region):
@@ -171,3 +186,53 @@ class Isere(Region):
                     stop.metro_id = metro_stop['id']
                     stop.metro_cluster = metro_stop['cluster']
                     stop.save()
+
+    def build_cache(self, widget_type):
+        """
+        Build disruptions cache
+        """
+        if widget_type != 'disruptions':
+            return
+
+        # Load disruptions
+        out = self.itinisere.get_disruptions()
+
+        # Linearize disruptions per lines
+        to_cache = {}
+        for d in out['Data']:
+
+            # Cleanup description
+            # Removes ALL html attributes
+            html = lxml.html.fromstring(d['Description'])
+            for tag in html.xpath('//*[@*]'):
+                for a in tag.attrib:
+                    del tag.attrib[a]
+            desc = lxml.html.tostring(html).decode('utf-8')
+
+            # Cleanup data
+            disruption = {
+                'start' : itinisere_timestamp(d['BeginValidityDate']),
+                'end' : itinisere_timestamp(d['EndValidityDate']),
+                'name' : d['Name'],
+                'description' : desc,
+                'type' : d['DisruptionType'],
+                'id' : d['Id'],
+            }
+
+            for line in d['DisruptedLines']:
+
+                # Add level
+                disruption['level'] = line['ServiceLevel']
+
+                # Build cache path
+                line_id = line['LineId']
+                direction = line['Direction']
+                cache_path = 'disruption:{}:{}'.format(line_id, direction)
+                if cache_path not in to_cache:
+                    to_cache[cache_path] = []
+                to_cache[cache_path].append(disruption)
+
+        # Save in cache, for 2 hours
+        for path, disruptions in to_cache.items():
+            cache.set(path, disruptions, 2*3600)
+            print('Cache {} : {}'.format(path, [d['id'] for d in disruptions]))

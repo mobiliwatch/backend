@@ -17,3 +17,9 @@ def get(name):
     if name not in out:
         raise Exception('No region {}'.format(name))
     return out[name]
+
+def all():
+    """
+    Get all instances
+    """
+    return _instances

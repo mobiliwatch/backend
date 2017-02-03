@@ -24,3 +24,9 @@ class Region(object):
         and the line instance
         """
         raise NotImplementedError
+
+    def build_cache(self, widget_type):
+        """
+        Build an optional cache for a widget type
+        """
+        raise NotImplementedError

@@ -4,7 +4,7 @@ from django.contrib.postgres.fields import HStoreField
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
 from providers.isere import Itinisere, MetroMobilite
-from mobili.helpers import itinisere_timestamp
+from region.isere import itinisere_timestamp
 from django.utils import timezone
 from django.core.cache import cache
 import calendar
