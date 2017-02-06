@@ -3,6 +3,8 @@
 
 {% block fullcontent %}
 <div id="welcome">
+  <a class="ribbon" target="_blank" href="{% url 'help' 'mobiliplay' %}">Lauréat Concours MobiliPlay !</a>
+
   <section id="image" class="hero is-large">
     <h1>{{ _('Tired of waiting for the bus at Grenoble ?') }}</h1>
   </section>
@@ -119,7 +121,10 @@ le tableau de bord de vos déplacements : interruptions de services ou incidents
       <div class="columns has-text-centered is-multiline">
         
         <div class="column is-12">
-          <h2 class="title">Conçu à Grenoble pour le challenge Mobili'Play</h2>
+          <h2 class="title">Conçu à Grenoble pour le concours Mobili'Play</h2>
+          <h3 class="subtitle">
+            <span class="tag is-success">NEW!</span> Nous sommes <a href="{% url 'help' 'mobiliplay' %}">lauréats du concours</a> !
+          </h3>
         </div>
         <div class="column is-4 is-offset-2">
           <figure class="image is-square">
@@ -155,7 +160,7 @@ le tableau de bord de vos déplacements : interruptions de services ou incidents
                 <span class="fa fa-twitter"></span>
               </span>
             </a>
-            <a href="http://scienticulture.fr/" title="NextCairn" target="_blank">
+            <a href="http://scienticulture.fr/" title="ScientiCulture" target="_blank">
               <span class="icon is-medium">
                 <span class="fa fa-user"></span>
               </span>
@@ -169,7 +174,7 @@ le tableau de bord de vos déplacements : interruptions de services ou incidents
 
 <footer class="has-text-centered is-dark">
   <p>
-    Projet réalisé pour le challenge <a href="http://www.mobiliplay.fr/">Mobili'Play</a>
+    Projet réalisé pour le concours <a href="http://www.mobiliplay.fr/">Mobili'Play</a>
   </p>
   <p class="is-muted">&bull;</p>
   <p>

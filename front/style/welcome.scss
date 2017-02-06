@@ -1,5 +1,26 @@
 /* Home hero */
 #welcome {
+
+  // Promotional ribbon
+  .ribbon {
+    width: 300px;
+    background: #e43;
+    position: absolute;
+    text-align: center;
+    line-height: 50px;
+    letter-spacing: 1px;
+    color: #f0f0f0;
+    background: #e43;
+    top: auto;
+    right: -65px;
+    bottom: 60px;
+    left: auto;
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+    position: fixed;
+    box-shadow: 0 0 3px rgba(0,0,0,.3);
+  }
+
   section#image {
     background: url(../img/home_top.jpg) no-repeat top center grey;
     background-size: cover;
