@@ -132,7 +132,8 @@ class Isere(Region):
         Build all line stops in DB from its base data on provider
         and the line instance
         """
-        from transport.models import Stop, City
+        from transport.models import Stop
+        from region.models import City
 
         metro_stops = []
         if line.metro_id:
@@ -160,7 +161,7 @@ class Isere(Region):
 
         for direction in line.directions.all():
             # Get stops from api
-            stops = self.itinisere.get_line_stops(line.itinisere_id, direction.itinisere_id)
+            stops = self.itinisere.get_line_stops(int(line.itinisere_id), int(direction.itinisere_id))
 
             if stops['Data'] is None:
                 continue
@@ -175,7 +176,9 @@ class Isere(Region):
 
                 # Build LineStop from Stop
                 defaults = {
-                    'providers__itinisere' : s['Id'],
+                    'providers' : {
+                        'itinisere' : s['Id'],
+                    },
                     'point' : Point(s['Longitude'], s['Latitude']),
                 }
                 stop.line_stops.get_or_create(region=self.slug, line=line, direction=direction, order=order, defaults=defaults)

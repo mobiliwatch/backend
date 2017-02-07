@@ -235,3 +235,9 @@ except ImportError:
     pass
 
 assert 'postgis' in DATABASES['default']['ENGINE']
+
+# Add prod app
+if not DEBUG:
+    INSTALLED_APPS += [
+        'raven.contrib.django.raven_compat',
+    ]

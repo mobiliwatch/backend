@@ -22,18 +22,15 @@ class ProvidersModel(models.Model):
         abstract = True
 
     def __getattr__(self, key):
-        if not key.endswith('_id'):
-            # raise KeyError
-            return None
+        """
+        Cautiously try to get directly providers id
+        """
+        if not key.startswith('_') and key.endswith('_id'):
+            provider_key = key[:-3]
+            if provider_key in self.providers:
+                return self.providers[key[:-3]]
 
-        return self.providers.get(key[:-3])
-
-    def __setattr__(self, key, value):
-        if key.endswith('_id'):
-            key = key[:-3]
-            self.providers[key] = value
-        else:
-            return super(ProvidersModel, self).__setattr__(key, value)
+        raise AttributeError
 
     def get_region(self):
         # Load region instance
@@ -74,12 +71,13 @@ class Direction(ProvidersModel):
         )
 
     def __str__(self):
-        return '#{} {}'.format(self.itinisere_id, self.name)
+        return '{} > {}'.format(self.line, self.name)
 
     def get_disruptions(self, commercial=True):
         """
         Fetch disruptions from cache
         """
+        # TODO: MOVE!!!!
         disruptions = cache.get('disruption:{}:{}'.format(self.line.itinisere_id, self.itinisere_id))
         if disruptions is None:
             return []
@@ -124,7 +122,6 @@ class Stop(ProvidersModel):
     name = models.CharField(max_length=250)
     city = models.ForeignKey('region.City', related_name='stops')
     point = models.PointField(null=True, blank=True) # computed average point
-
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.city)
