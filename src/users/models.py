@@ -1,6 +1,6 @@
 from django.contrib.gis.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from transport.trip import walk_trip
+from providers import OSMRouter
 from region.models import RegionModel
 import logging
 
@@ -144,7 +144,8 @@ class LocationStop(models.Model):
         Update distance & walking time in here
         """
         try:
-            trip = walk_trip(self.location, self.line_stop.stop)
+            router = OSMRouter()
+            trip = router.walk_trip(self.location.point, self.line_stop.point)
         except Exception as e:
             logger.error('Failed to updated LocationStop #{} : {}'.format(self.id, e))
             return

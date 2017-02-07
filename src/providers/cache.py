@@ -14,13 +14,16 @@ class CachedApi(object):
 
         self.use_cache = use_cache
 
-    def request(self, path, params={}):
+    def request(self, path=None, params={}, url=None):
         """
         Cached requests
         """
+        assert (path is None) ^ (url is None), \
+            'You need to use either a path or url'
 
         # Build unique query hash
-        url = '{}/{}'.format(self.API_URL, path)
+        if url is None:
+            url = '{}/{}'.format(self.API_URL, path)
         payload = url + '\n' + json.dumps(params, indent=4, sort_keys=True)
         h = hashlib.md5(payload.encode('utf-8')).hexdigest()
         cache_key = 'api:{}'.format(h)
