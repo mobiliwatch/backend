@@ -80,7 +80,6 @@ class StopSerializer(serializers.ModelSerializer):
         model = Stop
         fields = (
             'id',
-            'itinisere_id',
             'name',
             'point',
             'line_stops',

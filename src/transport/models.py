@@ -4,18 +4,17 @@ from django.contrib.postgres.fields import HStoreField
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
 from django.core.cache import cache
-import region
+from region.models import RegionModel
 import logging
 
 logger = logging.getLogger('transport.models')
 
 
-class ProvidersModel(models.Model):
+class ProvidersModel(RegionModel):
     """
     A model with several providers ids
     And a link to a region
     """
-    region = models.CharField(max_length=50, choices=region.ALL, default=region.DEFAULT)
     providers = HStoreField(default='')
 
     class Meta:
@@ -31,11 +30,6 @@ class ProvidersModel(models.Model):
                 return self.providers[key[:-3]]
 
         raise AttributeError
-
-    def get_region(self):
-        # Load region instance
-        return region.get(self.region)
-
 
 class Line(ProvidersModel):
     """

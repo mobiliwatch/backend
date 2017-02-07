@@ -1,8 +1,9 @@
-from django.views.generic import CreateView, DetailView, DeleteView
-from django.http import HttpResponseRedirect
+from django.views.generic import CreateView, DetailView, DeleteView, ListView
+from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.contrib.auth import login
+import region
 from users.forms import UserCreationForm, LocationCreationForm
 from users.models import User
 
@@ -23,16 +24,43 @@ class Signup(CreateView):
 
         return out
 
-class LocationCreate(LoginRequiredMixin, CreateView):
+class LocationCreate(LoginRequiredMixin, ListView):
     """
-    Create a new Location
+    List regions available to create a location
+    """
+    template_name = 'location/regions.html'
+    context_object_name = 'regions'
+
+    def get_queryset(self):
+        # Load all regions
+        return region.all()
+
+
+class LocationRegionCreate(LoginRequiredMixin, CreateView):
+    """
+    Create a new Location in a region
     """
     form_class = LocationCreationForm
     template_name = 'location/create.html'
 
+    def get_region(self):
+        """
+        Load specified region
+        """
+        try:
+            return region.get(self.kwargs['region'])
+        except:
+            raise Http404
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+        ctx['region'] = self.get_region()
+        return ctx
+
     def form_valid(self, form):
-        # Assign user
+        # Assign user & region
         location = form.save(commit=False)
+        location.region = self.get_region().slug
         location.user = self.request.user
         location.save()
 

@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from django.contrib.auth import views as auth
-from users.views import Signup, LocationCreate, LocationTransports, LocationDelete
+from users.views import Signup, LocationCreate, LocationRegionCreate, LocationTransports, LocationDelete
 
 location_patterns = [
     url('^$', LocationTransports.as_view(), name='location-transports'),
@@ -16,5 +16,6 @@ urlpatterns = (
 
     # User locations
     url('^location/new/$', LocationCreate.as_view(), name='location-create'),
+    url('^location/(?P<region>\w+)/new/$', LocationRegionCreate.as_view(), name='location-region-create'),
     url('^location/(?P<pk>\d+)/', include(location_patterns)),
 )

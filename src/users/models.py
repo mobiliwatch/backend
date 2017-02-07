@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from transport.trip import walk_trip
+from region.models import RegionModel
 import logging
 
 
@@ -92,9 +93,10 @@ class User(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
 
-class Location(models.Model):
+class Location(RegionModel):
     """
     A location for a user
+    Attached to a region
     """
     user = models.ForeignKey(User, related_name='locations')
     name = models.CharField(max_length=250)

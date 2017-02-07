@@ -2,8 +2,23 @@ from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
 from providers import Bano, Weather, AirQuality
 import logging
+import region
 
 logger = logging.getLogger('transport.models')
+
+
+class RegionModel(models.Model):
+    """
+    A model attached to a region
+    """
+    region = models.CharField(max_length=50, choices=region.ALL, default=region.DEFAULT)
+
+    class Meta:
+        abstract = True
+
+    def get_region(self):
+        # Load region instance
+        return region.get(self.region)
 
 
 class City(models.Model):
