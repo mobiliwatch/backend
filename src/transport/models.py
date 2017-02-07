@@ -3,8 +3,8 @@ from django.contrib.gis.geos import Point
 from django.contrib.postgres.fields import HStoreField
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
-from django.core.cache import cache
 from region.models import RegionModel
+from region.constants import DISRUPTION_COMMERCIAL
 import logging
 
 logger = logging.getLogger('transport.models')
@@ -69,16 +69,14 @@ class Direction(ProvidersModel):
 
     def get_disruptions(self, commercial=True):
         """
-        Fetch disruptions from cache
+        Fetch disruptions from region
         """
-        # TODO: MOVE!!!!
-        disruptions = cache.get('disruption:{}:{}'.format(self.line.itinisere_id, self.itinisere_id))
-        if disruptions is None:
-            return []
+        region = self.get_region()
+        disruptions = region.list_disruptions(self)
 
         # Remove commercial disruptions
         if not commercial:
-            disruptions = [d for d in disruptions if d['type']['Id'] != 1]
+            disruptions = [d for d in disruptions if d['type'] != DISRUPTION_COMMERCIAL]
 
         return disruptions
 

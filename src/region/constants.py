@@ -1,0 +1,17 @@
+# Disruptions types
+DISRUPTION_COMMERCIAL = 'commercial'
+DISRUPTION_BASE = 'perturbation'
+DISRUPTION_REALTIME = 'real_time'
+DISRUPTION_ROAD = 'route'
+DISRUPTION_WEATHER = 'weather'
+DISRUPTION_START = 'start'
+DISRUPTION_END = 'end'
+DISRUPTION_ROUTING = 'routing'
+DISRUPTION_WORKS = 'words'
+DISRUPTION_INCIDENT = 'incident'
+DISRUPTION_SOCIAL = 'social'
+DISRUPTION_MANIF = 'manifestation'
+DISRUPTION_EVENT = 'event'
+DISRUPTION_HOURS = 'hours'
+DISRUPTION_TRAFFIC = 'traffic'
+

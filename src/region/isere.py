@@ -8,6 +8,12 @@ from transport.constants import (
     TRANSPORT_BUS, TRANSPORT_TRAM, TRANSPORT_CAR,
     TRANSPORT_TRAIN, TRANSPORT_TAD, TRANSPORT_AVION
 )
+from region.constants import (
+    DISRUPTION_COMMERCIAL, DISRUPTION_BASE, DISRUPTION_REALTIME, DISRUPTION_ROAD,
+    DISRUPTION_WEATHER, DISRUPTION_START, DISRUPTION_END, DISRUPTION_ROUTING,
+    DISRUPTION_WORKS, DISRUPTION_INCIDENT, DISRUPTION_SOCIAL, DISRUPTION_MANIF,
+    DISRUPTION_EVENT, DISRUPTION_HOURS, DISRUPTION_TRAFFIC
+)
 import lxml.html
 import calendar
 import hashlib
@@ -23,6 +29,34 @@ ITI_MODES = {
     4 : TRANSPORT_TRAIN,
     7 : TRANSPORT_TAD,
     16 : TRANSPORT_AVION,
+}
+ITI_DISRUPTIONS = {
+    1: DISRUPTION_COMMERCIAL, # Commercial
+    2: DISRUPTION_BASE, # Perturbation
+    3: DISRUPTION_REALTIME, # Temps réel
+    4: DISRUPTION_ROAD, # Perturbation routière
+    5: DISRUPTION_WEATHER, # Perturbation météo
+    6: DISRUPTION_START, # Perturbation Début
+    7: DISRUPTION_END, # Perturbation Fin
+    8: DISRUPTION_ROUTING, # Modifications d'itinéraires",
+    9: DISRUPTION_WORKS, # Travaux
+    10: DISRUPTION_INCIDENT, # Accident
+    11: DISRUPTION_SOCIAL, # Mouvement social
+    12: DISRUPTION_MANIF, # Manifestation
+    13: DISRUPTION_EVENT, # Evènement
+    14: DISRUPTION_HOURS, # Horaires
+    200: DISRUPTION_BASE, # Autre
+    201: DISRUPTION_TRAFFIC, # Circulation difficile
+    202: DISRUPTION_TRAFFIC, # Circulation difficile (événement sportif)
+    203: DISRUPTION_TRAFFIC, # Circulation difficile (manifestation)
+    204: DISRUPTION_TRAFFIC, # Circulation difficile (travaux)
+    205: DISRUPTION_INCIDENT, # Incident d'exploitation
+    206: DISRUPTION_WEATHER, # Inondations
+    207: DISRUPTION_WEATHER, # Intempéries
+    208: DISRUPTION_SOCIAL, # Mouvement social
+    209: DISRUPTION_WEATHER, # Neige
+    210: DISRUPTION_ROAD, # Route coupée
+    211: DISRUPTION_ROAD, # Route déviée
 }
 
 
@@ -224,8 +258,8 @@ class Isere(Region):
                 'end' : itinisere_timestamp(d['EndValidityDate']),
                 'name' : d['Name'],
                 'description' : desc,
-                'type' : d['DisruptionType'],
-                'id' : d['Id'],
+                'type' : ITI_DISRUPTIONS.get(d['DisruptionType']['Id'], DISRUPTION_BASE),
+                'id' : 'itinisere:{}'.format(d['Id']),
             }
 
             for line in d['DisruptedLines']:
@@ -332,3 +366,14 @@ class Isere(Region):
             return Stop.objects.filter(providers__itinisere__in=ids)
 
         return Stop.objects.none()
+
+    def list_disruptions(self, direction):
+        """
+        Load disruptions about a specified direction
+        From cache
+        """
+        disruptions = cache.get('disruption:{}:{}'.format(direction.line.itinisere_id, direction.itinisere_id))
+        if disruptions is None:
+            return []
+
+        return disruptions

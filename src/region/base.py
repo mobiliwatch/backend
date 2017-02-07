@@ -43,3 +43,9 @@ class Region(object):
         Find stops near a location, under a given distance
         """
         raise NotImplementedError
+
+    def list_disruptions(self, direction):
+        """
+        Load disruptions about a specified direction
+        """
+        raise NotImplementedError
