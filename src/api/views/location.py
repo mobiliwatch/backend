@@ -3,7 +3,7 @@ from rest_framework.exceptions import APIException
 from api.serializers import StopSerializer, LocationSerializer, DistanceSerializer, LocationLightSerializer
 from channels import Channel
 from transport.models import Stop
-from providers import OSMRouter
+from providers import Router
 from django.http import Http404
 import logging
 
@@ -99,7 +99,7 @@ class LocationDistance(LocationMixin, RetrieveAPIView):
 
         # Calc trip
         try:
-            router = OSMRouter()
+            router = Router()
             return router.walk_trip(location.point, stop.point)
         except Exception as e:
             raise APIException('Trip calc failure: {}'.format(e))

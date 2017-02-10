@@ -12,7 +12,7 @@ class OSMRouter(CachedApi):
 
     def walk_trip(self, start, end):
         """
-        Cacl walk trip between 2 points
+        Calc walk trip between 2 points
         """
 
         # From 2 points to a string of gps coordinates
@@ -37,3 +37,43 @@ class OSMRouter(CachedApi):
 
         # Outputs geometry, distance, duration
         return route
+
+class YoursRouter(CachedApi):
+    """
+    Solve routing between 2 points using another OSM service impl.
+    https://wiki.openstreetmap.org/wiki/YOURS
+    """
+
+    API_URL = 'http://www.yournavigation.org/api/1.0/gosmore.php'
+
+    def walk_trip(self, start, end):
+        """
+        Calc walk trip between 2 points
+        """
+        params = {
+            # Settings
+            'format': 'geojson',
+            'v': 'pedestrian',
+            'fast': 0,  # 0=shortest, 1=fastest
+            'layer': 'mapnik',
+
+            # From
+            'flon': start.x,
+            'flat': start.y,
+
+            # To
+            'tlon': end.x,
+            'tlat': end.y,
+        }
+        resp = self.request('', params)
+        if 'coordinates' not in resp:
+            raise Exception('No route found')
+
+        from pprint import pprint
+        pprint(resp)
+
+        return {
+            'distance': float(resp['properties']['distance']) * 1000,
+            'duration': int(resp['properties']['traveltime']),
+            'geometry': LineString(*resp['coordinates']),
+        }
