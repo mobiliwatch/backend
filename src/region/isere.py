@@ -326,12 +326,16 @@ class Isere(Region):
             }
 
         # First use itinisere next stops
-        out = self.itinisere.get_next_departures_and_arrivals(line_stop.itinisere_id)
+        out = self.itinisere.get_next_departures_and_arrivals(int(line_stop.itinisere_id))
         if out.get('StatusCode') == 200 and 'Data' in out:
             return list(filter(None, [_clean_itinisere_regex(t) for t in out['Data']]))
 
         # Then search itinisere timetable
-        out = self.itinisere.get_stop_hours([line_stop.itinisere_id, ], line_stop.line.itinisere_id, line_stop.direction.itinisere_id)
+        out = self.itinisere.get_stop_hours(
+            [line_stop.itinisere_id, ],
+            int(line_stop.line.itinisere_id),
+            int(line_stop.direction.itinisere_id)
+        )
         if out.get('StatusCode') == 200 and 'Data' in out:
             return list(filter(None, [_clean_itinisere_offset(t) for t in out['Data']['Hours']]))
 
