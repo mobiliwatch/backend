@@ -69,9 +69,6 @@ class YoursRouter(CachedApi):
         if 'coordinates' not in resp:
             raise Exception('No route found')
 
-        from pprint import pprint
-        pprint(resp)
-
         return {
             'distance': float(resp['properties']['distance']) * 1000,
             'duration': int(resp['properties']['traveltime']),

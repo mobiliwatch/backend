@@ -2,16 +2,11 @@ from django.core.cache import cache
 import requests
 import hashlib
 import json
-import os
 
 class CachedApi(object):
     timeout = 4
 
     def __init__(self, use_cache=True):
-        self.cache_dir = './cache' # TODO
-        if not os.path.isdir(self.cache_dir):
-            os.makedirs(self.cache_dir)
-
         self.use_cache = use_cache
 
     def request(self, path=None, params={}, url=None):
