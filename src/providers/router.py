@@ -71,6 +71,6 @@ class YoursRouter(CachedApi):
 
         return {
             'distance': float(resp['properties']['distance']) * 1000,
-            'duration': int(resp['properties']['traveltime']),
+            'duration': int(resp['properties']['traveltime']) * 10,
             'geometry': LineString(*resp['coordinates']),
         }

@@ -2,7 +2,7 @@ from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework.exceptions import APIException
 from api.serializers import StopSerializer, LocationSerializer, DistanceSerializer, LocationLightSerializer
 from channels import Channel
-from transport.models import Stop
+from transport.models import Stop, LineStop
 from providers import Router
 from django.http import Http404
 import logging
@@ -97,9 +97,19 @@ class LocationDistance(LocationMixin, RetrieveAPIView):
         except Stop.DoesNotExist:
             raise Http404
 
+        # Load line stop
+        line_stop = None
+        line_stop_id = self.request.GET.get('line_stop')
+        if line_stop_id:
+            try:
+                line_stop = stop.line_stops.get(pk=line_stop_id)
+            except LineStop.DoesNotExist:
+                logger.warning('Failed to load line stop in distance: {}'.format(line_stop_id))
+
         # Calc trip
         try:
+            dest = line_stop and line_stop.point or stop.point
             router = Router()
-            return router.walk_trip(location.point, stop.point)
+            return router.walk_trip(location.point, dest)
         except Exception as e:
             raise APIException('Trip calc failure: {}'.format(e))

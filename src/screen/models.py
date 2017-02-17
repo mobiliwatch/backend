@@ -125,12 +125,10 @@ class Screen(models.Model):
                     'position': group_src.position,
                     'vertical': group_src.vertical,
                 }
-                print('clone', group_src, data)
                 group = self.groups.create(**data)
 
                 # Clone all widgets
                 for w_src in group_src.list_widgets():
-                    print('clone', w_src)
                     w = _clone_widget(w_src)
                     w.position = w_src.position
                     w.group = group
