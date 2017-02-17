@@ -427,3 +427,18 @@ class DisruptionWidget(Widget):
         return {
             'disruptions' : list(disruptions),
         }
+
+class TwitterWidget(Widget):
+    """
+    Display a twitter feed on a widget
+    """
+    text = models.TextField()
+
+    def build_update(self):
+        """
+        Send text to screens
+        """
+        return {
+            'text' : self.text,
+        }
+

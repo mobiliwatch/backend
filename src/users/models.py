@@ -58,6 +58,10 @@ class User(AbstractBaseUser):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    # Twitter authentication
+    twitter_token = models.CharField(max_length=250, null=True, blank=True)
+    twitter_secret = models.CharField(max_length=250, null=True, blank=True)
+
     objects = UserManager()
 
     USERNAME_FIELD = 'email'

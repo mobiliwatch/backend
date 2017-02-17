@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from django.contrib.auth import views as auth
-from users.views import Signup, LocationCreate, LocationRegionCreate, LocationTransports, LocationDelete
+from users.views import Signup, LocationCreate, LocationRegionCreate, LocationTransports, LocationDelete, TwitterAuth
 
 location_patterns = [
     url('^$', LocationTransports.as_view(), name='location-transports'),
@@ -13,6 +13,9 @@ urlpatterns = (
     url('^signup/$', Signup.as_view(), name='signup'),
     url('^login/$', auth.login, name='login'),
     url('^logout/$', auth.logout, name='logout'),
+
+    # Oauth
+    url('^twitter/$', TwitterAuth.as_view(), name='oauth-twitter'),
 
     # User locations
     url('^location/new/$', LocationCreate.as_view(), name='location-create'),
