@@ -6,6 +6,8 @@ from rest_framework import serializers
 from rest_framework.exceptions import APIException
 from rest_framework_gis.serializers import GeometrySerializerMethodField
 from mobili.helpers import haversine_distance
+from django.contrib.auth import authenticate
+from django.utils.translation import ugettext as _
 import math
 
 import logging
@@ -357,3 +359,39 @@ class ScreenCreationSerializer(serializers.Serializer):
     template = serializers.PrimaryKeyRelatedField(queryset=Screen.objects.filter(is_template=True))
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
     name = serializers.CharField()
+
+
+class LoginSerializer(serializers.Serializer):
+    """
+    Used to auth a client
+    """
+    user = None
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        print(attrs)
+        credentials = {
+            'email': attrs.get('email'),
+            'password': attrs.get('password')
+        }
+
+        if all(credentials.values()):
+            # Check user credentials
+            user = authenticate(**credentials)
+            if user:
+                if not user.is_active:
+                    msg = _('User account is disabled.')
+                    raise serializers.ValidationError(msg)
+
+                # Attach user instance
+                self.user = user
+
+                return {
+                    'email': user.email,
+                }
+            else:
+                msg = _('Unable to log in with provided credentials.')
+                raise serializers.ValidationError(msg)
+        else:
+            raise serializers.ValidationError(_('Must include "email" and "password".'))
