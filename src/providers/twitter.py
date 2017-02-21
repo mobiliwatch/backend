@@ -1,6 +1,7 @@
 import requests
 import base64
 import oauth2 as oauth
+from twitter.api import Api as TwitterAPI
 import cgi
 from django.conf import settings
 
@@ -10,12 +11,29 @@ AUTHENTICATE_URL = 'https://api.twitter.com/oauth/authenticate'
 
 class Twitter(object):
     API_URL = 'https://api.twitter.com'
+    api = None
 
-    def __init__(self):
+    def __init__(self, user=None):
         self.consumer = oauth.Consumer(
             settings.TWITTER_API_KEY,
             settings.TWITTER_API_SECRET
         )
+        if user is not None:
+            self.with_user(user)
+
+    def with_user(self, user):
+        """
+        Use stored credentials for a specific user
+        """
+        assert hasattr(user, 'twitter_token')
+        assert hasattr(user, 'twitter_secret')
+        self.api = TwitterAPI(
+            consumer_key=settings.TWITTER_API_KEY,
+            consumer_secret=settings.TWITTER_API_SECRET,
+            access_token_key=user.twitter_token,
+            access_token_secret=user.twitter_secret
+        )
+
 
     def build_oauth_url(self):
         """
@@ -79,23 +97,31 @@ class Twitter(object):
 
         return auth['access_token']
 
-    def search_tweets(self, terms, since_id=None):
+    def timeline(self):
         """
-        Search in tweets, using terms & last tweet id (optional)
+        Load tweets from an authenticated user
+        timeline (what he follows)
         """
-        url = self.API_URL + '/1.1/search/tweets.json'
-        headers = {
-            'Authorization' : 'Bearer {}'.format(self.token),
-        }
-        params = {
-            'q' : terms,
-        }
-        if since_id is None:
-            params['count'] = 10
-        else:
-            params['since_id'] = since_id
-        resp = requests.get(url, headers=headers, params=params)
-        if not resp.ok:
-            raise Exception('Invalid search response {} : {}'.format(resp.status_code, resp.content))
+        assert self.api is not None, \
+            'Use with an authenticated user'
 
-        return resp.json()
+        return self.api.GetHomeTimeline()
+
+    def user_tweets(self):
+        """
+        Load tweets created by user
+        """
+        assert self.api is not None, \
+            'Use with an authenticated user'
+
+        return self.api.GetUserTimeline()
+
+    def search(self, search_terms):
+        """
+        Find tweets about some search terms
+        """
+        assert self.api is not None, \
+            'Use with an authenticated user'
+
+        return self.api.GetSearch(search_terms)
+
