@@ -1,4 +1,4 @@
-from django.views.generic import CreateView, DetailView, DeleteView, ListView, TemplateView
+from django.views.generic import CreateView, DetailView, DeleteView, ListView, View
 from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
@@ -91,15 +91,12 @@ class LocationDelete(LocationMixin, DeleteView):
     def get_success_url(self):
         return reverse('home')
 
-class TwitterAuth(LoginRequiredMixin, TemplateView):
+class TwitterAuth(LoginRequiredMixin, View):
     """
     Authenticate user with Twitter Oauth flow
     """
-    template_name = 'oauth/twitter.html'
 
-    def get_context_data(self, *args, **kwargs):
-        ctx = super(TwitterAuth, self).get_context_data(*args, **kwargs)
-
+    def get(self, *args, **kwargs):
         tw = Twitter()
         session_key = 'twitter.oauth'
         if 'oauth_token' in self.request.GET and 'oauth_verifier' in self.request.GET:
@@ -117,11 +114,14 @@ class TwitterAuth(LoginRequiredMixin, TemplateView):
             self.request.user.twitter_token = conf[b'oauth_token'].decode('utf-8')
             self.request.user.twitter_secret = conf[b'oauth_token_secret'].decode('utf-8')
             self.request.user.save()
+
+            # Go to home
+            redirect_url = reverse('home')
         else:
             # Calc new auth url
-            ctx['redirect_url'], secret = tw.build_oauth_url()
+            redirect_url, secret = tw.build_oauth_url()
 
             # Store in session secret twitter token
             self.request.session[session_key] = secret
 
-        return ctx
+        return HttpResponseRedirect(redirect_url)

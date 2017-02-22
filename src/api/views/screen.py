@@ -1,7 +1,8 @@
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.generics import RetrieveAPIView, UpdateAPIView, ListAPIView, CreateAPIView, DestroyAPIView
 from rest_framework.exceptions import APIException
 from api.serializers import ScreenLightSerializer, ScreenSerializer, get_widget_serializer, GroupSerializer, WidgetCreationSerializer, ScreenCreationSerializer
-from screen.models import Screen, Group, LocationWidget, WeatherWidget, NoteWidget, ClockWidget, DisruptionWidget
+from screen.models import Screen, Group, LocationWidget, WeatherWidget, NoteWidget, ClockWidget, DisruptionWidget, TwitterWidget
 from django.http import Http404
 from rest_framework.response import Response
 
@@ -151,6 +152,12 @@ class WidgetCreate(ScreenMixin, CreateAPIView):
         last_location = self.request.user.locations.last()
         if widget_type == 'note':
             w = NoteWidget()
+        elif widget_type == 'twitter':
+            # Check current user has twitter auth
+            if not self.request.user.has_twitter_auth():
+                raise APIException(_('No twitter credentials: you need to connect your Twitter account.'))
+            w = TwitterWidget()
+
         elif widget_type == 'weather':
             if not last_location:
                 raise APIException('Missing location')

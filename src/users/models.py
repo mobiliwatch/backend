@@ -97,6 +97,13 @@ class User(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
 
+    def has_twitter_auth(self):
+        """
+        Helper to check if user has twitter credentials
+        """
+        return self.twitter_token is not None \
+            and self.twitter_secret is not None
+
 class Location(RegionModel):
     """
     A location for a user

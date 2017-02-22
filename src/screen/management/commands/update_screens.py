@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from screen.models import Screen, NoteWidget, LocationWidget, WeatherWidget, DisruptionWidget
+from screen.models import Screen, NoteWidget, LocationWidget, WeatherWidget, DisruptionWidget, TwitterWidget
 import region
 
 class Command(BaseCommand):
@@ -34,6 +34,13 @@ class Command(BaseCommand):
             default=False,
             help='Update disruptions data',
         )
+        parser.add_argument(
+            '--twitter',
+            action='store_true',
+            dest='twitter',
+            default=False,
+            help='Update twitter streams',
+        )
 
     def handle(self, *args, **options):
 
@@ -42,6 +49,7 @@ class Command(BaseCommand):
             'note': NoteWidget,
             'location': LocationWidget,
             'disruptions': DisruptionWidget,
+            'twitter': TwitterWidget,
         }
 
         # Build widgets needed cache
@@ -63,4 +71,7 @@ class Command(BaseCommand):
                     continue
                 instances = cls.objects.filter(group__screen=screen)
                 for w in instances:
-                    w.send_ws_update()
+                    try:
+                        w.send_ws_update()
+                    except Exception as e:
+                        print('Update failure on {}: {}'.format(w, e))

@@ -34,6 +34,14 @@
         {{ _('Hello') }} {{ user.first_name }}
       </span>
       <span class="nav-item">
+        {% if not user.has_twitter_auth %}
+        <a class="button is-info is-outlined" href="{% url 'oauth-twitter' %}">
+          <span class="icon is-small">
+            <i class="fa fa-twitter"></i>
+          </span>
+          <span>{{ _('Twitter connection') }}</span>
+        </a>
+        {% endif %}
         <a class="button is-info is-outlined" href="{% url 'help-home' %}">
           <span class="icon is-small">
             <i class="fa fa-question-circle"></i>

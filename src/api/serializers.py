@@ -1,7 +1,7 @@
 from transport.models import Stop, LineStop, Line, Direction
 from region.models import City
 from users.models import Location
-from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget, DisruptionWidget, Group
+from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget, DisruptionWidget, Group, TwitterWidget
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 from rest_framework_gis.serializers import GeometrySerializerMethodField
@@ -185,6 +185,24 @@ class ClockWidgetSerializer(WidgetSerializer):
 
         return widget
 
+class TwitterWidgetSerializer(WidgetSerializer):
+    mode = serializers.CharField()
+    search_terms = serializers.CharField()
+
+    def update(self, widget, data):
+
+        widget.mode = data['mode']
+        if widget.mode == 'search':
+            widget.search_terms = data['search_terms']
+        else:
+            widget.search_terms = None
+        widget.save()
+
+        # Send update through ws
+        widget.send_ws_update()
+
+        return widget
+
 class NoteWidgetSerializer(WidgetSerializer):
     text = serializers.CharField()
 
@@ -280,6 +298,7 @@ def get_widget_serializer(widget):
         NoteWidget : NoteWidgetSerializer,
         LocationWidget : LocationWidgetSerializer,
         DisruptionWidget : DisruptionWidgetSerializer,
+        TwitterWidget : TwitterWidgetSerializer,
     }
     return serializers.get(widget.__class__, WidgetSerializer)
 
