@@ -4,10 +4,28 @@ import hashlib
 import json
 
 class CachedApi(object):
-    timeout = 4
+    timeout = 3*3600
 
     def __init__(self, use_cache=True):
         self.use_cache = use_cache
+
+    def build_key(self, key_parts):
+        h = hashlib.md5(key_parts.encode('utf-8')).hexdigest()
+        return 'api:{}'.format(h)
+
+    def get(self, key_parts):
+        """
+        Retrieve from cache
+        """
+        cache_key = self.build_key(key_parts)
+        return cache.get(cache_key)
+
+    def store(self, key_parts, data):
+        """
+        Store in cache
+        """
+        cache_key = self.build_key(key_parts)
+        cache.set(cache_key, data, self.timeout)
 
     def request(self, path=None, params={}, url=None):
         """
@@ -20,12 +38,10 @@ class CachedApi(object):
         if url is None:
             url = '{}/{}'.format(self.API_URL, path)
         payload = url + '\n' + json.dumps(params, indent=4, sort_keys=True)
-        h = hashlib.md5(payload.encode('utf-8')).hexdigest()
-        cache_key = 'api:{}'.format(h)
 
         # Use cache
         if self.use_cache:
-            cached_data = cache.get(cache_key)
+            cached_data = self.get(payload)
             if cached_data:
                 return cached_data
 
@@ -37,6 +53,6 @@ class CachedApi(object):
 
         # Save in cache
         data = resp.json()
-        cache.set(cache_key, data, 12*3600)
+        self.store(payload, data)
 
         return data

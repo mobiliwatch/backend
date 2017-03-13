@@ -2,6 +2,7 @@ import requests
 import base64
 import oauth2 as oauth
 from twitter.api import Api as TwitterAPI
+from providers.cache import CachedApi
 import cgi
 from django.conf import settings
 
@@ -9,9 +10,11 @@ REQUEST_TOKEN_URL = 'https://api.twitter.com/oauth/request_token'
 ACCESS_TOKEN_URL = 'https://api.twitter.com/oauth/access_token'
 AUTHENTICATE_URL = 'https://api.twitter.com/oauth/authenticate'
 
-class Twitter(object):
+class Twitter(CachedApi):
     API_URL = 'https://api.twitter.com'
     api = None
+    user_id = None
+    timeout = 5 * 60 # cache timeout
 
     def __init__(self, user=None):
         self.consumer = oauth.Consumer(
@@ -33,6 +36,7 @@ class Twitter(object):
             access_token_key=user.twitter_token,
             access_token_secret=user.twitter_secret
         )
+        self.user_id = user.id # for cache keys
 
 
     def build_oauth_url(self):
@@ -105,7 +109,17 @@ class Twitter(object):
         assert self.api is not None, \
             'Use with an authenticated user'
 
-        return self.api.GetHomeTimeline()
+        # Manage cache
+        key = 'twitter:timeline:{}'.format(self.user_id)
+        cached = self.get(key)
+        if cached:
+            return cached
+
+        # Exec and cache
+        data = self.api.GetHomeTimeline()
+        self.store(key, data)
+
+        return data
 
     def user_tweets(self):
         """
@@ -114,7 +128,17 @@ class Twitter(object):
         assert self.api is not None, \
             'Use with an authenticated user'
 
-        return self.api.GetUserTimeline()
+        # Manage cache
+        key = 'twitter:user:{}'.format(self.user_id)
+        cached = self.get(key)
+        if cached:
+            return cached
+
+        # Exec and cache
+        data = self.api.GetUserTimeline()
+        self.store(key, data)
+
+        return data
 
     def search(self, search_terms):
         """
@@ -123,5 +147,14 @@ class Twitter(object):
         assert self.api is not None, \
             'Use with an authenticated user'
 
-        return self.api.GetSearch(search_terms)
+        # Manage cache
+        key = 'twitter:search:{}:{}'.format(search_terms, self.user_id)
+        cached = self.get(key)
+        if cached:
+            return cached
 
+        # Exec and cache
+        data = self.api.GetSearch(search_terms)
+        self.store(key, data)
+
+        return data

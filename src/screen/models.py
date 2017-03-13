@@ -9,6 +9,7 @@ from channels import Group as WsGroup
 import uuid
 import time
 import json
+import arrow
 from io import BytesIO
 from datetime import datetime
 from django.utils.timezone import utc
@@ -461,15 +462,18 @@ class TwitterWidget(Widget):
             raise Exception('Invalid twitter mode')
 
         def _serialize(tweet):
-            if tweet.media:
+            # TODO: display photos... maybe ?
+            if False and tweet.media:
                 photos = [m.media_url_https for m in tweet.media if m.type == 'photo']
             else:
                 photos = []
+            date_format = 'ddd MMM DD HH:mm:ss Z YYYY'
             return {
                 'id': tweet.id,
                 'user': tweet.user.screen_name,
+                'fullname': tweet.user.name,
                 'avatar': tweet.user.profile_image_url,
-                'created': tweet.created_at,
+                'created': arrow.get(tweet.created_at, date_format).timestamp,
                 'text': tweet.text,
                 'photos': photos,
             }
