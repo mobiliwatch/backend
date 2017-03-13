@@ -1,10 +1,13 @@
-from transport.models import Stop, LineStop, Line, Direction, City
+from transport.models import Stop, LineStop, Line, Direction
+from region.models import City
 from users.models import Location
-from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget, DisruptionWidget, Group
+from screen.models import Screen, ClockWidget, WeatherWidget, LocationWidget, NoteWidget, DisruptionWidget, Group, TwitterWidget
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 from rest_framework_gis.serializers import GeometrySerializerMethodField
 from mobili.helpers import haversine_distance
+from django.contrib.auth import authenticate
+from django.utils.translation import ugettext as _
 import math
 
 import logging
@@ -79,7 +82,6 @@ class StopSerializer(serializers.ModelSerializer):
         model = Stop
         fields = (
             'id',
-            'itinisere_id',
             'name',
             'point',
             'line_stops',
@@ -183,6 +185,24 @@ class ClockWidgetSerializer(WidgetSerializer):
 
         return widget
 
+class TwitterWidgetSerializer(WidgetSerializer):
+    mode = serializers.CharField()
+    search_terms = serializers.CharField()
+
+    def update(self, widget, data):
+
+        widget.mode = data['mode']
+        if widget.mode == 'search':
+            widget.search_terms = data['search_terms']
+        else:
+            widget.search_terms = None
+        widget.save()
+
+        # Send update through ws
+        widget.send_ws_update()
+
+        return widget
+
 class NoteWidgetSerializer(WidgetSerializer):
     text = serializers.CharField()
 
@@ -278,6 +298,7 @@ def get_widget_serializer(widget):
         NoteWidget : NoteWidgetSerializer,
         LocationWidget : LocationWidgetSerializer,
         DisruptionWidget : DisruptionWidgetSerializer,
+        TwitterWidget : TwitterWidgetSerializer,
     }
     return serializers.get(widget.__class__, WidgetSerializer)
 
@@ -357,3 +378,38 @@ class ScreenCreationSerializer(serializers.Serializer):
     template = serializers.PrimaryKeyRelatedField(queryset=Screen.objects.filter(is_template=True))
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
     name = serializers.CharField()
+
+
+class LoginSerializer(serializers.Serializer):
+    """
+    Used to auth a client
+    """
+    user = None
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        credentials = {
+            'email': attrs.get('email'),
+            'password': attrs.get('password')
+        }
+
+        if all(credentials.values()):
+            # Check user credentials
+            user = authenticate(**credentials)
+            if user:
+                if not user.is_active:
+                    msg = _('User account is disabled.')
+                    raise serializers.ValidationError(msg)
+
+                # Attach user instance
+                self.user = user
+
+                return {
+                    'email': user.email,
+                }
+            else:
+                msg = _('Unable to log in with provided credentials.')
+                raise serializers.ValidationError(msg)
+        else:
+            raise serializers.ValidationError(_('Must include "email" and "password".'))

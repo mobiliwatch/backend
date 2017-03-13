@@ -1,8 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
-from screen.models import Screen, NoteWidget, LocationWidget, WeatherWidget, DisruptionWidget
-from mobili.helpers import itinisere_timestamp
-from django.core.cache import cache
-import lxml.html
+from screen.models import Screen, NoteWidget, LocationWidget, WeatherWidget, DisruptionWidget, TwitterWidget
+import region
 
 class Command(BaseCommand):
     help = 'Update all screens data though WebSockets'
@@ -36,113 +34,44 @@ class Command(BaseCommand):
             default=False,
             help='Update disruptions data',
         )
+        parser.add_argument(
+            '--twitter',
+            action='store_true',
+            dest='twitter',
+            default=False,
+            help='Update twitter streams',
+        )
 
     def handle(self, *args, **options):
 
-        # Cache disruptions
-        if options['disruptions']:
-            self.cache_disruptions()
+        classes = {
+            'weather': WeatherWidget,
+            'note': NoteWidget,
+            'location': LocationWidget,
+            'disruptions': DisruptionWidget,
+            'twitter': TwitterWidget,
+        }
+
+        # Build widgets needed cache
+        for r in region.all():
+            for name in classes:
+                if not options[name]:
+                    continue
+                r.build_cache(name)
 
         # Check we have some screens
         screens = Screen.objects.filter(active=True)
         if not screens.exists():
             raise CommandError('No active screens')
 
-        # Update screen asked data
+        # Update screen widgets
         for screen in screens:
-            if options['weather']:
-                self.update_weather(screen)
-            if options['note']:
-                self.update_note(screen)
-            if options['location']:
-                self.update_location(screen)
-            if options['disruptions']:
-                self.update_disruptions(screen)
-
-    def cache_disruptions(self):
-        """
-        Store Itinisere disruptions in cache
-        """
-        # Load disruptions
-        from api import Itinisere
-        iti = Itinisere()
-        out = iti.get_disruptions()
-
-        # Linearize disruptions per lines
-        to_cache = {}
-        for d in out['Data']:
-
-            # Cleanup description
-            # Removes ALL html attributes
-            html = lxml.html.fromstring(d['Description'])
-            for tag in html.xpath('//*[@*]'):
-                for a in tag.attrib:
-                    del tag.attrib[a]
-            desc = lxml.html.tostring(html).decode('utf-8')
-
-            # Cleanup data
-            disruption = {
-                'start' : itinisere_timestamp(d['BeginValidityDate']),
-                'end' : itinisere_timestamp(d['EndValidityDate']),
-                'name' : d['Name'],
-                'description' : desc,
-                'type' : d['DisruptionType'],
-                'id' : d['Id'],
-            }
-
-            for line in d['DisruptedLines']:
-
-                # Add level
-                disruption['level'] = line['ServiceLevel']
-
-                # Build cache path
-                line_id = line['LineId']
-                direction = line['Direction']
-                cache_path = 'disruption:{}:{}'.format(line_id, direction)
-                if cache_path not in to_cache:
-                    to_cache[cache_path] = []
-                to_cache[cache_path].append(disruption)
-
-        # Save in cache, for 2 hours
-        for path, disruptions in to_cache.items():
-            cache.set(path, disruptions, 2*3600)
-            print('Cache {} : {}'.format(path, [d['id'] for d in disruptions]))
-
-
-    def update_weather(self, screen):
-        """
-        Update weather data for a screen
-        """
-        print('Update weather for screen {}'.format(screen))
-        widgets = WeatherWidget.objects.filter(group__screen=screen)
-        for w in widgets:
-            w.send_ws_update()
-
-    def update_note(self, screen):
-        """
-        Update note data for a screen
-        """
-        print('Update note for screen {}'.format(screen))
-
-        widgets = NoteWidget.objects.filter(group__screen=screen)
-        for w in widgets:
-            w.send_ws_update()
-
-    def update_location(self, screen):
-        """
-        Update location data for a screen
-        """
-        print('Update locations for screen {}'.format(screen))
-        widgets = LocationWidget.objects.filter(group__screen=screen)
-        for w in widgets:
-            print('Location: {}'.format(w.location))
-            w.send_ws_update()
-
-    def update_disruptions(self, screen):
-        """
-        Update disruptions data for a screen
-        """
-        print('Update disruptions for screen {}'.format(screen))
-        widgets = DisruptionWidget.objects.filter(group__screen=screen)
-        for w in widgets:
-            w.send_ws_update()
+            for name, cls in classes.items():
+                if not options[name]:
+                    continue
+                instances = cls.objects.filter(group__screen=screen)
+                for w in instances:
+                    try:
+                        w.send_ws_update()
+                    except Exception as e:
+                        print('Update failure on {}: {}'.format(w, e))

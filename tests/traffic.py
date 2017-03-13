@@ -1,4 +1,4 @@
-from api import Itinisere
+from providers.isere import Itinisere
 import geojson
 from geojson import MultiLineString, Feature, FeatureCollection
 import re

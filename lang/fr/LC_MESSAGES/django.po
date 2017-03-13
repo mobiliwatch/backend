@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-01-02 21:44+0100\n"
-"PO-Revision-Date: 2017-01-02 21:45+0100\n"
+"POT-Creation-Date: 2017-02-22 15:57+0100\n"
+"PO-Revision-Date: 2017-02-22 16:00+0100\n"
 "Last-Translator: Bastien Abadie <bastien@nextcairn.com>\n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -16,13 +16,31 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.8.7.1\n"
 
-#: mobili/settings.py:157
+#: api/serializers.py:384
+msgid "User account is disabled."
+msgstr "Compte utilisateur inactif."
+
+#: api/serializers.py:394
+msgid "Unable to log in with provided credentials."
+msgstr "Impossible de se connecter avec les informations fournises."
+
+#: api/serializers.py:397
+msgid "Must include \"email\" and \"password\"."
+msgstr "Veuillez préciser \"email\" et \"password\""
+
+#: api/views/screen.py:158
+msgid "No twitter credentials: you need to connect your Twitter account."
+msgstr ""
+"Pas de connection vers votre compte Twitter disponible: vous devez "
+"connecter votre compte Twitter avant d'utiliser ce widget."
+
+#: mobili/settings.py:159
 msgid "French"
 msgstr "Français"
 
-#: mobili/settings.py:158
+#: mobili/settings.py:160
 msgid "English"
 msgstr "Anglais"
 
@@ -38,13 +56,25 @@ msgstr "Lieu"
 msgid "Screen template"
 msgstr "Disposition d'affichage"
 
-#: screen/models.py:17
+#: screen/models.py:18
 msgid "Light"
 msgstr "Clair"
 
-#: screen/models.py:18
+#: screen/models.py:19
 msgid "Dark"
 msgstr "Sombre"
+
+#: screen/models.py:435
+msgid "Timeline"
+msgstr "Flux Twitter"
+
+#: screen/models.py:436
+msgid "User Tweets"
+msgstr "Mes tweets"
+
+#: screen/models.py:437
+msgid "Search"
+msgstr "Recherche"
 
 #: screen/templates/screen/create.html:9
 msgid "Add a screen "
@@ -74,7 +104,7 @@ msgstr "Supprimer"
 msgid "Mobili.Watch"
 msgstr "Mobili.Watch"
 
-#: templates/base.html:19 templates/welcome.html:23
+#: templates/base.html:19 templates/welcome.html:25
 msgid "Baseline..."
 msgstr "Embarquez sans attendre"
 
@@ -90,13 +120,13 @@ msgstr "Aide"
 msgid "Logout"
 msgstr "Déconnection"
 
-#: templates/base.html:63 templates/welcome.html:29
+#: templates/base.html:63 templates/welcome.html:31
 #: users/templates/registration/signup.html:7
 #: users/templates/registration/signup.html:20
 msgid "Signup"
 msgstr "Créer un compte"
 
-#: templates/base.html:69 templates/welcome.html:35
+#: templates/base.html:69 templates/welcome.html:37
 #: users/templates/registration/login.html:7
 #: users/templates/registration/login.html:17
 msgid "Login"
@@ -175,15 +205,15 @@ msgstr ""
 "Vous pouvez créer de nouveaux écrans pour afficher des notes, la météo, vos "
 "arrêts de bus/tram favoris..."
 
-#: templates/welcome.html:7
+#: templates/welcome.html:9
 msgid "Tired of waiting for the bus at Grenoble ?"
 msgstr "Marre d'attendre le bus à Grenoble ?"
 
-#: templates/welcome.html:20
+#: templates/welcome.html:22
 msgid "Welcome on Mobili.Watch !"
 msgstr "Bienvenue sur Mobili.Watch !"
 
-#: templates/welcome.html:42
+#: templates/welcome.html:44
 msgid "Try our demo"
 msgstr "Essayez notre démo"
 
@@ -221,8 +251,6 @@ msgid "Add a location"
 msgstr "Ajouter un lieu"
 
 #: users/templates/location/create.html:16
-#| msgid ""
-#| "You can create new locations to select your favorite bus & tramway stops."
 msgid ""
 "You must create at least one location to select bus & tramway stops (your "
 "home, workplace, school, ...)"

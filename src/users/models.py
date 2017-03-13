@@ -1,6 +1,7 @@
 from django.contrib.gis.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from transport.trip import walk_trip
+from providers import Router
+from region.models import RegionModel
 import logging
 
 
@@ -57,6 +58,10 @@ class User(AbstractBaseUser):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
+    # Twitter authentication
+    twitter_token = models.CharField(max_length=250, null=True, blank=True)
+    twitter_secret = models.CharField(max_length=250, null=True, blank=True)
+
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
@@ -92,14 +97,22 @@ class User(AbstractBaseUser):
         # Simplest possible answer: All admins are staff
         return self.is_admin
 
-class Location(models.Model):
+    def has_twitter_auth(self):
+        """
+        Helper to check if user has twitter credentials
+        """
+        return self.twitter_token is not None \
+            and self.twitter_secret is not None
+
+class Location(RegionModel):
     """
     A location for a user
+    Attached to a region
     """
     user = models.ForeignKey(User, related_name='locations')
     name = models.CharField(max_length=250)
     address = models.TextField()
-    city = models.ForeignKey('transport.City', related_name='locations')
+    city = models.ForeignKey('region.City', related_name='locations')
     point = models.PointField()
 
     line_stops = models.ManyToManyField('transport.LineStop', through='users.LocationStop', related_name='locations')
@@ -142,7 +155,8 @@ class LocationStop(models.Model):
         Update distance & walking time in here
         """
         try:
-            trip = walk_trip(self.location, self.line_stop.stop)
+            router = Router()
+            trip = router.walk_trip(self.location.point, self.line_stop.point)
         except Exception as e:
             logger.error('Failed to updated LocationStop #{} : {}'.format(self.id, e))
             return

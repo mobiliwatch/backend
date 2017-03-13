@@ -4,10 +4,12 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.text import slugify
 from rest_framework.renderers import JSONRenderer
 from PIL import Image, ImageDraw
+from providers import Twitter
 from channels import Group as WsGroup
 import uuid
 import time
 import json
+import arrow
 from io import BytesIO
 from datetime import datetime
 from django.utils.timezone import utc
@@ -125,12 +127,10 @@ class Screen(models.Model):
                     'position': group_src.position,
                     'vertical': group_src.vertical,
                 }
-                print('clone', group_src, data)
                 group = self.groups.create(**data)
 
                 # Clone all widgets
                 for w_src in group_src.list_widgets():
-                    print('clone', w_src)
                     w = _clone_widget(w_src)
                     w.position = w_src.position
                     w.group = group
@@ -246,6 +246,7 @@ class Group(models.Model):
             + list(self.clockwidget.all()) \
             + list(self.weatherwidget.all()) \
             + list(self.notewidget.all()) \
+            + list(self.twitterwidget.all()) \
             + list(self.disruptionwidget.all())
         return sorted(all_widgets, key=lambda w: w.position)
 
@@ -363,7 +364,7 @@ class WeatherWidget(Widget):
     """
     Display current weather on a screen
     """
-    city = models.ForeignKey('transport.City', related_name='weather_widgets')
+    city = models.ForeignKey('region.City', related_name='weather_widgets')
 
     def build_update(self):
         """
@@ -428,4 +429,57 @@ class DisruptionWidget(Widget):
 
         return {
             'disruptions' : list(disruptions),
+        }
+
+
+TWITTER_MODES = (
+    ('timeline', _('Timeline')),
+    ('user_tweets', _('User Tweets')),
+    ('search', _('Search')),
+)
+
+class TwitterWidget(Widget):
+    """
+    Display a twitter feed on a widget
+    """
+    mode = models.CharField(max_length=50, choices=TWITTER_MODES, default='timeline')
+    search_terms = models.CharField(max_length=250, null=True, blank=True)
+
+    def build_update(self):
+        """
+        Send tweets according to mode
+        """
+        tw = Twitter(self.group.screen.user)
+        if self.mode == 'timeline':
+            tweets = tw.timeline()
+        elif self.mode == 'user_tweets':
+            tweets = tw.user_tweets()
+        elif self.mode == 'search':
+            if not self.search_terms:
+                raise Exception('Missing twitter search terms')
+            tweets = tw.search(self.search_terms)
+        else:
+            raise Exception('Invalid twitter mode')
+
+        def _serialize(tweet):
+            # TODO: display photos... maybe ?
+            if False and tweet.media:
+                photos = [m.media_url_https for m in tweet.media if m.type == 'photo']
+            else:
+                photos = []
+            date_format = 'ddd MMM DD HH:mm:ss Z YYYY'
+            return {
+                'id': tweet.id,
+                'user': tweet.user.screen_name,
+                'fullname': tweet.user.name,
+                'avatar': tweet.user.profile_image_url,
+                'created': arrow.get(tweet.created_at, date_format).timestamp,
+                'text': tweet.text,
+                'photos': photos,
+            }
+
+        return {
+            'mode': self.mode,
+            'search_terms': self.search_terms,
+            'tweets': [_serialize(t) for t in tweets],
         }

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% load bulma_forms %}
+
+{% block content %}
+
+{% for region in regions %}
+<div class="">
+  <a href="{% url 'location-region-create' region.slug %}">
+    {{ region.slug }}
+  </a>
+</div>
+{% endfor %}
+
+{% endblock %}

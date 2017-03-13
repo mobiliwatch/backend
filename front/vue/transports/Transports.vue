@@ -124,10 +124,10 @@ module.exports = {
   },
 
   methods : {
-    selected_stop : function(stop){
+    selected_stop : function(stop, line_stop){
       // Save selected stop
       this.$set(this, 'current_stop', stop);
-      if(stop.trip){
+      if(stop.trip && !line_stop){
         // avoid repeated requests
         this.$nextTick(function(){
           this.$set(this, 'path', stop.trip.geometry);
@@ -142,9 +142,15 @@ module.exports = {
 
       // Load trip for this stop
       var url = '/api/location/' + this.location_id + '/distance/' + stop.id + '/';
+      if(line_stop)
+        url += '?line_stop=' + line_stop.id;
       this.$http.get(url).then(function(resp){
         // Save currently display path
         this.$set(this, 'path', resp.body.geometry);
+
+        // No cache when using line stop
+        if(line_stop)
+          return;
 
         // Update trip on stop
         stop.trip = resp.body;

@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
+    'django.contrib.postgres',
     'widget_tweaks',
     'webpack_loader',
     'rest_framework',
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
 
     # Our apps
     'mobili',
+    'region',
     'transport',
     'users',
     'screen',
@@ -186,6 +188,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+    )
 }
 
 # Webpack
@@ -210,6 +215,7 @@ CHANNEL_LAYERS = {
 # Cors
 CORS_ORIGIN_WHITELIST = (
     'localhost:8080',
+    '127.0.0.1:8080',
 )
 CORS_ALLOW_CREDENTIALS = True
 
@@ -231,3 +237,11 @@ try:
     from .local_settings import *
 except ImportError:
     pass
+
+assert 'postgis' in DATABASES['default']['ENGINE']
+
+# Add prod app
+if not DEBUG:
+    INSTALLED_APPS += [
+        'raven.contrib.django.raven_compat',
+    ]

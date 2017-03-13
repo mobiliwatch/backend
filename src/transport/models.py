@@ -1,19 +1,37 @@
 from django.contrib.gis.db import models
 from django.contrib.gis.geos import Point
+from django.contrib.postgres.fields import HStoreField
 from transport.constants import TRANSPORT_MODES
 from statistics import mean
-from api import Itinisere, MetroMobilite, Bano, Weather, AirQuality
-from mobili.helpers import itinisere_timestamp
-from django.utils import timezone
-from django.core.cache import cache
-import calendar
-import hashlib
+from region.models import RegionModel
+from region.constants import DISRUPTION_COMMERCIAL
 import logging
 
 logger = logging.getLogger('transport.models')
 
 
-class Line(models.Model):
+class ProvidersModel(RegionModel):
+    """
+    A model with several providers ids
+    And a link to a region
+    """
+    providers = HStoreField(default='')
+
+    class Meta:
+        abstract = True
+
+    def __getattr__(self, key):
+        """
+        Cautiously try to get directly providers id
+        """
+        if not key.startswith('_') and key.endswith('_id'):
+            provider_key = key[:-3]
+            if provider_key in self.providers:
+                return self.providers[key[:-3]]
+
+        raise AttributeError
+
+class Line(ProvidersModel):
     """
     A transport line
     """
@@ -21,10 +39,6 @@ class Line(models.Model):
     operator = models.CharField(max_length=250, null=True, blank=True)
     name = models.CharField(max_length=250)
     full_name = models.TextField()
-
-    # Api ids
-    itinisere_id = models.IntegerField(unique=True)
-    metro_id = models.CharField(max_length=250, null=True, blank=True)
 
     # Colors as hex values
     color_back = models.CharField(max_length=6, null=True, blank=True)
@@ -38,38 +52,36 @@ class Line(models.Model):
     def __str__(self):
         return '{} {}'.format(self.mode, self.name)
 
-class Direction(models.Model):
+class Direction(ProvidersModel):
     """
     A direction for a transport line
     """
     line = models.ForeignKey(Line, related_name='directions')
-    itinisere_id = models.IntegerField() # 1|2
     name = models.CharField(max_length=250)
 
     class Meta:
         unique_together = (
-            ('line', 'itinisere_id'),
+            ('line', 'providers'),
         )
 
     def __str__(self):
-        return '#{} {}'.format(self.itinisere_id, self.name)
+        return '{} > {}'.format(self.line, self.name)
 
     def get_disruptions(self, commercial=True):
         """
-        Fetch disruptions from cache
+        Fetch disruptions from region
         """
-        disruptions = cache.get('disruption:{}:{}'.format(self.line.itinisere_id, self.itinisere_id))
-        if disruptions is None:
-            return []
+        region = self.get_region()
+        disruptions = region.list_disruptions(self)
 
         # Remove commercial disruptions
         if not commercial:
-            disruptions = [d for d in disruptions if d['type']['Id'] != 1]
+            disruptions = [d for d in disruptions if d['type'] != DISRUPTION_COMMERCIAL]
 
         return disruptions
 
 
-class LineStop(models.Model):
+class LineStop(ProvidersModel):
     """
     M2M between a line/direction and a stop
     """
@@ -78,8 +90,6 @@ class LineStop(models.Model):
     order = models.PositiveIntegerField()
     stop = models.ForeignKey('transport.Stop', related_name='line_stops')
     point = models.PointField()
-
-    itinisere_id = models.IntegerField() # Stop
 
     class Meta:
         ordering = ('line', 'direction', 'order')
@@ -90,93 +100,20 @@ class LineStop(models.Model):
     def get_next_times(self):
         """
         Get stop hours for this stop
-        and direction
+        and direction using its region
         """
-        # Use current day timestamp as base
-        now = timezone.localtime(timezone.now())
-        now_stamp = calendar.timegm(now.timetuple())
+        region = self.get_region()
+        return region.next_times(self)
 
-        # Calc utc offset
-        tz = timezone.get_current_timezone()
-        utc_offset = tz.utcoffset(timezone.datetime.utcnow()).seconds
-
-        def _clean_itinisere_offset(time):
-            # Build itinisere output
-            offset = time.get('RealDepartureTime') \
-                or time.get('PredictedDepartureTime') \
-                or time.get('TheoricDepartureTime')
-            if offset is None:
-                return
-            offset *= 60 # in seconds
-            limit = now_stamp % (24*3600)
-            if offset < limit:
-                return # already passed
-            return {
-                'time' : now_stamp - limit + offset - utc_offset,
-                'reference' : 'v:{}'.format(time['VehicleJourneyId']),
-            }
-
-        def _clean_itinisere_regex(time):
-            t = itinisere_timestamp(time['AimedTime'])
-            return {
-                'time' : t,
-                'reference' : time['VehicleJourneyRef'],
-            }
-
-        def _clean_metro(time):
-            # Build metro mobilite output
-            contents = '{stopId}:{serviceDay}:{realtimeArrival}'.format(**time)
-            h = hashlib.md5(contents.encode('utf-8')).hexdigest()
-            return {
-                'time' : time['serviceDay'] + time.get('realtimeArrival', time['scheduledArrival']),
-                'reference' : h[0:6],
-            }
-
-        # First use itinisere next stops
-        iti = Itinisere()
-        out = iti.get_next_departures_and_arrivals(self.itinisere_id)
-        if out.get('StatusCode') == 200 and 'Data' in out:
-            return list(filter(None, [_clean_itinisere_regex(t) for t in out['Data']]))
-
-        # Then search itinisere timetable
-        out = iti.get_stop_hours([self.itinisere_id, ], self.line.itinisere_id, self.direction.itinisere_id)
-        if out.get('StatusCode') == 200 and 'Data' in out:
-            return list(filter(None, [_clean_itinisere_offset(t) for t in out['Data']['Hours']]))
-
-        # Then search on metro mobilite
-        if self.stop.metro_cluster and self.line.metro_id:
-
-            # Reorder results per directions
-            try:
-                api = MetroMobilite()
-                results = api.get_next_times(self.stop.metro_cluster, self.line.metro_id)
-                directions = dict([(r['pattern']['dir'],r['times']) for r in results])
-                times = directions.get(self.direction.itinisere_id) # yes, use itinisere id here. looks liek it matches
-                if times is None:
-                    raise Exception('Missing metro mobilite times')
-
-                # Convert in nice timestamps
-                return [_clean_metro(t) for t in times]
-            except Exception as e:
-                logger.error('Metro time lookup failed: {}'.format(e))
-
-        # No times :/
-        return []
-
-class Stop(models.Model):
+class Stop(ProvidersModel):
     """
     A Logical stop on some transport lines
     Linked to lines, by direction
     """
     lines = models.ManyToManyField(Line, through=LineStop, related_name='stops')
     name = models.CharField(max_length=250)
-    city = models.ForeignKey('transport.City', related_name='stops')
+    city = models.ForeignKey('region.City', related_name='stops')
     point = models.PointField(null=True, blank=True) # computed average point
-
-    # Api ids
-    itinisere_id = models.IntegerField(unique=True) # LogicalStop
-    metro_id = models.CharField(max_length=250, null=True, blank=True)
-    metro_cluster = models.CharField(max_length=250, null=True, blank=True)
 
     def __str__(self):
         return '{} ({})'.format(self.name, self.city)
@@ -192,50 +129,3 @@ class Stop(models.Model):
         x, y = map(mean, zip(*points))
         self.point = Point(x, y)
         return self.point
-
-
-
-class City(models.Model):
-    """
-    A city, used by transport & location
-    """
-    insee_code = models.CharField(max_length=8, unique=True)
-    name = models.CharField(max_length=250)
-    position = models.PointField(null=True, blank=True)
-
-    class Meta:
-        ordering = ('name', )
-
-    def __str__(self):
-        return self.name
-
-    def find_position(self):
-        api = Bano()
-        resp = api.get_city(self.name, self.insee_code)
-        if not resp or not resp.get('features'):
-            raise Exception('No result found')
-
-        best = resp['features'][0]['geometry']['coordinates']
-        self.position = Point(*best)
-        return self.position
-
-    def get_weather(self):
-        """
-        Get current weather
-        """
-        if not self.position:
-            self.find_position()
-            self.save()
-
-        w = Weather()
-        return w.now(self.position)
-
-    def get_air_quality(self):
-        """
-        Get current & past air quality
-        """
-        aq = AirQuality()
-        data = aq.get_city(self.insee_code)
-        if 'series' not in data:
-            return None
-        return data['series'][0]['data']

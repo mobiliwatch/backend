@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.gis.geos import Point
-from api import Bano
+from providers import Bano
 from users.models import User, Location
 from django.utils.translation import ugettext_lazy as _
 

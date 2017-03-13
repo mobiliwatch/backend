@@ -1,10 +1,9 @@
 from rest_framework.generics import ListAPIView, UpdateAPIView, RetrieveAPIView
 from rest_framework.exceptions import APIException
 from api.serializers import StopSerializer, LocationSerializer, DistanceSerializer, LocationLightSerializer
-from api import Itinisere
 from channels import Channel
-from transport.models import Stop
-from transport.trip import walk_trip
+from transport.models import Stop, LineStop
+from providers import Router
 from django.http import Http404
 import logging
 
@@ -40,24 +39,20 @@ class LocationStops(LocationMixin, ListAPIView):
         except:
           raise Http404
 
-        # Find nearby stops
+        # Find nearby stops from region
         distance = int(self.request.GET.get('distance', 400))
-        iti = Itinisere()
+        region = self.location.get_region()
         try:
-            stops = iti.get_nearest_line_stops(self.location.point.x, self.location.point.y, distance)
+            new_stops = region.find_stops(self.location, distance)
+            new_stops = new_stops.distinct() # needed to merge
         except Exception as e:
             logger.error('Itinisere error on location {} : {}'.format(self.location.id, e))
             raise APIException('itinisere')
-        if stops and stops.get('Data'):
-            stop_ids = set(s['LogicalStopId'] for s in stops['Data'])
-        else:
-            stop_ids = set()
 
-        # Add already selected stops
-        stop_ids = stop_ids.union(list(self.location.line_stops.values_list('stop__itinisere_id', flat=True)))
+        # Fetch already selected stops
+        selected_stops = Stop.objects.filter(line_stops__location_stops__location=self.location).distinct()
 
-        # Load stops from database
-        return Stop.objects.filter(itinisere_id__in=stop_ids).distinct()
+        return new_stops | selected_stops
 
 
 class LocationDetails(LocationMixin, RetrieveAPIView, UpdateAPIView):
@@ -102,8 +97,19 @@ class LocationDistance(LocationMixin, RetrieveAPIView):
         except Stop.DoesNotExist:
             raise Http404
 
+        # Load line stop
+        line_stop = None
+        line_stop_id = self.request.GET.get('line_stop')
+        if line_stop_id:
+            try:
+                line_stop = stop.line_stops.get(pk=line_stop_id)
+            except LineStop.DoesNotExist:
+                logger.warning('Failed to load line stop in distance: {}'.format(line_stop_id))
+
         # Calc trip
         try:
-            return walk_trip(location, stop)
+            dest = line_stop and line_stop.point or stop.point
+            router = Router()
+            return router.walk_trip(location.point, dest)
         except Exception as e:
             raise APIException('Trip calc failure: {}'.format(e))

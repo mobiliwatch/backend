@@ -145,6 +145,9 @@ module.exports = {
       stop.line_stops.forEach(function(ls, i){
         var coords = ls.point.coordinates;
         var circle = L.circle([coords[1], coords[0]], 4);
+        circle.on('click', function(){
+          that.$emit('selected_stop', stop, ls);
+        });
         that.stop_circles.addLayer(circle);
       });
     },

@@ -22,6 +22,7 @@
         <Clock v-if="widget.type == 'ClockWidget'" :widgetId="widget.id" />
         <LocationWidget v-if="widget.type == 'LocationWidget'" :widgetId="widget.id" />
         <Disruption v-if="widget.type == 'DisruptionWidget'" :widgetId="widget.id" />
+        <Twitter v-if="widget.type == 'TwitterWidget'" :widgetId="widget.id" />
       </div>
       <div class="modal" :class="{'is-active': modal}">
         <div class="modal-background"></div>
@@ -31,6 +32,10 @@
             <button class="delete" v-on:click="close()"></button>
           </header>
           <section class="modal-card-body">
+            <div class="notification is-danger" v-if="error">
+              <h4 class="title is-4">Erreur</h4> 
+              {{ error }}
+            </div>
             <div v-for="(meta, type) in types" v-if="type != widget.type" class="columns is-multiline widget-description">
               <div class="column is-8">
                 <h5 class="title is-5">{{ meta.title }}</h5>
@@ -63,6 +68,7 @@ var Note = require('./widgets/Note.vue');
 var Weather = require('./widgets/Weather.vue');
 var Clock = require('./widgets/Clock.vue');
 var LocationWidget = require('./widgets/Location.vue');
+var Twitter = require('./widgets/Twitter.vue');
 var Disruption = require('./widgets/Disruption.vue');
 
 module.exports = {
@@ -71,6 +77,7 @@ module.exports = {
     Note : Note,
     Weather : Weather,
     Clock : Clock,
+    Twitter : Twitter,
     LocationWidget : LocationWidget, // reserved word location
     Disruption : Disruption,
   },
@@ -85,12 +92,17 @@ module.exports = {
       // Replace current widget with a new type
       var that = this;
       this.$set(this, 'replacing', true);
+      this.$set(this, 'error', null);
       this.$store.dispatch('replace_widget', {
         id : this.widgetId,
         type : type,
         group : this.groupId,
       }).then(function(){
         that.close();
+        that.$set(that, 'replacing', false);
+      }).catch(function(err){
+        console.warn('Error received while replacing widget', err.data);
+        that.$set(that, 'error', err.data.detail || err);
         that.$set(that, 'replacing', false);
       });
     },
@@ -99,6 +111,7 @@ module.exports = {
     return {
       modal : false,
       replacing : false,
+      error : null,
       types : {
         'LocationWidget' : {
           title : 'Prochains passages',
@@ -119,6 +132,10 @@ module.exports = {
         'NoteWidget' : {
           title : 'Notes',
           description : 'Avec ce widget vous pouvez laisser un message sur l\'écran: une liste de courses, un memo, un gentil mot...',
+        },
+        'TwitterWidget' : {
+          title : 'Twitter',
+          description : 'Affichez en direct votre propre flux twitter ou les tweets d\'une recherche avec un #hashtag',
         },
       },
     };

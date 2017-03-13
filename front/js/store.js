@@ -202,21 +202,26 @@ module.exports = new Vuex.Store({
     add_widget : function(context, payload){
       var group_id = payload.group;
       var url = '/api/screen/' + context.state.screen.slug + '/widgets/';
-      return Vue.http.post(url, payload).then(function(resp){
-          // Commit change on local store
-          context.commit('add_widget', resp.body);
+      return new Promise(function(resolve, reject){
+        Vue.http.post(url, payload).then(function(resp){
+            // Commit change on local store
+            context.commit('add_widget', resp.body);
 
-          // Update group to use this widget
-          var widgets = context.state.groups[group_id].widgets;
-          if(payload.position){
-            widgets.splice(payload.position, 0, resp.body.id);
-          }else{
-            widgets.push(resp.body.id);
-          }
-          context.commit('update_group', {
-            id : payload.group,
-            widgets : widgets,
-          });
+            // Update group to use this widget
+            var widgets = context.state.groups[group_id].widgets;
+            if(payload.position){
+              widgets.splice(payload.position, 0, resp.body.id);
+            }else{
+              widgets.push(resp.body.id);
+            }
+            context.commit('update_group', {
+              id : payload.group,
+              widgets : widgets,
+            });
+
+            console.log('in');
+            resolve();
+        }, reject);
       });
     },
 
@@ -255,12 +260,12 @@ module.exports = new Vuex.Store({
       }
       return new Promise(function(resolve, reject){
 
-        // First delete existing widget
-        context.dispatch('delete_widget', remove).then(function(){
+        // First add new widget
+        context.dispatch('add_widget', add).then(function(){
 
-          // Then add new widget
-          context.dispatch('add_widget', add).then(resolve).catch(reject);
-        }).catch(reject);
+          // Then delete existing widget
+          context.dispatch('delete_widget', remove).then(resolve).catch(reject);
+        }, reject);
       });
     },
   }
