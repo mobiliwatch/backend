@@ -4,6 +4,7 @@ from rest_framework.exceptions import APIException
 from api.serializers import ScreenLightSerializer, ScreenSerializer, get_widget_serializer, GroupSerializer, WidgetCreationSerializer, ScreenCreationSerializer
 from screen.models import Screen, Group, LocationWidget, WeatherWidget, NoteWidget, ClockWidget, DisruptionWidget, TwitterWidget
 from django.http import Http404
+from django.db.models import Max
 from rest_framework.response import Response
 
 class ScreenMixin(object):
@@ -206,9 +207,13 @@ class GroupManage(ScreenMixin, CreateAPIView, DestroyAPIView, UpdateAPIView):
         """
         Create sub group
         """
-        # Create group
+        # Find max position
         group = self.get_object()
-        new_group = Group.objects.create(screen=group.screen, parent=group, position=group.groups.count())
+        max_pos = group.groups.all().aggregate(Max('position'))
+        position = (max_pos['position__max'] or 0) + 1
+
+        # Create group
+        new_group = Group.objects.create(screen=group.screen, parent=group, position=position)
 
         # Update screen
         group.screen.send_ws_update()
