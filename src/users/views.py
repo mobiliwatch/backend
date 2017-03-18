@@ -14,7 +14,8 @@ class Signup(CreateView):
     template_name = 'registration/signup.html'
 
     def get_success_url(self):
-        return reverse('location-create')
+        # TODO: use region-create
+        return reverse('location-region-create', args=('isere',))
 
     def form_valid(self, form):
         # Create user & build redirect
