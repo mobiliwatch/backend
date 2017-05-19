@@ -49,3 +49,9 @@ class Region(object):
         Load disruptions about a specified direction
         """
         raise NotImplementedError
+
+    def solve_trip(self, trip):
+        """
+        List all solutions available for a trip
+        """
+        raise NotImplementedError

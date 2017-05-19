@@ -381,3 +381,13 @@ class Isere(Region):
             return []
 
         return disruptions
+
+    def solve_trip(self, trip):
+        """
+        Solve a trip using Itinisere calculator
+        """
+        out = self.itinisere.calc_trip(trip.start.point, trip.end.point)
+
+        from pprint import pprint
+        pprint(out)
+

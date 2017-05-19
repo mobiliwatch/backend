@@ -103,6 +103,23 @@ class Itinisere(CachedApi):
         }
         return self.request('transport/v3/disruption/GetActiveDisruptions/json', params)
 
+    def calc_trip(self, start_point, end_point, start_date=None):
+        """
+        Calc a trip with full public transport
+        """
+        if start_date is None:
+            start_date = datetime.now()
+        params = {
+            'DepLat' : start_point.y,
+            'DepLon' : start_point.x,
+            'ArrLat' : end_point.y,
+            'ArrLon' : end_point.x,
+            'Date' : start_date.strftime('%Y-%m-%d'),
+            'DepartureTime' : start_date.strftime('%H-%M'),
+        }
+        print(params)
+        return self.request('journeyplanner/v2/PlanTrip/json ', params)
+
 
 class MetroMobilite(CachedApi):
     """

@@ -165,3 +165,23 @@ class LocationStop(models.Model):
         self.walking_time = trip['duration']
         logger.info('Update location stop #{} with distance={} time={}'.format(self.id, self.distance, self.walking_time))
 
+
+class Trip(models.Model):
+    """
+    A regular trip between 2 locations
+    """
+    user = models.ForeignKey(User, related_name='trips')
+
+    # Locations
+    start = models.ForeignKey(Location, related_name='trips_start')
+    end = models.ForeignKey(Location, related_name='trips_end')
+
+    # Dates
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = (
+            ('user', 'start', 'end'),
+        )
+
