@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 class Itinisere(CachedApi):
-    API_URL = 'http://www.itinisere.fr:80/webServices/TransinfoService/api'
+    API_URL = 'http://www.itinisere.fr/webServices/TransinfoService/api'
 
     POSITION_POI = 'POI'
     POSITION_BOARDING = 'BOARDING_POSITION'
@@ -110,6 +110,7 @@ class Itinisere(CachedApi):
         if start_date is None:
             start_date = datetime.now()
         params = {
+            'Algorithm': 'FASTEST',
             'DepLat' : start_point.y,
             'DepLon' : start_point.x,
             'ArrLat' : end_point.y,
@@ -117,8 +118,7 @@ class Itinisere(CachedApi):
             'Date' : start_date.strftime('%Y-%m-%d'),
             'DepartureTime' : start_date.strftime('%H-%M'),
         }
-        print(params)
-        return self.request('journeyplanner/v2/PlanTrip/json ', params)
+        return self.request('journeyplanner/v2/PlanTrip/json', params)
 
 
 class MetroMobilite(CachedApi):

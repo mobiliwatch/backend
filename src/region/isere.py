@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from django.contrib.gis.geos import Point
 from django.core.cache import cache
 from django.utils import timezone
+from datetime import datetime
 from region.base import Region
 from providers.isere import MetroMobilite, Itinisere
 from transport.constants import (
@@ -387,7 +388,76 @@ class Isere(Region):
         Solve a trip using Itinisere calculator
         """
         out = self.itinisere.calc_trip(trip.start.point, trip.end.point)
+        assert 'trips' in out, \
+            'Invalid itinisere response'
 
-        from pprint import pprint
-        pprint(out)
+        date_fmt = '%d/%m/%Y %H:%M:%S'
 
+        solutions = out['trips']['Trip']
+        print(len(solutions))
+
+        def _clean_base(data):
+            start = datetime.strptime(data['Departure']['Time'], date_fmt)
+            end = datetime.strptime(data['Arrival']['Time'], date_fmt)
+            return {
+                'distance': data.get('Distance'),
+                'duration': end - start,
+                'start_time': start,
+                'end_time': end,
+            }
+
+        def _clean_section(section):
+            if section['Leg']:
+                data = section['Leg']
+                mode = 'own'
+            elif section['PTRide']:
+                data = section['PTRide']
+                mode = 'transport'
+            else:
+                raise Exception('No data')
+
+            out = _clean_base(data)
+            out.update({
+                'mode': data['TransportMode'].lower()
+            })
+
+            # Calc distance from path links
+            if data.get('pathLinks'):
+                out['distance'] = sum([p.get('Distance', 0) for p in data['pathLinks']['PathLink']])
+
+            # Add departure and arrival
+            if mode == 'own':
+                out['start'] = {
+                    'position': [
+                        data['Departure']['Site']['Position']['Lat'],
+                        data['Departure']['Site']['Position']['Long'],
+                    ],
+                    'itinisere_id': data['Departure']['Site']['LogicalId'],
+                }
+                out['end'] = {
+                    'position': [
+                        data['Arrival']['Site']['Position']['Lat'],
+                        data['Arrival']['Site']['Position']['Long'],
+                    ],
+                    'itinisere_id': data['Arrival']['Site']['LogicalId'],
+                }
+            elif mode == 'transport':
+                # TODO: resolve with db
+                out['start'] = data['Departure']['StopPlace']['id']
+                out['end'] = data['Arrival']['StopPlace']['id']
+
+            return out
+
+
+        out = []
+        for i,s in enumerate(solutions):
+            solution = _clean_base(s)
+            solution.update({
+                'steps': [
+                    _clean_section(section)
+                    for section in s['sections']['Section']
+                ],
+            })
+            out.append(solution)
+
+        return out
