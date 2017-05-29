@@ -387,6 +387,8 @@ class Isere(Region):
         """
         Solve a trip using Itinisere calculator
         """
+        from transport.models import LineStop
+
         out = self.itinisere.calc_trip(trip.start.point, trip.end.point)
         assert 'trips' in out, \
             'Invalid itinisere response'
@@ -394,7 +396,9 @@ class Isere(Region):
         date_fmt = '%d/%m/%Y %H:%M:%S'
 
         solutions = out['trips']['Trip']
-        print(len(solutions))
+
+        def _get_object(cls, ls_id):
+            return cls.objects.filter(providers__itinisere=ls_id).first()
 
         def _clean_base(data):
             start = datetime.strptime(data['Departure']['Time'], date_fmt)
@@ -422,7 +426,7 @@ class Isere(Region):
             })
 
             # Calc distance from path links
-            if data.get('pathLinks'):
+            if not out['distance'] and data.get('pathLinks'):
                 out['distance'] = sum([p.get('Distance', 0) for p in data['pathLinks']['PathLink']])
 
             # Add departure and arrival
@@ -442,9 +446,8 @@ class Isere(Region):
                     'itinisere_id': data['Arrival']['Site']['LogicalId'],
                 }
             elif mode == 'transport':
-                # TODO: resolve with db
-                out['start'] = data['Departure']['StopPlace']['id']
-                out['end'] = data['Arrival']['StopPlace']['id']
+                out['start'] = _get_object(LineStop, data['Departure']['StopPlace']['id'])
+                out['end'] = _get_object(LineStop, data['Arrival']['StopPlace']['id'])
 
             return out
 
