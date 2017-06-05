@@ -15,6 +15,7 @@ location_patterns = [
   url(r'^$', LocationDetails.as_view(), name='location'),
 ]
 
+app_name = 'api'
 urlpatterns = [
   url(r'^location/(?P<pk>\d+)/', include(location_patterns)),
   url(r'^location/$', LocationList.as_view(), name='locations'),

@@ -56,7 +56,7 @@ class Direction(ProvidersModel):
     """
     A direction for a transport line
     """
-    line = models.ForeignKey(Line, related_name='directions')
+    line = models.ForeignKey(Line, related_name='directions', on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
 
     class Meta:
@@ -85,10 +85,10 @@ class LineStop(ProvidersModel):
     """
     M2M between a line/direction and a stop
     """
-    line = models.ForeignKey(Line, related_name='line_stops')
-    direction = models.ForeignKey(Direction, related_name='line_stops')
+    line = models.ForeignKey(Line, related_name='line_stops', on_delete=models.CASCADE)
+    direction = models.ForeignKey(Direction, related_name='line_stops', on_delete=models.CASCADE)
     order = models.PositiveIntegerField()
-    stop = models.ForeignKey('transport.Stop', related_name='line_stops')
+    stop = models.ForeignKey('transport.Stop', related_name='line_stops', on_delete=models.CASCADE)
     point = models.PointField()
 
     class Meta:
@@ -112,7 +112,7 @@ class Stop(ProvidersModel):
     """
     lines = models.ManyToManyField(Line, through=LineStop, related_name='stops')
     name = models.CharField(max_length=250)
-    city = models.ForeignKey('region.City', related_name='stops')
+    city = models.ForeignKey('region.City', related_name='stops', on_delete=models.CASCADE)
     point = models.PointField(null=True, blank=True) # computed average point
 
     def __str__(self):

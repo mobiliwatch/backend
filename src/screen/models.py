@@ -24,7 +24,7 @@ class Screen(models.Model):
     """
     A user screen
     """
-    user = models.ForeignKey('users.User', related_name='screens')
+    user = models.ForeignKey('users.User', related_name='screens', on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     slug = models.SlugField(max_length=100)
     style = models.CharField(max_length=10, choices=STYLES, default='light')
@@ -225,8 +225,8 @@ class Group(models.Model):
     """
     A group of widget, used for display
     """
-    screen = models.ForeignKey(Screen, related_name='groups')
-    parent = models.ForeignKey('self', related_name='groups', null=True, blank=True)
+    screen = models.ForeignKey(Screen, related_name='groups', on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', related_name='groups', null=True, blank=True, on_delete=models.CASCADE)
     position = models.PositiveIntegerField(default=0)
 
     vertical = models.BooleanField(default=False)
@@ -256,7 +256,7 @@ class Widget(models.Model):
     An abstract widget on a screen
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-    group = models.ForeignKey(Group, related_name='%(class)s')
+    group = models.ForeignKey(Group, related_name='%(class)s', on_delete=models.CASCADE)
     position = models.PositiveIntegerField(default=0)
 
 
@@ -324,7 +324,7 @@ class LocationWidget(Widget):
     """
     Display location on a screen
     """
-    location = models.ForeignKey('users.Location', related_name='widgets')
+    location = models.ForeignKey('users.Location', related_name='widgets', on_delete=models.CASCADE)
     auto_pagination = models.BooleanField(default=False)
 
     def build_update(self):
@@ -364,7 +364,7 @@ class WeatherWidget(Widget):
     """
     Display current weather on a screen
     """
-    city = models.ForeignKey('region.City', related_name='weather_widgets')
+    city = models.ForeignKey('region.City', related_name='weather_widgets', on_delete=models.CASCADE)
 
     def build_update(self):
         """
@@ -410,7 +410,7 @@ class DisruptionWidget(Widget):
     """
     List active disruptions for a location
     """
-    location = models.ForeignKey('users.Location', related_name='widgets_disruptions')
+    location = models.ForeignKey('users.Location', related_name='widgets_disruptions', on_delete=models.CASCADE)
 
     def build_update(self):
         """

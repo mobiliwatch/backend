@@ -109,10 +109,10 @@ class Location(RegionModel):
     A location for a user
     Attached to a region
     """
-    user = models.ForeignKey(User, related_name='locations')
+    user = models.ForeignKey(User, related_name='locations', on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     address = models.TextField()
-    city = models.ForeignKey('region.City', related_name='locations')
+    city = models.ForeignKey('region.City', related_name='locations', on_delete=models.CASCADE)
     point = models.PointField()
 
     line_stops = models.ManyToManyField('transport.LineStop', through='users.LocationStop', related_name='locations')
@@ -134,8 +134,8 @@ class LocationStop(models.Model):
     """
     Link a location and a line stop
     """
-    location = models.ForeignKey(Location, related_name='location_stops')
-    line_stop = models.ForeignKey('transport.LineStop', related_name='location_stops')
+    location = models.ForeignKey(Location, related_name='location_stops', on_delete=models.CASCADE)
+    line_stop = models.ForeignKey('transport.LineStop', related_name='location_stops', on_delete=models.CASCADE)
 
     # Link metadata
     distance = models.FloatField(default=0)
@@ -170,11 +170,11 @@ class Trip(models.Model):
     """
     A regular trip between 2 locations
     """
-    user = models.ForeignKey(User, related_name='trips')
+    user = models.ForeignKey(User, related_name='trips', on_delete=models.CASCADE)
 
     # Locations
-    start = models.ForeignKey(Location, related_name='trips_start')
-    end = models.ForeignKey(Location, related_name='trips_end')
+    start = models.ForeignKey(Location, related_name='trips_start', on_delete=models.CASCADE)
+    end = models.ForeignKey(Location, related_name='trips_end', on_delete=models.CASCADE)
 
     # Dates
     created = models.DateTimeField(auto_now_add=True)
