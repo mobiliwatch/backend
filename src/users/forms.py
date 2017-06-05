@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.gis.geos import Point
 from providers import Bano
-from users.models import User, Location
+from users.models import User, Location, Trip
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -79,3 +79,38 @@ class LocationCreationForm(forms.ModelForm):
         obj = super(LocationCreationForm, self).save(*args, **kwargs)
         obj.point = self.point
         return obj
+
+
+class TripCreationForm(forms.ModelForm):
+    class Meta:
+        model = Trip
+        fields = ('start', 'end')
+        labels = {
+            'start' : _('Start location'),
+            'end' : _('Destination'),
+        }
+
+    def __init__(self, locations, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['start'].queryset = locations
+        self.fields['end'].queryset = locations
+
+    def clean(self, *args, **kwargs):
+        start = self.cleaned_data.get('start')
+        end = self.cleaned_data.get('end')
+
+        # Impossible errors
+        if start.region != end.region:
+            raise forms.ValidationError('Same region needed')
+
+        if start.user != end.user:
+            raise forms.ValidationError('Same user needed')
+        user = start.user
+
+        # User errors
+        if start == end:
+            raise forms.ValidationError(_('You must select 2 different locations.'))
+
+        if user.trips.filter(start=start, end=end).exists():
+            raise forms.ValidationError(_('This trip already exists for your account.'))
+

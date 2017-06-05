@@ -166,9 +166,9 @@ class LocationStop(models.Model):
         logger.info('Update location stop #{} with distance={} time={}'.format(self.id, self.distance, self.walking_time))
 
 
-class Trip(models.Model):
+class Trip(RegionModel):
     """
-    A regular trip between 2 locations
+    A regular trip between 2 locations in a region
     """
     user = models.ForeignKey(User, related_name='trips', on_delete=models.CASCADE)
 

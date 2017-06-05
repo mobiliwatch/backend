@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form action="" method="post">
+  {% csrf_token %}
+
+  Êtes vous sur de supprimer le trajet de <strong>{{ trip.start.name }}</strong> vers <strong>{{ trip.end.name }}</strong> ?
+
+  <p class="control">
+    <button type="submit" class="button is-danger">
+      <span>{{ _('Delete') }}</span>
+    </button>
+    <a href="{% url 'home' %}" class="button">
+      {{ _('Cancel') }}
+    </a>
+  </p>
+
+</form>
+
+{% endblock %}

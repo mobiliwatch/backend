@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% load bulma_forms %}
+
+{% block content %}
+
+<form method="post" action="">
+  <h3 class="title">{{ _('Add a trip') }} : {{ region }}</h3>
+  {% csrf_token %}
+
+  {% if user.locations.count < 2 %}
+  <div class="notification is-info">
+    <span class="icon">
+      <span class="fa fa-question-circle"></span>
+    </span>
+    {{ _('You must create at least two locations to create a trip between them') }}
+    {{ _('For more informations, please <a target="_blank" href="/help/trip/">read the help page</a>') }}
+  </div>
+  {% endif %}
+
+  {% form_errors form %}
+  {% form_input form.start 'play' %}
+  {% form_input form.end 'stop' %}
+
+  <hr />
+  <p class="control">
+    <button class="button is-success" type="submit">
+      {{ _('Add a trip') }}
+    </button>
+    <a class="button" href="{% url 'home' %}">
+      {{ _('Cancel') }}
+    </a>
+  </p>
+</form>
+
+{% endblock %}

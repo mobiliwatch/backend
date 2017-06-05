@@ -1,0 +1,53 @@
+<div class="columns">
+  <div class="column">
+    <h1 class="title">
+      {{ _('Your trips') }}
+    </h1>
+    <h2 class="subtitle">
+      {{ _('Add some trips to display them on your screens') }}
+    </h2>
+  </div>
+  <div class="column has-text-right">
+    <a href="{% url 'trip-region-create' 'isere' %}" class="button is-info is-medium">
+      <span class="icon">
+        <span class="fa fa-globe"></span>
+      </span>
+      <span>{{ _('Create a trip') }}</span>
+    </a>
+  </div>
+</div>
+
+<div class="columns is-multiline">
+  {% for trip in user.trips.all %}
+  <div class="column is-one-third">
+    <div class="box">
+      <h5 class="title">{{ _('From') }} {{ trip.start.name }}</h5>
+      <h4 class="subtitle">{{ trip.start.address }} - {{ trip.start.city }}</h5>
+      <h5 class="title">{{ _('To') }} {{ trip.end.name }}</h5>
+      <h4 class="subtitle">{{ trip.end.address }} - {{ trip.end.city }}</h5>
+      <hr />
+      <nav class="level">
+        <div class="level-left">
+          <a class="level-item" href="{% url 'trip-delete' trip.pk %}">
+            <span class="icon is-small"><i class="fa fa-eye"></i></span>
+            <span>{{ _('View trip times') }}</span>
+          </a>
+          <a class="level-item" href="{% url 'trip-delete' trip.pk %}">
+            <span class="icon is-small"><i class="fa fa-trash"></i></span>
+            <span>{{ _('Delete') }}</span>
+          </a>
+        </div>
+      </nav>
+    </div>
+  </div>
+  {% empty %}
+  <div class="column is-12">
+    <div class="notification is-info">
+      <span class="icon">
+        <span class="fa fa-question-circle"></span>
+      </span>
+      {{ _('You can create new trips to be aware of your precise transport time.') }}
+    </div>
+  </div>
+  {% endfor %}
+</div>

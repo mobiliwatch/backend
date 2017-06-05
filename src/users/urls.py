@@ -1,10 +1,15 @@
 from django.conf.urls import url, include
 from django.contrib.auth import views as auth
-from users.views import Signup, LocationCreate, LocationRegionCreate, LocationTransports, LocationDelete, TwitterAuth
+from users.views import Signup, LocationRegionCreate, LocationTransports, LocationDelete, TwitterAuth, TripRegionCreate, TripDelete, TripView
 
 location_patterns = [
     url('^$', LocationTransports.as_view(), name='location-transports'),
     url('^delete/$', LocationDelete.as_view(), name='location-delete'),
+]
+
+trip_patterns = [
+    url('^$', TripView.as_view(), name='trip'),
+    url('^delete/$', TripDelete.as_view(), name='trip-delete'),
 ]
 
 urlpatterns = (
@@ -18,7 +23,10 @@ urlpatterns = (
     url('^twitter/$', TwitterAuth.as_view(), name='oauth-twitter'),
 
     # User locations
-    url('^location/new/$', LocationCreate.as_view(), name='location-create'),
     url('^location/(?P<region>\w+)/new/$', LocationRegionCreate.as_view(), name='location-region-create'),
     url('^location/(?P<pk>\d+)/', include(location_patterns)),
+
+    # User trips
+    url('^trip/(?P<region>\w+)/new/$', TripRegionCreate.as_view(), name='trip-region-create'),
+    url('^trip/(?P<pk>\d+)/', include(trip_patterns)),
 )
