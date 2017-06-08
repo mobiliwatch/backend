@@ -65,7 +65,7 @@ class TripRegionCreate(ObjectRegionCreate):
         return ctx
 
     def get_success_url(self, trip):
-        return trip.frontend_url
+        return HttpResponseRedirect(trip.frontend_url)
 
 class TripDelete(TripMixin, DeleteView):
     """
