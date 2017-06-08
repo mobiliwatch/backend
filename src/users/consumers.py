@@ -39,16 +39,8 @@ def async_trip_init(message):
     """
     trip = models.Trip.objects.get(id=message.content['trip'])
 
-    print('TRIP INIT', trip.start, trip.end)
-
+    # Send trip solution
     trip.send_ws_update()
-
-    # Send initial trip solution
-    #for widget in screen.all_widgets:
-    #    Channel('screen.widget').send({
-    #        'widget_id' : str(widget.id),
-    #        'widget_class' : widget.__class__.__name__,
-    #    })
 
 @channel_session_user_from_http
 @trip_required

@@ -430,9 +430,17 @@ class Isere(Region):
                 'mode': data['TransportMode'].lower()
             })
 
+            from pprint import pprint
+            pprint(section)
+
             # Calc distance from path links
             if not out['distance'] and data.get('pathLinks'):
                 out['distance'] = sum([p.get('Distance', 0) for p in data['pathLinks']['PathLink']])
+
+            start = datetime.strptime(data['Departure']['Time'], date_fmt)
+            end = datetime.strptime(data['Arrival']['Time'], date_fmt)
+            diff = end - start
+            out['duration'] = diff.total_seconds()
 
             # Add departure and arrival
             if mode == 'own':
@@ -456,15 +464,41 @@ class Isere(Region):
 
             return out
 
+        def _calc_modes(steps):
+            out = {}
+            for step in steps:
+                mode = step['mode']
+                if mode not in out:
+                    # Base structure
+                    out[mode] = {
+                        'mode' : mode,
+                        'lines' : [],
+                        'distance' : 0,
+                        'duration' : 0,
+                    }
+
+                # Add common stats
+                out[mode]['distance'] += step['distance']
+                out[mode]['duration'] += step.get('duration', 0)
+
+                # Add line
+                line = step['start'].get('line')
+                if line and line not in out[mode]['lines']:
+                    out[mode]['lines'].append(line)
+
+            return out
+
 
         out = []
         for i,s in enumerate(solutions):
             solution = _clean_base(s)
+            steps = [
+                _clean_section(section)
+                for section in s['sections']['Section']
+            ]
             solution.update({
-                'steps': [
-                    _clean_section(section)
-                    for section in s['sections']['Section']
-                ],
+                'steps': steps,
+                'modes': _calc_modes(steps),
             })
             out.append(solution)
 
