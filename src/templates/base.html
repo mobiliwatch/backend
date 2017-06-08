@@ -34,7 +34,13 @@
         {{ _('Hello') }} {{ user.first_name }}
       </span>
       <span class="nav-item">
-        {% if not user.has_twitter_auth %}
+        {% if user.has_twitter_auth %}
+        <span class="nav-text"  style="margin-right: 8px;">
+          <span class="icon is-small is-success" title="Twitter OK !">
+            <i class="fa fa-twitter"></i>
+          </span>
+        </span>
+        {% else %}
         <a class="button is-info is-outlined" href="{% url 'oauth-twitter' %}">
           <span class="icon is-small">
             <i class="fa fa-twitter"></i>

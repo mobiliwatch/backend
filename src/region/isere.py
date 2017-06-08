@@ -388,6 +388,7 @@ class Isere(Region):
         Solve a trip using Itinisere calculator
         """
         from transport.models import LineStop
+        from api.serializers import LineStopSerializer
 
         out = self.itinisere.calc_trip(trip.start.point, trip.end.point)
         assert 'trips' in out, \
@@ -397,8 +398,12 @@ class Isere(Region):
 
         solutions = out['trips']['Trip']
 
-        def _get_object(cls, ls_id):
-            return cls.objects.filter(providers__itinisere=ls_id).first()
+        def _get_object(cls, serializer, ls_id):
+            instance = cls.objects.filter(providers__itinisere=ls_id).first()
+            if not instance:
+                return
+            serializer = serializer(instance=instance)
+            return serializer.data
 
         def _clean_base(data):
             start = datetime.strptime(data['Departure']['Time'], date_fmt)
@@ -446,8 +451,8 @@ class Isere(Region):
                     'itinisere_id': data['Arrival']['Site']['LogicalId'],
                 }
             elif mode == 'transport':
-                out['start'] = _get_object(LineStop, data['Departure']['StopPlace']['id'])
-                out['end'] = _get_object(LineStop, data['Arrival']['StopPlace']['id'])
+                out['start'] = _get_object(LineStop, LineStopSerializer, data['Departure']['StopPlace']['id'])
+                out['end'] = _get_object(LineStop, LineStopSerializer, data['Arrival']['StopPlace']['id'])
 
             return out
 

@@ -1,6 +1,8 @@
 from django.contrib.gis.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from providers import Router
+from channels import Group as WsGroup
+from rest_framework.renderers import JSONRenderer
 from region.models import RegionModel
 import logging
 
@@ -186,7 +188,31 @@ class Trip(RegionModel):
         )
 
     @property
+    def ws_group(self):
+        # Used by websockets
+        return WsGroup('trip_{}'.format(self.id))
+
+    @property
     def frontend_url(self):
         from django.conf import settings
         return settings.FRONTEND_TRIP_URL.format(self.pk)
+
+    def solve(self):
+        """
+        Find solutions for this trip, using the region provider
+        """
+        region = self.get_region()
+        return region.solve_trip(self)
+
+    def send_ws_update(self):
+        """
+        Send an update for trips through WebSockets
+        """
+        data = {
+            'type': 'trip',
+            'solutions': self.solve(),
+        }
+        self.ws_group.send({
+            'text' : JSONRenderer().render(data).decode('utf-8')
+        })
 
