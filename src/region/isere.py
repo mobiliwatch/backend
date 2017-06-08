@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from django.contrib.gis.geos import Point
 from django.core.cache import cache
 from django.utils import timezone
+from datetime import datetime
 from region.base import Region
 from providers.isere import MetroMobilite, Itinisere
 from transport.constants import (
@@ -381,3 +382,124 @@ class Isere(Region):
             return []
 
         return disruptions
+
+    def solve_trip(self, trip):
+        """
+        Solve a trip using Itinisere calculator
+        """
+        from transport.models import LineStop
+        from api.serializers import LineStopSerializer
+
+        out = self.itinisere.calc_trip(trip.start.point, trip.end.point)
+        assert 'trips' in out, \
+            'Invalid itinisere response'
+
+        date_fmt = '%d/%m/%Y %H:%M:%S'
+
+        solutions = out['trips']['Trip']
+
+        def _get_object(cls, serializer, ls_id):
+            instance = cls.objects.filter(providers__itinisere=ls_id).first()
+            if not instance:
+                return
+            serializer = serializer(instance=instance)
+            return serializer.data
+
+        def _clean_base(data):
+            start = datetime.strptime(data['Departure']['Time'], date_fmt)
+            end = datetime.strptime(data['Arrival']['Time'], date_fmt)
+            return {
+                'distance': data.get('Distance'),
+                'duration': end - start,
+                'start_time': start,
+                'end_time': end,
+            }
+
+        def _clean_section(section):
+            if section['Leg']:
+                data = section['Leg']
+                mode = 'own'
+            elif section['PTRide']:
+                data = section['PTRide']
+                mode = 'transport'
+            else:
+                raise Exception('No data')
+
+            out = _clean_base(data)
+            out.update({
+                'mode': data['TransportMode'].lower()
+            })
+
+            from pprint import pprint
+            pprint(section)
+
+            # Calc distance from path links
+            if not out['distance'] and data.get('pathLinks'):
+                out['distance'] = sum([p.get('Distance', 0) for p in data['pathLinks']['PathLink']])
+
+            start = datetime.strptime(data['Departure']['Time'], date_fmt)
+            end = datetime.strptime(data['Arrival']['Time'], date_fmt)
+            diff = end - start
+            out['duration'] = diff.total_seconds()
+
+            # Add departure and arrival
+            if mode == 'own':
+                out['start'] = {
+                    'position': [
+                        data['Departure']['Site']['Position']['Lat'],
+                        data['Departure']['Site']['Position']['Long'],
+                    ],
+                    'itinisere_id': data['Departure']['Site']['LogicalId'],
+                }
+                out['end'] = {
+                    'position': [
+                        data['Arrival']['Site']['Position']['Lat'],
+                        data['Arrival']['Site']['Position']['Long'],
+                    ],
+                    'itinisere_id': data['Arrival']['Site']['LogicalId'],
+                }
+            elif mode == 'transport':
+                out['start'] = _get_object(LineStop, LineStopSerializer, data['Departure']['StopPlace']['id'])
+                out['end'] = _get_object(LineStop, LineStopSerializer, data['Arrival']['StopPlace']['id'])
+
+            return out
+
+        def _calc_modes(steps):
+            out = {}
+            for step in steps:
+                mode = step['mode']
+                if mode not in out:
+                    # Base structure
+                    out[mode] = {
+                        'mode' : mode,
+                        'lines' : [],
+                        'distance' : 0,
+                        'duration' : 0,
+                    }
+
+                # Add common stats
+                out[mode]['distance'] += step['distance']
+                out[mode]['duration'] += step.get('duration', 0)
+
+                # Add line
+                line = step['start'].get('line')
+                if line and line not in out[mode]['lines']:
+                    out[mode]['lines'].append(line)
+
+            return out
+
+
+        out = []
+        for i,s in enumerate(solutions):
+            solution = _clean_base(s)
+            steps = [
+                _clean_section(section)
+                for section in s['sections']['Section']
+            ]
+            solution.update({
+                'steps': steps,
+                'modes': _calc_modes(steps),
+            })
+            out.append(solution)
+
+        return out

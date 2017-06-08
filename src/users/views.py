@@ -1,12 +1,12 @@
-from django.views.generic import CreateView, DetailView, DeleteView, ListView, View
-from django.http import HttpResponseRedirect, Http404
+from django.views.generic import CreateView, DetailView, DeleteView, View
+from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 from django.contrib.auth import login
-import region
 from providers import Twitter
-from users.forms import UserCreationForm, LocationCreationForm
+from users.forms import UserCreationForm, LocationCreationForm, TripCreationForm
 from users.models import User
+from users.mixins import ObjectRegionCreate, LocationMixin, TripMixin
 
 class Signup(CreateView):
     model = User
@@ -26,56 +26,15 @@ class Signup(CreateView):
 
         return out
 
-class LocationCreate(LoginRequiredMixin, ListView):
-    """
-    List regions available to create a location
-    """
-    template_name = 'location/regions.html'
-    context_object_name = 'regions'
-
-    def get_queryset(self):
-        # Load all regions
-        return region.all()
-
-
-class LocationRegionCreate(LoginRequiredMixin, CreateView):
+class LocationRegionCreate(ObjectRegionCreate):
     """
     Create a new Location in a region
     """
     form_class = LocationCreationForm
     template_name = 'location/create.html'
 
-    def get_region(self):
-        """
-        Load specified region
-        """
-        try:
-            return region.get(self.kwargs['region'])
-        except:
-            raise Http404
-
-    def get_context_data(self, *args, **kwargs):
-        ctx = super().get_context_data(*args, **kwargs)
-        ctx['region'] = self.get_region()
-        return ctx
-
-    def form_valid(self, form):
-        # Assign user & region
-        location = form.save(commit=False)
-        location.region = self.get_region().slug
-        location.user = self.request.user
-        location.save()
-
+    def get_success_url(self, location):
         return HttpResponseRedirect(reverse('location-transports', args=(location.pk, )))
-
-class LocationMixin(LoginRequiredMixin):
-    """
-    Access a location from user
-    """
-    context_object_name = 'location'
-
-    def get_queryset(self):
-        return self.request.user.locations.all()
 
 class LocationTransports(LocationMixin, DetailView):
     """
@@ -88,6 +47,31 @@ class LocationDelete(LocationMixin, DeleteView):
     Delete a location
     """
     template_name = 'location/delete.html'
+
+    def get_success_url(self):
+        return reverse('home')
+
+class TripRegionCreate(ObjectRegionCreate):
+    """
+    Create a new trip in a region
+    """
+    form_class = TripCreationForm
+    template_name = 'trip/create.html'
+
+    def get_form_kwargs(self, *args, **kwargs):
+        ctx = super().get_form_kwargs(*args, **kwargs)
+        region = self.get_region().slug
+        ctx['locations'] = self.request.user.locations.filter(region=region)
+        return ctx
+
+    def get_success_url(self, trip):
+        return trip.frontend_url
+
+class TripDelete(TripMixin, DeleteView):
+    """
+    Delete a trip
+    """
+    template_name = 'trip/delete.html'
 
     def get_success_url(self):
         return reverse('home')

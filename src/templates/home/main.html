@@ -8,6 +8,12 @@
 
   <hr />
 
+{% if user.is_admin %}
+  {% include 'home/trips.html' %}
+
+  <hr />
+{% endif %}
+
   {% include 'home/screens.html' %}
 
 </div>

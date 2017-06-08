@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from django.contrib import admin
-from mobili.views import Help, Home
+from mobili.views import Help, Home, Regions
 
 urlpatterns = [
     url(r'^api/', include('api.urls', namespace='api')),
@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^help/?$', Help.as_view(), name='help-home', kwargs={'slug' : 'home'}),
 
     # Home page
+    url('^regions/', Regions.as_view(), name='regions'),
     url(r'^$', Home.as_view(), name='home'),
 ]

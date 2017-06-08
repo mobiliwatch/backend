@@ -3,7 +3,9 @@ from django.conf import settings
 from screen.models import Screen
 from django.http import Http404
 from mobili.static import Pages
-
+from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+import region
 
 class Home(TemplateView):
     """
@@ -57,3 +59,14 @@ class Help(TemplateView):
             'toc': pages.toc,
             'content': pages.render(slug),
         }
+
+class Regions(LoginRequiredMixin, ListView):
+    """
+    List regions available to create a location
+    """
+    template_name = 'location/regions.html'
+    context_object_name = 'regions'
+
+    def get_queryset(self):
+        # Load all regions
+        return region.all()

@@ -1,5 +1,5 @@
 from django.conf.urls import url, include
-from api.views import LocationStops, LocationList, LocationDetails, ScreenManage, WidgetManage, WidgetCreate, ScreenList, ScreenShared, LocationDistance, GroupManage, CityList, TemplateManage, Auth
+from api.views import LocationStops, LocationList, LocationDetails, ScreenManage, WidgetManage, WidgetCreate, ScreenList, ScreenShared, LocationDistance, GroupManage, CityList, TemplateManage, Auth, TripDetails
 
 screen_patterns = [
     url(r'^widgets/$', WidgetCreate.as_view(), name='widget-create'),
@@ -15,6 +15,7 @@ location_patterns = [
   url(r'^$', LocationDetails.as_view(), name='location'),
 ]
 
+app_name = 'api'
 urlpatterns = [
   url(r'^location/(?P<pk>\d+)/', include(location_patterns)),
   url(r'^location/$', LocationList.as_view(), name='locations'),
@@ -22,6 +23,7 @@ urlpatterns = [
   url(r'^screen/(?P<slug>[\w\-]+)/', include(screen_patterns)),
   url(r'^screen/$', ScreenList.as_view(), name='screens'),
   url(r'^template/$', TemplateManage.as_view(), name='templates'),
+  url(r'^trip/(?P<pk>[\d]+)/', TripDetails.as_view(), name='trip'),
 
   # Auth
   url(r'^auth/', Auth.as_view(), name='auth'),

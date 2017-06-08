@@ -10,6 +10,7 @@ module.exports = new Vuex.Store({
     locations : [],
     cities : [],
     editor : 'normal', // normal | advanced
+    trip: {},
   },
   mutations: {
     use_editor : function(state, editor){
@@ -32,6 +33,9 @@ module.exports = new Vuex.Store({
         });
       };
       add_groups(state.screen.groups);
+    },
+    use_trip : function(state, trip){
+      state.trip = trip;
     },
 
     add_widget : function(state, widget){

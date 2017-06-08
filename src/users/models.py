@@ -1,6 +1,8 @@
 from django.contrib.gis.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from providers import Router
+from channels import Group as WsGroup
+from rest_framework.renderers import JSONRenderer
 from region.models import RegionModel
 import logging
 
@@ -109,10 +111,10 @@ class Location(RegionModel):
     A location for a user
     Attached to a region
     """
-    user = models.ForeignKey(User, related_name='locations')
+    user = models.ForeignKey(User, related_name='locations', on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     address = models.TextField()
-    city = models.ForeignKey('region.City', related_name='locations')
+    city = models.ForeignKey('region.City', related_name='locations', on_delete=models.CASCADE)
     point = models.PointField()
 
     line_stops = models.ManyToManyField('transport.LineStop', through='users.LocationStop', related_name='locations')
@@ -134,8 +136,8 @@ class LocationStop(models.Model):
     """
     Link a location and a line stop
     """
-    location = models.ForeignKey(Location, related_name='location_stops')
-    line_stop = models.ForeignKey('transport.LineStop', related_name='location_stops')
+    location = models.ForeignKey(Location, related_name='location_stops', on_delete=models.CASCADE)
+    line_stop = models.ForeignKey('transport.LineStop', related_name='location_stops', on_delete=models.CASCADE)
 
     # Link metadata
     distance = models.FloatField(default=0)
@@ -164,4 +166,53 @@ class LocationStop(models.Model):
         self.distance = trip['distance']
         self.walking_time = trip['duration']
         logger.info('Update location stop #{} with distance={} time={}'.format(self.id, self.distance, self.walking_time))
+
+
+class Trip(RegionModel):
+    """
+    A regular trip between 2 locations in a region
+    """
+    user = models.ForeignKey(User, related_name='trips', on_delete=models.CASCADE)
+
+    # Locations
+    start = models.ForeignKey(Location, related_name='trips_start', on_delete=models.CASCADE)
+    end = models.ForeignKey(Location, related_name='trips_end', on_delete=models.CASCADE)
+
+    # Dates
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = (
+            ('user', 'start', 'end'),
+        )
+
+    @property
+    def ws_group(self):
+        # Used by websockets
+        return WsGroup('trip_{}'.format(self.id))
+
+    @property
+    def frontend_url(self):
+        from django.conf import settings
+        return settings.FRONTEND_TRIP_URL.format(self.pk)
+
+    def solve(self):
+        """
+        Find solutions for this trip, using the region provider
+        """
+        region = self.get_region()
+        return region.solve_trip(self)
+
+    def send_ws_update(self):
+        """
+        Send an update for trips through WebSockets
+        """
+        data = {
+            'type': 'trip',
+            'solutions': self.solve(),
+        }
+        self.ws_group.send({
+            'text' : JSONRenderer().render(data).decode('utf-8')
+        })
 

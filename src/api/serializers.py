@@ -413,3 +413,16 @@ class LoginSerializer(serializers.Serializer):
                 raise serializers.ValidationError(msg)
         else:
             raise serializers.ValidationError(_('Must include "email" and "password".'))
+
+
+class TripSerializer(serializers.Serializer):
+    start = LocationLightSerializer()
+    end = LocationLightSerializer()
+
+    class Meta:
+        model = Group
+        fields = (
+            'id',
+            'start',
+            'end',
+        )
