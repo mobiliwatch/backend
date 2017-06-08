@@ -1,6 +1,6 @@
 from django.conf.urls import url, include
 from django.contrib.auth import views as auth
-from users.views import Signup, LocationRegionCreate, LocationTransports, LocationDelete, TwitterAuth, TripRegionCreate, TripDelete, TripView
+from users.views import Signup, LocationRegionCreate, LocationTransports, LocationDelete, TwitterAuth, TripRegionCreate, TripDelete
 
 location_patterns = [
     url('^$', LocationTransports.as_view(), name='location-transports'),
@@ -8,7 +8,6 @@ location_patterns = [
 ]
 
 trip_patterns = [
-    url('^$', TripView.as_view(), name='trip'),
     url('^delete/$', TripDelete.as_view(), name='trip-delete'),
 ]
 

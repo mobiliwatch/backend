@@ -222,6 +222,7 @@ CORS_ALLOW_CREDENTIALS = True
 # Frontend
 FRONTEND_SCREEN_URL = 'http://localhost:8080/#/screen/{}'
 FRONTEND_SCREEN_SHARED_URL = 'http://localhost:8080/#/share/{}/{}'
+FRONTEND_TRIP_URL = 'http://localhost:8080/#/trip/{}'
 
 # Weather
 OPEN_WEATHER_MAP_API = None

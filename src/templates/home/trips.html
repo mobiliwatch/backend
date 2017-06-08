@@ -28,7 +28,7 @@
       <hr />
       <nav class="level">
         <div class="level-left">
-          <a class="level-item" href="{% url 'trip-delete' trip.pk %}">
+          <a class="level-item" href="{{ trip.frontend_url }}">
             <span class="icon is-small"><i class="fa fa-eye"></i></span>
             <span>{{ _('View trip times') }}</span>
           </a>

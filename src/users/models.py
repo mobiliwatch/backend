@@ -185,3 +185,8 @@ class Trip(RegionModel):
             ('user', 'start', 'end'),
         )
 
+    @property
+    def frontend_url(self):
+        from django.conf import settings
+        return settings.FRONTEND_TRIP_URL.format(self.pk)
+

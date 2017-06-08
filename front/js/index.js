@@ -4,7 +4,6 @@ Vue.use(require('vue-resource'));
 Vue.use(require('vuex'));
 var Transports = require('vue/transports/Transports.vue')
 var Screen = require('vue/screen/Screen.vue')
-var Trip = require('vue/trip/Trip.vue')
 
 // Add csrf token
 Vue.http.headers.common['X-CSRFTOKEN'] = document.querySelector('#csrf').getAttribute('content');
@@ -20,7 +19,6 @@ var app = new Vue({
   components : {
     Transports : Transports,
     Screen : Screen,
-    Trip : Trip,
   },
 });
 
