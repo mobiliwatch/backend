@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from django.contrib.gis.geos import Point
 from django.core.cache import cache
 from django.utils import timezone
-from datetime import datetime
+from datetime import datetime, timezone
 from region.base import Region
 from providers.isere import MetroMobilite, Itinisere
 from transport.constants import (
@@ -398,6 +398,9 @@ class Isere(Region):
 
         solutions = out['trips']['Trip']
 
+        def _timestamp(x):
+            return int(x.replace(tzinfo=timezone.utc).timestamp())
+
         def _get_object(cls, serializer, ls_id):
             instance = cls.objects.filter(providers__itinisere=ls_id).first()
             if not instance:
@@ -408,11 +411,12 @@ class Isere(Region):
         def _clean_base(data):
             start = datetime.strptime(data['Departure']['Time'], date_fmt)
             end = datetime.strptime(data['Arrival']['Time'], date_fmt)
+
             return {
                 'distance': data.get('Distance'),
                 'duration': end - start,
-                'start_time': start,
-                'end_time': end,
+                'start_time': _timestamp(start),
+                'end_time': _timestamp(end),
             }
 
         def _clean_section(section):
@@ -429,9 +433,6 @@ class Isere(Region):
             out.update({
                 'mode': data['TransportMode'].lower()
             })
-
-            from pprint import pprint
-            pprint(section)
 
             # Calc distance from path links
             if not out['distance'] and data.get('pathLinks'):
