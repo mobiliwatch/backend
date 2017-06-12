@@ -3,6 +3,7 @@ TRANSPORT_CAR = 'car'
 TRANSPORT_TRAM = 'tram'
 TRANSPORT_TRAIN = 'train'
 TRANSPORT_AVION = 'avion'
+TRANSPORT_WALK = 'walk'
 TRANSPORT_TAD = 'Transport a la demande'
 
 TRANSPORT_MODES = (

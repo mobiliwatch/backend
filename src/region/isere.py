@@ -7,7 +7,8 @@ from region.base import Region
 from providers.isere import MetroMobilite, Itinisere
 from transport.constants import (
     TRANSPORT_BUS, TRANSPORT_TRAM, TRANSPORT_CAR,
-    TRANSPORT_TRAIN, TRANSPORT_TAD, TRANSPORT_AVION
+    TRANSPORT_TRAIN, TRANSPORT_TAD, TRANSPORT_AVION,
+    TRANSPORT_WALK
 )
 from region.constants import (
     DISRUPTION_COMMERCIAL, DISRUPTION_BASE, DISRUPTION_REALTIME, DISRUPTION_ROAD,
@@ -31,6 +32,13 @@ ITI_MODES = {
     4 : TRANSPORT_TRAIN,
     7 : TRANSPORT_TAD,
     16 : TRANSPORT_AVION,
+}
+ITI_MODES_STR = { # yeah, they use string too. Damn.
+    'bus' : TRANSPORT_BUS,
+    'car' : TRANSPORT_CAR,
+    'tramway' : TRANSPORT_TRAM,
+    'train' : TRANSPORT_TRAIN,
+    'walk' : TRANSPORT_WALK,
 }
 ITI_DISRUPTIONS = {
     1: DISRUPTION_COMMERCIAL, # Commercial
@@ -482,9 +490,14 @@ class Isere(Region):
             else:
                 raise Exception('No data')
 
+            iti_mode = ITI_MODES_STR.get(data['TransportMode'].lower())
+            if iti_mode is None:
+                logger.warn('Unsuported mode {}'.format(data['TransportMode']))
+                return
+
             out = _clean_base(data)
             out.update({
-                'mode': data['TransportMode'].lower()
+                'mode': iti_mode,
             })
 
             # Calc distance from path links
@@ -505,7 +518,6 @@ class Isere(Region):
                 # as a polyline encoded by google algo
                 out['path'] = _clean_polyline(data['pathLinks']['PathLink'])
 
-
             elif mode == 'transport':
 
                 # Use stations from DB
@@ -517,7 +529,10 @@ class Isere(Region):
         def _calc_modes(steps):
             out = {}
             for step in steps:
-                mode = step['mode']
+                mode = ITI_MODES_STR.get(step['mode'])
+                if mode is None:
+                    logger.warn('Unsuported mode {}'.format(step['mode']))
+                    continue
                 if mode not in out:
                     # Base structure
                     out[mode] = {
