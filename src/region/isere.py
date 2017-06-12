@@ -37,6 +37,7 @@ ITI_MODES_STR = { # yeah, they use string too. Damn.
     'bus' : TRANSPORT_BUS,
     'car' : TRANSPORT_CAR,
     'tramway' : TRANSPORT_TRAM,
+    'tram' : TRANSPORT_TRAM,
     'train' : TRANSPORT_TRAIN,
     'walk' : TRANSPORT_WALK,
 }
@@ -408,7 +409,7 @@ class Isere(Region):
         solutions = out['trips']['Trip']
 
         def _timestamp(x):
-            return int(x.replace(tzinfo=timezone.utc).timestamp())
+            return int(x.timestamp())
 
         def _get_object(cls, serializer, object_id):
             instance = cls.objects.filter(providers__itinisere=object_id).first()

@@ -1,6 +1,7 @@
 from django.utils import timezone
 from .cache import CachedApi
 from datetime import datetime
+import arrow
 
 
 class Itinisere(CachedApi):
@@ -108,7 +109,7 @@ class Itinisere(CachedApi):
         Calc a trip with full public transport
         """
         if start_date is None:
-            start_date = datetime.now()
+            start_date = arrow.get(datetime.now(), 'Europe/Paris')
         params = {
             'Algorithm': 'FASTEST',
             'DepLat' : start_point.y,
