@@ -2,7 +2,7 @@ from __future__ import absolute_import
 from django.contrib.gis.geos import Point
 from django.core.cache import cache
 from django.utils import timezone
-from datetime import datetime, timezone
+from datetime import datetime
 from region.base import Region
 from providers.isere import MetroMobilite, Itinisere
 from transport.constants import (
@@ -17,6 +17,7 @@ from region.constants import (
 )
 import lxml.html
 import calendar
+import polyline
 import hashlib
 import re
 import logging
@@ -387,8 +388,8 @@ class Isere(Region):
         """
         Solve a trip using Itinisere calculator
         """
-        from transport.models import LineStop
-        from api.serializers import LineStopSerializer
+        from transport.models import LineStop, Stop
+        from api.serializers import LineStopSerializer, StopLightSerializer
 
         out = self.itinisere.calc_trip(trip.start.point, trip.end.point)
         assert 'trips' in out, \
@@ -401,8 +402,8 @@ class Isere(Region):
         def _timestamp(x):
             return int(x.replace(tzinfo=timezone.utc).timestamp())
 
-        def _get_object(cls, serializer, ls_id):
-            instance = cls.objects.filter(providers__itinisere=ls_id).first()
+        def _get_object(cls, serializer, object_id):
+            instance = cls.objects.filter(providers__itinisere=object_id).first()
             if not instance:
                 return
             serializer = serializer(instance=instance)
@@ -419,7 +420,59 @@ class Isere(Region):
                 'end_time': _timestamp(end),
             }
 
-        def _clean_section(section):
+        def _clean_polyline(links):
+            """
+            Build a google encoded polyline from a list of LINESTRING
+            """
+            # Extract geometries
+            geometries = list(filter(None, [l.get('Geometry') for l in links]))
+            if not geometries:
+                return None
+
+            # Extracts all points
+            pos = list(map(
+                lambda x : (float(x[0]), float(x[1])),
+                re.findall('(\d+\.\d+) (\d+\.\d+)', ''.join(geometries))
+            ))
+
+            # Encode polyline
+            return polyline.encode(pos)
+
+        def _clean_section_site(data, first=False, last=False):
+            """
+            Extract base information for a site in a walking section
+            Find a name from multiple sources:
+             * Location for first/last step
+             * DB Stop
+             * Name from api
+            """
+            site = data['Site']
+
+            # Load Stop when available
+            iti_id = site['LogicalId']
+            stop = _get_object(Stop, StopLightSerializer, str(iti_id))
+
+            name = site['Name']
+            if first is True:
+                # Use start location
+                name = trip.start.name
+            elif last is True:
+                # Use end location
+                name = trip.end.name
+            elif stop is not None:
+                # Use stop name
+                name = stop['name']
+
+            return {
+                'position': [
+                    site['Position']['Lat'],
+                    site['Position']['Long'],
+                ],
+                'name': name,
+                'stop': stop,
+            }
+
+        def _clean_section(section, position, total):
             if section['Leg']:
                 data = section['Leg']
                 mode = 'own'
@@ -443,23 +496,19 @@ class Isere(Region):
             diff = end - start
             out['duration'] = diff.total_seconds()
 
-            # Add departure and arrival
             if mode == 'own':
-                out['start'] = {
-                    'position': [
-                        data['Departure']['Site']['Position']['Lat'],
-                        data['Departure']['Site']['Position']['Long'],
-                    ],
-                    'itinisere_id': data['Departure']['Site']['LogicalId'],
-                }
-                out['end'] = {
-                    'position': [
-                        data['Arrival']['Site']['Position']['Lat'],
-                        data['Arrival']['Site']['Position']['Long'],
-                    ],
-                    'itinisere_id': data['Arrival']['Site']['LogicalId'],
-                }
+                # Add departure and arrival
+                out['start'] = _clean_section_site(data['Departure'], first=(position==0))
+                out['end'] = _clean_section_site(data['Arrival'], last=(position==total-1))
+
+                # Add links to display on a map
+                # as a polyline encoded by google algo
+                out['path'] = _clean_polyline(data['pathLinks']['PathLink'])
+
+
             elif mode == 'transport':
+
+                # Use stations from DB
                 out['start'] = _get_object(LineStop, LineStopSerializer, data['Departure']['StopPlace']['id'])
                 out['end'] = _get_object(LineStop, LineStopSerializer, data['Arrival']['StopPlace']['id'])
 
@@ -493,9 +542,11 @@ class Isere(Region):
         out = []
         for i,s in enumerate(solutions):
             solution = _clean_base(s)
+            sections = s['sections']['Section']
+            nb = len(sections)
             steps = [
-                _clean_section(section)
-                for section in s['sections']['Section']
+                _clean_section(section, j, nb)
+                for j, section in enumerate(sections)
             ]
             solution.update({
                 'steps': steps,
