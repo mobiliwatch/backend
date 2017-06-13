@@ -440,7 +440,7 @@ class Isere(Region):
 
             # Extracts all points
             pos = list(map(
-                lambda x : (float(x[0]), float(x[1])),
+                lambda x : (float(x[1]), float(x[0])), # lat lng
                 re.findall('(\d+\.\d+) (\d+\.\d+)', ''.join(geometries))
             ))
 
