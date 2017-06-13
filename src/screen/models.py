@@ -482,5 +482,5 @@ class TwitterWidget(Widget):
         return {
             'mode': self.mode,
             'search_terms': self.search_terms,
-            'tweets': [_serialize(t) for t in tweets][:self.nb_tweets],
+            'tweets': [_serialize(t) for t in tweets[:self.nb_tweets]],
         }
