@@ -422,9 +422,10 @@ class Isere(Region):
             start = datetime.strptime(data['Departure']['Time'], date_fmt)
             end = datetime.strptime(data['Arrival']['Time'], date_fmt)
 
+            diff = end - start
             return {
                 'distance': data.get('Distance'),
-                'duration': end - start,
+                'duration': diff.total_seconds(),
                 'start_time': _timestamp(start),
                 'end_time': _timestamp(end),
             }
@@ -527,7 +528,7 @@ class Isere(Region):
 
             return out
 
-        def _calc_modes(steps):
+        def _calc_modes(steps, total_duration):
             out = {}
             for step in steps:
                 mode = ITI_MODES_STR.get(step['mode'])
@@ -552,6 +553,14 @@ class Isere(Region):
                 if line and line not in out[mode]['lines']:
                     out[mode]['lines'].append(line)
 
+            # Add waiting time
+            out['wait'] = {
+                'mode': 'wait',
+                'lines' : [],
+                'distance': 0,
+                'duration' : max(0, total_duration - sum([m['duration'] for m in out.values()]))
+            }
+
             return out
 
 
@@ -566,7 +575,7 @@ class Isere(Region):
             ]
             solution.update({
                 'steps': steps,
-                'modes': _calc_modes(steps),
+                'modes': _calc_modes(steps, solution['duration']),
             })
             out.append(solution)
 
