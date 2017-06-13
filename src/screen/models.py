@@ -443,6 +443,7 @@ class TwitterWidget(Widget):
     Display a twitter feed on a widget
     """
     mode = models.CharField(max_length=50, choices=TWITTER_MODES, default='timeline')
+    nb_tweets = models.PositiveIntegerField(default=5)
     search_terms = models.CharField(max_length=250, null=True, blank=True)
 
     def build_update(self):
@@ -481,5 +482,5 @@ class TwitterWidget(Widget):
         return {
             'mode': self.mode,
             'search_terms': self.search_terms,
-            'tweets': [_serialize(t) for t in tweets],
+            'tweets': [_serialize(t) for t in tweets][:self.nb_tweets],
         }
