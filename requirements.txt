@@ -28,7 +28,7 @@ python-dateutil==2.6.0
 python-twitter==3.2.1
 pytz==2016.7
 redis==2.10.5
-requests==2.10.0
+requests==2.20.0
 requests-oauthlib==0.8.0
 six==1.10.0
 Twisted==16.5.0
