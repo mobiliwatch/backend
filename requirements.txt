@@ -1,7 +1,7 @@
 arrow==0.10.0
 asgi-redis==0.14.1
 asgiref==0.14.0
-autobahn==0.16.0
+autobahn==20.12.3
 channels==0.17.3
 constantly==15.1.0
 daphne==0.15.0
