@@ -31,6 +31,6 @@ redis==2.10.5
 requests==2.10.0
 requests-oauthlib==0.8.0
 six==1.10.0
-Twisted==16.5.0
+Twisted==22.4.0
 txaio==2.5.1
 zope.interface==4.3.2
